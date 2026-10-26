@@ -1,10 +1,12 @@
 # Fase 7 — Registro de decisiones de arquitectura (ADRs)
 
+> [← Anterior](./06-escenarios.md) · [Índice](./README.md) · [Siguiente →](./08-revision.md)
+
 **Proyecto:** Casino Andino, casino online regulado en Colombia
 **Insumos:**
-- `06-escenarios.md`: el Context de cada ADR es su escenario, copiado tal cual.
-- `05-seleccion-escenarios.md`: criterio de selección.
-- `02-ficha-contexto.md`: restricciones y cifras.
+- [`06-escenarios.md`](./06-escenarios.md): el Context de cada ADR es su escenario, copiado tal cual.
+- [`05-seleccion-escenarios.md`](./05-seleccion-escenarios.md): criterio de selección.
+- [`02-ficha-contexto.md`](./02-ficha-contexto.md): restricciones y cifras.
 
 **Estado de todos los ADR: Propuesto.** Siguiendo el material del curso, cada ADR llega **hasta las opciones consideradas**. Decision y Consequences se escriben en el Bloque 3, cuando contemos con las tácticas para elegir con fundamento.
 
@@ -203,4 +205,8 @@
 1. **Opciones aprobadas.** El equipo no discutió alternativas adicionales.
 2. **Las respuestas "Depende" se mantienen:** se resuelven midiendo en el Bloque 3.
 
-> **Fase 8:** el Context de ADR-03 se actualizó junto con ESC-03 (regla de identificadores repetidos). Ver `08-revision.md`, hallazgo H1.
+> **Fase 8:** el Context de ADR-03 se actualizó junto con ESC-03 (regla de identificadores repetidos). Ver [`08-revision.md`](./08-revision.md), hallazgo H1.
+
+---
+
+> [← Anterior](./06-escenarios.md) · [Índice](./README.md) · [Siguiente →](./08-revision.md)

@@ -1,10 +1,12 @@
 # Fase 4 — Priorización con presupuesto de 18 puntos
 
+> [← Anterior](./03-mapa-tensiones.md) · [Índice](./README.md) · [Siguiente →](./05-seleccion-escenarios.md)
+
 **Proyecto:** Casino Andino, casino online regulado en Colombia
 **Insumos:**
-- `02-ficha-contexto.md`: cifras y supuestos [S#].
-- `03-mapa-tensiones.md`: tensiones T1–T6 y L1–L13.
-- `01-investigacion-dominio.md`: obligaciones [F#] y códigos A1, B3, C6…
+- [`02-ficha-contexto.md`](./02-ficha-contexto.md): cifras y supuestos [S#].
+- [`03-mapa-tensiones.md`](./03-mapa-tensiones.md): tensiones T1–T6 y L1–L13.
+- [`01-investigacion-dominio.md`](./01-investigacion-dominio.md): obligaciones [F#] y códigos A1, B3, C6…
 
 **Reglas del presupuesto (del material del curso):**
 - Cada uno de los 8 atributos de ISO 25010 recibe de 1 a 5 puntos.
@@ -177,3 +179,7 @@ Las dos variantes también suman 18. Cambian qué tensiones quedan críticas.
 
 1. **El equipo adopta la propuesta recomendada:** Seguridad 4, Fiabilidad 4, Desempeño 3, Compatibilidad 3, Adecuación funcional 1, Usabilidad 1, Mantenibilidad 1, Portabilidad 1.
 2. **Mantenibilidad en 1 se mantiene, con el riesgo asumido explícitamente.** El equipo acepta el costo de la regulación cambiante y se apoya en una seguridad fuerte: un sistema con controles sólidos tiene más probabilidad de seguir cumpliendo cuando cambian las reglas, aunque cambiarlo cueste más.
+
+---
+
+> [← Anterior](./03-mapa-tensiones.md) · [Índice](./README.md) · [Siguiente →](./05-seleccion-escenarios.md)

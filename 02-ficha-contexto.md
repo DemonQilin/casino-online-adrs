@@ -1,8 +1,10 @@
 # Fase 2 — Ficha de contexto
 
+> [← Anterior](./01-investigacion-dominio.md) · [Índice](./README.md) · [Siguiente →](./03-mapa-tensiones.md)
+
 **Proyecto:** casino online de juegos de azar regulado en Colombia
 **Nombre de trabajo:** *Casino Andino* (operador ficticio)
-**Insumo:** `01-investigacion-dominio.md` (las referencias [F#] remiten a sus fuentes)
+**Insumo:** [`01-investigacion-dominio.md`](./01-investigacion-dominio.md) (las referencias [F#] remiten a sus fuentes)
 **Horizonte de diseño:** año 3 de operación
 
 **Convenciones:**
@@ -262,3 +264,7 @@ Estas condiciones no son negociables y valen para cualquier diseño.
 5. **Métricas del SARLAFT (S18–S21).** Reconsulta de la base en ≤ 6 h, ~2 % de retiros con diligencia reforzada y resolución en ≤ 48 h.
 
 > **Estado:** el equipo validó todas las métricas, incluidas las del SARLAFT (punto 5), el 25 de octubre de 2026. **Fase cerrada.**
+
+---
+
+> [← Anterior](./01-investigacion-dominio.md) · [Índice](./README.md) · [Siguiente →](./03-mapa-tensiones.md)

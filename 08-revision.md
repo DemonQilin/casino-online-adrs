@@ -1,5 +1,7 @@
 # Fase 8 — Revisión integral
 
+> [← Anterior](./07-adrs.md) · [Índice](./README.md)
+
 **Proyecto:** Casino Andino, casino online regulado en Colombia
 **Documentos revisados:** `00` a `07`
 **Fecha:** 26 de octubre de 2026
@@ -115,3 +117,7 @@ El plan pide una lectura de alguien que no haya participado en la redacción. Pr
 1. **H1 confirmado por el equipo:** queda la nueva redacción de ESC-03 y del Context de ADR-03.
 2. **Revisión en frío pendiente:** el equipo designará más adelante a un compañero que no haya redactado (sección 5).
 3. **Estado:** fases 1 a 8 cerradas, salvo la revisión en frío. La **fase 9 (integración** en HTML interactivo o en presentación) arranca cuando el equipo lo decida.
+
+---
+
+> [← Anterior](./07-adrs.md) · [Índice](./README.md)

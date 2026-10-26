@@ -1,10 +1,12 @@
 # Fase 5 — Selección de escenarios
 
+> [← Anterior](./04-priorizacion.md) · [Índice](./README.md) · [Siguiente →](./06-escenarios.md)
+
 **Proyecto:** Casino Andino, casino online regulado en Colombia
 **Insumos:**
-- `04-priorizacion.md`: priorización adoptada.
-- `03-mapa-tensiones.md`: tensiones T1–T6 y L1.
-- `02-ficha-contexto.md`: cifras y restricciones.
+- [`04-priorizacion.md`](./04-priorizacion.md): priorización adoptada.
+- [`03-mapa-tensiones.md`](./03-mapa-tensiones.md): tensiones T1–T6 y L1.
+- [`02-ficha-contexto.md`](./02-ficha-contexto.md): cifras y restricciones.
 
 **Priorización adoptada:**
 
@@ -109,3 +111,7 @@ Si el equipo quiere mostrar un segundo ejemplo de escenario no crítico, se pued
 
 1. **Aprobado:** 4 escenarios, 3 de ellos críticos (3 ADRs). Se descarta la variante de 5.
 2. **Aprobado:** el fallo cerrado entra como restricción en el Context de ADR-01 y no tiene ADR propio.
+
+---
+
+> [← Anterior](./04-priorizacion.md) · [Índice](./README.md) · [Siguiente →](./06-escenarios.md)

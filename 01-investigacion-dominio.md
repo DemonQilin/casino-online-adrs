@@ -1,5 +1,7 @@
 # Fase 1 — Investigación del dominio
 
+> [← Anterior](./00-plan-de-trabajo.md) · [Índice](./README.md) · [Siguiente →](./02-ficha-contexto.md)
+
 **Proyecto:** casino online de juegos de azar regulado en Colombia (sin apuestas deportivas)
 **Fecha de corte de la investigación:** 25 de octubre de 2026
 **Propósito:** reunir hechos verificables para que la ficha de contexto (fase 2) no invente nada.
@@ -319,3 +321,7 @@ Esto es un adelanto para la fase 3, sin soluciones.
 - **[F31]** Blask, "Colombia: deposit tax returns, opening doors for offshore" (2026). https://blask.com/newsroom/colombia-deposit-tax-returns-opening-doors-for-offshore/
 - **[F32]** MercoPress, "How Live Dealer Casino Games Actually Work" (sept. 2026). https://en.mercopress.com/2026/09/01/how-live-dealer-casino-games-actually-work-at-olimp
 - **[F33]** Focus Gaming News, "Coljuegos y la Superintendencia Financiera de Colombia buscan facilitar el acceso de operadores de juego al sistema bancario". https://focusgn.com/latinoamerica/coljuegos-y-la-superintendencia-financiera-de-colombia-buscan-facilitar-el-acceso-de-operadores-de-juego-al-sistema-bancario
+
+---
+
+> [← Anterior](./00-plan-de-trabajo.md) · [Índice](./README.md) · [Siguiente →](./02-ficha-contexto.md)

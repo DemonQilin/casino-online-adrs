@@ -1,11 +1,13 @@
 # Fase 6 — Escenarios de calidad
 
+> [← Anterior](./05-seleccion-escenarios.md) · [Índice](./README.md) · [Siguiente →](./07-adrs.md)
+
 **Proyecto:** Casino Andino, casino online regulado en Colombia
 **Insumos:**
-- `05-seleccion-escenarios.md`: selección aprobada.
-- `04-priorizacion.md`: puntajes.
-- `03-mapa-tensiones.md`: tensiones.
-- `02-ficha-contexto.md`: cifras.
+- [`05-seleccion-escenarios.md`](./05-seleccion-escenarios.md): selección aprobada.
+- [`04-priorizacion.md`](./04-priorizacion.md): puntajes.
+- [`03-mapa-tensiones.md`](./03-mapa-tensiones.md): tensiones.
+- [`02-ficha-contexto.md`](./02-ficha-contexto.md): cifras.
 
 **Formato:** cada escenario tiene el atributo y sus seis partes (fuente, estímulo, artefacto, entorno, respuesta y medida de la respuesta). Ese bloque de 7 filas es el que pasa **tal cual** al Context de su ADR en la fase 7. Debajo de cada escenario hay notas de apoyo que **no** forman parte del escenario.
 
@@ -160,3 +162,7 @@ Revisión según el Constructor y la Clínica del taller GPSMetro.
 
 1. **Textos aprobados.** Pasan tal cual al Context de los ADR.
 2. **S22 aprobado** y agregado a la ficha (§4.3 y supuestos).
+
+---
+
+> [← Anterior](./05-seleccion-escenarios.md) · [Índice](./README.md) · [Siguiente →](./07-adrs.md)

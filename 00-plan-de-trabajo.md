@@ -1,5 +1,7 @@
 # Plan de trabajo — Casino online regulado en Colombia
 
+> [Índice](./README.md) · [Siguiente →](./01-investigacion-dominio.md)
+
 **Materia:** Arquitectura de Software · Bloque 2 (atributos de calidad, escenarios y ADR)
 **Sistema hipotético:** casino online de juegos de azar (tragamonedas, ruleta con generador de números aleatorios, blackjack en vivo y un juego *crash*), operado bajo la regulación colombiana. **No incluye apuestas deportivas.**
 **Entrega:** en equipo. Juan comparte con el equipo lo que se define en cada fase.
@@ -33,14 +35,14 @@ El número de ADRs no está fijado: es igual al número de escenarios que result
 
 | Fase | Entregable | Alimenta (rúbrica / puerta de revisión) | Punto de control |
 |------|-----------|------------------------------------------|------------------|
-| 1. Investigación del dominio | `01-investigacion-dominio.md` | Base factual de la ficha | Confirmar alcance de juegos |
-| 2. Ficha de contexto | `02-ficha-contexto.md` | Ficha de contexto · puerta 1 | Validar cifras y supuestos |
-| 3. Mapa de tensiones | `03-mapa-tensiones.md` | Puerta 2 y 3 | Validar pares en tensión |
-| 4. Priorización (18 puntos) | `04-priorizacion.md` | Priorización · puerta 4 | **Decisión del equipo** |
-| 5. Selección de escenarios | `05-seleccion-escenarios.md` | Selección de escenarios críticos | **Decisión del equipo** |
-| 6. Redacción de escenarios | `06-escenarios.md` | Estímulo y entorno · Respuesta · Medida · Coherencia | Validar escenarios |
-| 7. ADRs hasta opciones | `07-adrs.md` | ADR: contexto y estado · ADR: opciones y trade-offs | Validar opciones |
-| 8. Revisión integral | `08-revision.md` | Los 9 criterios | Aprobación final |
+| 1. Investigación del dominio | [`01-investigacion-dominio.md`](./01-investigacion-dominio.md) | Base factual de la ficha | Confirmar alcance de juegos |
+| 2. Ficha de contexto | [`02-ficha-contexto.md`](./02-ficha-contexto.md) | Ficha de contexto · puerta 1 | Validar cifras y supuestos |
+| 3. Mapa de tensiones | [`03-mapa-tensiones.md`](./03-mapa-tensiones.md) | Puerta 2 y 3 | Validar pares en tensión |
+| 4. Priorización (18 puntos) | [`04-priorizacion.md`](./04-priorizacion.md) | Priorización · puerta 4 | **Decisión del equipo** |
+| 5. Selección de escenarios | [`05-seleccion-escenarios.md`](./05-seleccion-escenarios.md) | Selección de escenarios críticos | **Decisión del equipo** |
+| 6. Redacción de escenarios | [`06-escenarios.md`](./06-escenarios.md) | Estímulo y entorno · Respuesta · Medida · Coherencia | Validar escenarios |
+| 7. ADRs hasta opciones | [`07-adrs.md`](./07-adrs.md) | ADR: contexto y estado · ADR: opciones y trade-offs | Validar opciones |
+| 8. Revisión integral | [`08-revision.md`](./08-revision.md) | Los 9 criterios | Aprobación final |
 
 ---
 
@@ -56,7 +58,7 @@ El número de ADRs no está fijado: es igual al número de escenarios que result
 | 1.2 Modelo operativo | Describir actores (jugador, operador, proveedores de juegos, agregadores, pasarelas de pago, regulador, laboratorio certificador) y flujos principales (registro y verificación de identidad, depósito, jugada y resultado, retiro). Se describen **flujos, no arquitectura**. | Lista de actores y flujos |
 | 1.3 Cifras de referencia | Buscar datos para dimensionar: tamaño del mercado online colombiano, usuarios, patrones de pico (noches, fines de semana, quincenas), exigencias del juego en vivo. | Tabla de cifras, cada una con fuente o marcada como estimación |
 
-**Entregable:** `01-investigacion-dominio.md`, con lista de fuentes.
+**Entregable:** [`01-investigacion-dominio.md`](./01-investigacion-dominio.md), con lista de fuentes.
 
 **Terminado cuando:**
 - cada obligación regulatoria tiene fuente;
@@ -77,7 +79,7 @@ El número de ADRs no está fijado: es igual al número de escenarios que result
 | 2.3 Requisitos no funcionales | Tabla con cifras de usuarios registrados y concurrentes, picos, disponibilidad esperada, tiempos de respuesta del juego, volumen de transacciones, retención de datos, regulación, presupuesto, tamaño del equipo y restricciones. |
 | 2.4 Supuestos | Lista de los números que no vienen de una fuente, con la razón de cada uno. |
 
-**Entregable:** `02-ficha-contexto.md`
+**Entregable:** [`02-ficha-contexto.md`](./02-ficha-contexto.md)
 
 **Terminado cuando:**
 - pasa la prueba "alguien externo puede puntuar sin inventar";
@@ -96,7 +98,7 @@ El número de ADRs no está fijado: es igual al número de escenarios que result
 | 3.1 Recorrido de pares | Partir de la pestaña Tensiones del widget de ISO 25010 y revisar los 28 pares posibles. Se conservan solo los que tienen una situación concreta en el casino. |
 | 3.2 Ficha por par | Para cada par conservado: la situación del casino, el tipo (tensión fuerte, tensión leve o sinergia) y quién pierde si se prioriza el otro atributo. |
 
-**Entregable:** `03-mapa-tensiones.md`, con una matriz resumen y una ficha por par.
+**Entregable:** [`03-mapa-tensiones.md`](./03-mapa-tensiones.md), con una matriz resumen y una ficha por par.
 
 **Terminado cuando:**
 - hay al menos tres atributos en tensión real (puerta 2);
@@ -115,7 +117,7 @@ El número de ADRs no está fijado: es igual al número de escenarios que result
 | 4.3 Costo explícito | Una sección "Lo que nos costó": qué se bajó para poder subir qué. |
 | 4.4 Verificación | Revisión aritmética de la suma y los límites. |
 
-**Entregable:** `04-priorizacion.md`
+**Entregable:** [`04-priorizacion.md`](./04-priorizacion.md)
 
 **Terminado cuando:**
 - se cumple la puerta 4 (respeta los 18 puntos y obligó a bajar algún atributo);
@@ -135,7 +137,7 @@ El número de ADRs no está fijado: es igual al número de escenarios que result
 | 5.2 Prueba de criticidad | Hacer a cada candidato las dos preguntas del material: ¿su atributo dominante está entre los más altos? ¿Cumplirlo cuesta otro atributo también alto? |
 | 5.3 Selección | Elegir de 3 a 5 escenarios y marcar cuáles son críticos. Escribir una línea que justifique la selección. |
 
-**Entregable:** `05-seleccion-escenarios.md`
+**Entregable:** [`05-seleccion-escenarios.md`](./05-seleccion-escenarios.md)
 
 **Decisión del equipo:** cuántos escenarios y cuántos críticos. Orientación: 4 o 5 escenarios, de los cuales 3 o 4 son críticos. Incluir algún escenario no crítico ayuda a demostrar el criterio de selección, porque escribir un ADR para todos es el nivel Inicial de la rúbrica.
 
@@ -160,7 +162,7 @@ El número de ADRs no está fijado: es igual al número de escenarios que result
 
 **Tarea 6.3 — Trazabilidad.** Para cada escenario, indicar de qué puntaje de la priorización sale y qué atributo paga el costo.
 
-**Entregable:** `06-escenarios.md`
+**Entregable:** [`06-escenarios.md`](./06-escenarios.md)
 
 **Terminado cuando:**
 - todos los escenarios pasan la lista de chequeo;
@@ -178,7 +180,7 @@ El número de ADRs no está fijado: es igual al número de escenarios que result
 | 7.2 Opciones | Plantear al menos 2 opciones (idealmente 3), descritas como mecanismos y sin nombres de tácticas ni marcas. Tabla por opción: qué gana, qué paga, atributo sacrificado y si cumple la medida de la respuesta. |
 | 7.3 Armado del ADR | Título numerado que nombra la decisión, estado **Propuesto**, Context igual al escenario copiado tal cual, opciones y nota de pendientes. |
 
-**Entregable:** `07-adrs.md`, con una sección por ADR (ADR-01, ADR-02, …).
+**Entregable:** [`07-adrs.md`](./07-adrs.md), con una sección por ADR (ADR-01, ADR-02, …).
 
 **Terminado cuando:**
 - no hay Decision ni Consequences escritas;
@@ -196,7 +198,7 @@ El número de ADRs no está fijado: es igual al número de escenarios que result
 | 8.2 Coherencia en cadena | Verificar que las cifras y los nombres son consistentes de la ficha a la priorización, a los escenarios y a los ADRs. |
 | 8.3 Revisión en frío | Pedir una lectura a alguien que no haya participado en la redacción: un compañero del equipo o una revisión independiente. |
 
-**Entregable:** `08-revision.md`, con hallazgos y correcciones aplicadas.
+**Entregable:** [`08-revision.md`](./08-revision.md), con hallazgos y correcciones aplicadas.
 
 ---
 
@@ -232,3 +234,7 @@ Convertir los archivos markdown en el formato final (HTML interactivo o presenta
 | Colar soluciones antes de tiempo (fases 2 a 6) | Lista de chequeo de la fase 6 y regla de oro del taller. |
 | Ampliar el alcance hacia apuestas deportivas | Exclusión explícita en la ficha. |
 | Inconsistencias entre archivos | Revisión en cadena de la fase 8. |
+
+---
+
+> [Índice](./README.md) · [Siguiente →](./01-investigacion-dominio.md)

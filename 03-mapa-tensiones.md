@@ -1,9 +1,11 @@
 # Fase 3 — Mapa de tensiones
 
+> [← Anterior](./02-ficha-contexto.md) · [Índice](./README.md) · [Siguiente →](./04-priorizacion.md)
+
 **Proyecto:** Casino Andino, casino online regulado en Colombia
 **Insumos:**
-- `02-ficha-contexto.md`: las cifras citadas salen de ahí; [S#] son sus supuestos.
-- `01-investigacion-dominio.md`: las referencias [F#] y los códigos de obligación (A1, B3, C6…) remiten a su sección 1.2.
+- [`02-ficha-contexto.md`](./02-ficha-contexto.md): las cifras citadas salen de ahí; [S#] son sus supuestos.
+- [`01-investigacion-dominio.md`](./01-investigacion-dominio.md): las referencias [F#] y los códigos de obligación (A1, B3, C6…) remiten a su sección 1.2.
 - La pestaña **Tensiones** del widget de ISO 25010 del curso, como punto de partida.
 
 **Método:**
@@ -227,3 +229,7 @@ La priorización con 18 puntos deberá decidir cuáles de **Seguridad, Desempeñ
    - Razón: legalmente es más grave pagar dinero proveniente de lavado de activos que demorar un retiro.
    - El criterio quedó registrado en la ficha (§4.4 y restricción 9).
 2. **La presentación se enfocará en las tensiones fuertes.** La inversión de sinergias (L2, L3) queda solo como dato del mapa y no se presenta como hallazgo.
+
+---
+
+> [← Anterior](./02-ficha-contexto.md) · [Índice](./README.md) · [Siguiente →](./04-priorizacion.md)
