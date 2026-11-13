@@ -1,42 +1,31 @@
-# Fase 7 — Registro de decisiones de arquitectura (ADRs)
+# Fase 6 — Escenarios de calidad
 
 **Proyecto:** Casino Andino, casino online regulado en Colombia
 **Insumos:**
-- `06-escenarios.md`: el Context de cada ADR es su escenario, copiado tal cual.
-- `05-seleccion-escenarios.md`: criterio de selección.
-- `02-ficha-contexto.md`: restricciones y cifras.
+- `05-seleccion-escenarios.md`: selección aprobada.
+- `04-priorizacion.md`: puntajes.
+- `03-mapa-tensiones.md`: tensiones.
+- `02-ficha-contexto.md`: cifras.
 
-**Estado de todos los ADR: Propuesto.** Siguiendo el material del curso, cada ADR llega **hasta las opciones consideradas**. Decision y Consequences se escriben en el Bloque 3, cuando contemos con las tácticas para elegir con fundamento.
+**Formato:** cada escenario tiene el atributo y sus seis partes (fuente, estímulo, artefacto, entorno, respuesta y medida de la respuesta). Ese bloque de 7 filas es el que pasa **tal cual** al Context de su ADR en la fase 7. Debajo de cada escenario hay notas de apoyo que **no** forman parte del escenario.
 
-**Convenciones para las opciones:**
-- Se describen como **mecanismos del sistema**, sin nombres de tácticas ni marcas.
-- Cada opción indica qué gana, qué paga, qué atributo sacrifica y si cumple la medida de la respuesta.
-- La medida de la respuesta del escenario es el criterio para compararlas.
+**Regla de esta fase:** ninguna respuesta nombra tácticas ni tecnologías. Se describe lo que se observa desde afuera.
 
 ---
 
-## Selección de los ADR
+## Resumen
 
-> Hay un ADR por cada escenario crítico: ESC-01, ESC-02, ESC-03 y ESC-05. Son las únicas tensiones fuertes entre dos atributos priorizados altos (T1 Seguridad × Desempeño, T2 Fiabilidad × Desempeño, T3 Compatibilidad × Fiabilidad y T7 Seguridad × Compatibilidad). ESC-04 no lleva ADR porque su costo cae en un atributo priorizado bajo (Adecuación funcional, 1).
-
-| ADR | Escenario | Atributo dominante | Atributo que paga |
-|-----|-----------|--------------------|-------------------|
-| ADR-01 | ESC-01 | Seguridad (4) | Desempeño (3) |
-| ADR-02 | ESC-02 | Fiabilidad (4) | Desempeño (3) |
-| ADR-03 | ESC-03 | Compatibilidad (3) | Fiabilidad (4) |
-| ADR-04 | ESC-05 | Seguridad (4) | Compatibilidad (3) |
+| ID | Atributo dominante (puntaje) | Paga | Tensión | ¿Crítico? | ADR |
+|----|------------------------------|------|---------|:---------:|-----|
+| ESC-01 | Seguridad (4) | Desempeño (3) | T1 | ✔ | ADR-01 |
+| ESC-02 | Fiabilidad (4) | Desempeño (3) | T2 | ✔ | ADR-02 |
+| ESC-03 | Compatibilidad (3) | Fiabilidad (4) | T3 | ✔ | ADR-03 |
+| ESC-04 | Eficiencia de desempeño (3) | Adecuación funcional (1) | T6 | ✘ | — |
+| ESC-05 | Seguridad (4) | Compatibilidad (3) | T7 | ✔ | ADR-04 |
 
 ---
 
-# ADR-01: Evaluación de los retiros contra listas restrictivas recién recibidas
-
-### Estado
-
-**Propuesto.** Pasa a Aceptado en el Bloque 3, cuando se complete la Decision.
-
-### Context
-
-*El escenario ESC-01, tal cual.*
+## ESC-01 · Retiro de un jugador incluido en una lista recién recibida
 
 | Parte | Contenido |
 |-------|-----------|
@@ -48,45 +37,18 @@
 | **Respuesta** | Evalúa el retiro contra la versión de la lista recién recibida, aunque la cuenta no haya sido reconsultada todavía. Si el jugador está en la lista: no paga el retiro, suspende la cuenta por precaución, alerta al oficial de cumplimiento, deja el caso listo para el reporte a la UIAF y le muestra al jugador el retiro "en revisión", sin revelarle el motivo. Si el jugador no está en la lista y su riesgo es normal: el retiro sigue su curso habitual. El juego y los depósitos de los demás jugadores siguen operando |
 | **Medida de la respuesta** | **0 retiros pagados** a personas incluidas en una lista ya recibida, verificado cruzando pagos y listas por marca de tiempo. Evaluación del retiro en **p95 ≤ 1 s**, también durante la reconsulta. Alerta al oficial de cumplimiento en **≤ 15 min**. Durante la reconsulta, las operaciones de saldo del juego se mantienen en **p99 ≤ 250 ms**. Reconsulta completa en **≤ 6 h**. Los retiros de riesgo normal mantienen la orden de transferencia en **≤ 24 h** |
 
-**Restricciones del proyecto que también fuerzan esta decisión:**
-- **Fallo cerrado (ficha, restricción 9):** si la evaluación de riesgo o la consulta de listas no están disponibles, los retiros se detienen. Legalmente es más grave pagar dinero de lavado que demorar un retiro. El plazo máximo sigue siendo de 72 h para la orden de transferencia [F1].
-- SARLAFT, cumpliendo los mínimos del SIPLAFT [F9]; ~3.000 retiros al día (S8); las listas cambian varias veces al mes (S19).
+**Casos que distingue la respuesta:**
+- persona en la lista recibida → retiro retenido, cuenta suspendida, alerta;
+- persona fuera de la lista y de riesgo normal → retiro normal;
+- el resto de jugadores → sin afectación.
 
-### Opciones consideradas
+**Por qué es crítico (T1):** la Seguridad (4) exige evaluar contra la lista más reciente en el camino de cada retiro, mientras una reconsulta masiva consume recursos en pleno pico. Cumplirlo presiona el Desempeño (3): la evaluación del retiro y las operaciones de saldo del juego deben mantener sus tiempos.
 
-**A · Retener los retiros hasta que termine la reconsulta.** Mientras corre la reconsulta masiva, toda solicitud de retiro queda en espera. Al terminar la reconsulta, cada retiro se evalúa con todas las cuentas ya marcadas.
-
-**B · Consultar al proveedor de listas en cada retiro.** Cada solicitud de retiro dispara, en ese momento, una consulta individual al proveedor externo de listas por el documento del jugador. La reconsulta masiva sigue por su lado.
-
-**C · Lista vigente consultable por el operador, independiente de la reconsulta.** Al recibir la actualización, el operador guarda la lista nueva en un registro propio de documentos listados, consultable por documento. Cada retiro se evalúa contra ese registro desde el primer minuto. La reconsulta masiva de cuentas avanza aparte, con un ritmo máximo para no competir con el juego, y debe cumplir las 6 h (al menos ~16 cuentas por segundo).
-
-| Opción | Gana | Paga | Atributo sacrificado | ¿Cumple la medida? |
-|--------|------|------|----------------------|--------------------|
-| A · Retener hasta terminar la reconsulta | Es la más simple: ningún retiro se evalúa con una lista incompleta | Los retiros de riesgo normal esperan hasta 6 h para ser evaluados, sin culpa del jugador | Desempeño (comportamiento temporal); de paso, Usabilidad | **No**: incumple la evaluación en p95 ≤ 1 s |
-| B · Consultar al proveedor en cada retiro | Cada retiro ve la lista más reciente del proveedor, sin depender de la reconsulta | Cada retiro depende de la latencia y la disponibilidad de un tercero. Con fallo cerrado, una caída del proveedor **detiene todos los retiros** | Fiabilidad (disponibilidad de los retiros) y Compatibilidad (dependencia externa en el camino crítico) | **Depende**: hay que medir la latencia del proveedor (¿p95 ≤ 1 s?) y su disponibilidad |
-| C · Lista vigente propia, separada de la reconsulta | Evaluación en tiempo constante contra la lista más reciente desde el minuto 0. La reconsulta no compite con el juego gracias a su ritmo máximo | Almacenamiento adicional y dos procesos que mantener coherentes (lista vigente y reconsulta). La reconsulta tarda más por su ritmo limitado | Mantenibilidad; Desempeño (utilización de recursos) | **Sí**, si la lista nueva se carga en pocos minutos y el ritmo de la reconsulta (≥ 16 cuentas/s) cabe sin afectar el p99 ≤ 250 ms del juego |
-
-### Pendiente para el Bloque 3
-
-- **Decision:** abierta. No elegimos todavía.
-- **Para decidir con fundamento hace falta:**
-  - saber cuánto tarda cargar una lista nueva en la opción C;
-  - la latencia y la disponibilidad reales del proveedor de listas (opción B);
-  - verificar que las 6 h de la reconsulta caben dentro del ritmo máximo.
-- **Familias de tácticas por revisar:** *Detectar ataques* y *Resistir ataques* (Seguridad), y *Controlar la demanda de recursos* (Desempeño).
-- **Consequences:** se escriben al decidir: qué se gana, qué se paga y qué queda sin resolver. Por ejemplo, el manejo de coincidencias parciales de nombre (homonimia).
+**Trazabilidad:** ficha §4.2, §4.4, S18–S21; restricción 9 (fallo cerrado, que irá al Context de ADR-01); investigación §1.3 y obligación C4.
 
 ---
 
-# ADR-02: Permanencia de las operaciones de saldo confirmadas ante la caída de un servidor
-
-### Estado
-
-**Propuesto.** Pasa a Aceptado en el Bloque 3, cuando se complete la Decision.
-
-### Context
-
-*El escenario ESC-02, tal cual.*
+## ESC-02 · Caída del servidor de saldo en pleno pico
 
 | Parte | Contenido |
 |-------|-----------|
@@ -98,47 +60,18 @@
 | **Respuesta** | Conserva todas las operaciones que ya había confirmado a los proveedores. Las operaciones que estaban en curso sin confirmar quedan sin efecto sobre el saldo, de forma que el proveedor y el operador terminen con el mismo saldo. Avisa a los jugadores afectados que el juego no está disponible. Restablece el juego y el saldo. Al reconectarse, cada jugador ve el resultado de la jugada que quedó incompleta. Registra el inicio, la duración y los servicios afectados, e informa a Coljuegos |
 | **Medida de la respuesta** | **0 operaciones confirmadas perdidas**, verificado por la conciliación operador–proveedores posterior al evento. **0 saldos negativos.** Juego y saldo restablecidos en **≤ 15 min**. **100 %** de las jugadas incompletas con su resultado visible al reconectarse. Aviso a Coljuegos en **≤ 30 min**. A los **5 min** del restablecimiento, las operaciones de saldo vuelven a **p99 ≤ 250 ms** |
 
-**Restricciones del proyecto que también fuerzan esta decisión:**
-- **Sistema alterno** con la misma certificación que el principal; todo cambio en el principal se replica de inmediato en el alterno (E1) [F1].
-- Centro de datos Tier III como mínimo (A1); copias en un sitio físicamente separado (E5) [F1].
-- Saldo nunca negativo (C6); toda jugada debe poder reconstruirse (C11) [F1].
-- Los proveedores dan por fallida una operación sin respuesta en ~3 s y la revierten por su cuenta (S14, F24).
+**Casos que distingue la respuesta:**
+- operación ya confirmada → se conserva;
+- operación en curso sin confirmar → sin efecto, con ambos saldos coincidiendo;
+- jugada incompleta → resultado visible al volver.
 
-### Opciones consideradas
+**Por qué es crítico (T2):** la Fiabilidad (4) exige que ninguna de las ~3.000 operaciones por segundo que se confirmaron se pierda en la caída. Esa garantía tiene que cumplirse **sin que la confirmación supere p99 ≤ 250 ms** en el pico, y por eso presiona el Desempeño (3).
 
-**A · Confirmar solo después de escribir en dos sitios físicos.** El operador responde al proveedor únicamente cuando la operación quedó grabada de forma permanente en el servidor principal **y** en una segunda ubicación física independiente, como el sistema alterno.
-
-**B · Confirmar tras la grabación local y copiar después.** El operador responde en cuanto la operación queda grabada de forma permanente en el servidor principal. La copia a la segunda ubicación se hace a continuación, segundos después.
-
-**C · Libreta de operaciones de solo agregar, confirmada por mayoría.** Cada operación se anota primero, en orden, en una libreta a la que solo se le agregan entradas, y que mantienen tres servidores del mismo centro de datos. El operador responde al proveedor cuando al menos dos de los tres la tienen grabada. El saldo de cada jugador se calcula desde esa libreta. El sistema alterno recibe la libreta aparte.
-
-| Opción | Gana | Paga | Atributo sacrificado | ¿Cumple la medida? |
-|--------|------|------|----------------------|--------------------|
-| A · Dos sitios antes de confirmar | Cero pérdida incluso si se pierde todo el sitio principal | Cada una de las ~3.000 operaciones por segundo espera el viaje de red hasta el otro sitio. Si el segundo sitio no responde, el juego se detiene o hay que relajar la garantía | Desempeño (comportamiento temporal) y Fiabilidad (disponibilidad, por depender de dos sitios) | **Depende**: la pérdida cero se cumple, pero el p99 ≤ 250 ms depende de la distancia al segundo sitio. Hay que medirlo |
-| B · Grabación local y copia posterior | La respuesta más rápida; el viaje al segundo sitio no está en el camino de la jugada | Si el servidor falla antes de copiar, se pierden las últimas operaciones ya confirmadas (una ventana de segundos) | Fiabilidad (integridad y recuperación) | **No**: deja una ventana de pérdida, y la medida exige 0 operaciones confirmadas perdidas |
-| C · Libreta confirmada por mayoría | Tolera la caída de un servidor completo sin perder lo confirmado y sin esperar al más lento. La libreta permite reconstruir saldos y jugadas, como exige el reglamento | Más infraestructura (tres servidores), mayor complejidad de operación y de recertificación, y un viaje de red dentro del centro de datos en cada operación | Mantenibilidad; Desempeño (utilización de recursos) | **Sí**, si la mayoría se obtiene dentro de p99 ≤ 250 ms con los tres servidores en el mismo centro de datos. Hay que medirlo |
-
-### Pendiente para el Bloque 3
-
-- **Decision:** abierta. No elegimos todavía.
-- **Para decidir con fundamento hace falta:**
-  - la latencia de red real entre los sitios (opción A) y dentro del centro de datos (opción C), bajo ~3.000 operaciones por segundo;
-  - el costo de la infraestructura adicional frente al presupuesto (~15 % del GGR).
-- **Familias de tácticas por revisar:** *Detectar fallas*, *Recuperarse de fallas* y *Prevenir fallas* (Fiabilidad), y *Gestionar los recursos* (Desempeño).
-- **Pregunta abierta:** cómo se mantiene el sistema alterno al día "de inmediato" (E1) sin que eso entre al camino de cada jugada.
-- **Consequences:** se escriben al decidir.
+**Trazabilidad:** ficha §4.2, §4.3, S6, S13, S14; investigación C6, D6, E1–E5. El aviso a Coljuegos en ≤ 30 min concreta el "de inmediato" del reglamento **[nuevo supuesto S22]**. La vuelta a p99 ≤ 250 ms en 5 min se respalda con S24 (agregado en la fase 8).
 
 ---
 
-# ADR-03: Tratamiento de las peticiones de saldo repetidas de los proveedores de juego
-
-### Estado
-
-**Propuesto.** Pasa a Aceptado en el Bloque 3, cuando se complete la Decision.
-
-### Context
-
-*El escenario ESC-03, tal cual.*
+## ESC-03 · El proveedor del *crash* envía tres veces el mismo abono
 
 | Parte | Contenido |
 |-------|-----------|
@@ -150,50 +83,37 @@
 | **Respuesta** | Abona los COP 50.000 una sola vez. A la segunda y a la tercera petición les responde con el mismo resultado y el mismo saldo que a la primera. Si llegara una petición del mismo proveedor, para el mismo jugador y con el mismo identificador, pero con datos distintos (otro monto u otro tipo de operación), la rechaza y genera una alerta. Registra cada petición recibida para la conciliación con el proveedor. Reporta la transacción una sola vez al sistema de inspección de Coljuegos |
 | **Medida de la respuesta** | **0 abonos duplicados.** **100 %** de las peticiones repetidas reciben una respuesta idéntica a la original, en **p99 ≤ 250 ms**. **0 diferencias** en la conciliación diaria de saldos operador–proveedor. **0 transacciones duplicadas** en el reporte a Coljuegos. **100 %** de las peticiones que repiten proveedor, jugador e identificador con datos distintos rechazadas, con alerta en **≤ 5 min** |
 
-**Restricciones del proyecto que también fuerzan esta decisión:**
-- Los identificadores de transacción con proveedores se conservan **≥ 4 meses** para conciliación (ficha §4.5, F24).
-- El alcance de unicidad del identificador lo define cada proveedor: en algunos protocolos es único solo por jugador, y dos jugadores pueden compartir el mismo identificador (F26). Una petición repetida se reconoce por la combinación de proveedor, jugador e identificador.
-- Registros de toda operación del jugador con ≥ 6 meses disponibles (C11) [F1].
-- Un proveedor nuevo sobre otra plataforma obliga a recertificar la integración (B4) [F1]; se suman 1 o 2 proveedores al año (S11).
-- Volumen: ~24 millones de operaciones de saldo al día (ficha §4.5).
+**Casos que distingue la respuesta:**
+- petición nueva → se aplica;
+- petición repetida idéntica → misma respuesta, sin volver a aplicarse;
+- mismo proveedor, jugador e identificador con datos distintos → se rechaza y genera alerta;
+- mismo identificador para otro jugador → es una operación nueva, porque algunos proveedores solo garantizan identificadores únicos por jugador [F26].
 
-### Opciones consideradas
+**Por qué es crítico (T3):** la Compatibilidad (3) exige aceptar el protocolo de cada proveedor tal como viene, con sus repeticiones, sus reversiones y sus tiempos de espera. Cada variante es una forma de descontar o abonar dos veces, así que cumplirla presiona la Fiabilidad (4) del saldo.
 
-**A · Buscar el identificador en el historial de operaciones.** Ante cada petición, se busca en el historial completo de operaciones del jugador si ese identificador ya se aplicó. Si aparece, se reconstruye la respuesta; si no, se aplica la operación.
-
-**B · Registro de identificadores procesados, guardado junto con el cambio de saldo.** Al llegar una petición, el operador anota la combinación de proveedor, jugador e identificador, junto con la respuesta que dio, **en el mismo paso indivisible** en que modifica el saldo. Si el identificador ya estaba anotado, devuelve la respuesta guardada sin tocar el saldo. Si estaba anotado con datos distintos, rechaza y alerta. Las anotaciones se conservan durante el periodo de conciliación (≥ 4 meses).
-
-**C · Una pieza de traducción por proveedor que descarta repetidos antes de llegar al saldo.** Cada proveedor tiene su propia pieza que lleva su protocolo al modelo del operador y descarta las peticiones repetidas que recuerda de las últimas 24 horas. Al saldo solo le llegan operaciones nuevas.
-
-| Opción | Gana | Paga | Atributo sacrificado | ¿Cumple la medida? |
-|--------|------|------|----------------------|--------------------|
-| A · Buscar en el historial | No añade estado nuevo: usa el historial que ya existe por obligación | El tiempo de búsqueda crece con el historial (~24 M de operaciones al día). Dos copias que llegan al mismo tiempo pueden pasar ambas la búsqueda antes de que alguna quede registrada, y aplicarse dos veces | Desempeño y Fiabilidad (integridad) | **No**: no garantiza 0 abonos duplicados cuando las repeticiones llegan a la vez, y su tiempo crece |
-| B · Registro de identificadores junto con el saldo | Tiempo constante. Cada operación se aplica exactamente una vez, incluso con copias simultáneas. Respuesta idéntica garantizada. Sirve igual para los 5 proveedores | Almacenamiento: ~24 M de anotaciones al día durante ≥ 4 meses (~2.900 M de registros). Cada operación de saldo hace una escritura más en su mismo paso | Desempeño (utilización de recursos) | **Sí**, si la escritura adicional cabe en p99 ≤ 250 ms |
-| C · Traductor por proveedor que filtra repetidos | Aísla las particularidades de cada protocolo, lo que facilita sumar proveedores nuevos. El núcleo del saldo no conoce protocolos externos | Su memoria de 24 h no detecta repeticiones tardías (por ejemplo, una reversión días después). Si el traductor se cae, pierde su memoria. Son 5 piezas que mantener y recertificar | Fiabilidad (integridad) y Mantenibilidad | **Parcial**: no garantiza 0 duplicados fuera de la ventana de 24 h ni tras una caída del traductor |
-
-### Pendiente para el Bloque 3
-
-- **Decision:** abierta. No elegimos todavía.
-- **Para decidir con fundamento hace falta:**
-  - medir el costo de la escritura adicional de la opción B en el pico;
-  - definir el plan de almacenamiento de ~2.900 M de anotaciones;
-  - evaluar si B y C se combinan: traducción por proveedor para el protocolo y registro junto al saldo para la garantía.
-- **Familias de tácticas por revisar:** *Gestionar interfaces* (Compatibilidad), *Prevenir fallas* (Fiabilidad) y *Reducir el acoplamiento* (Mantenibilidad).
-- **Relación con ADR-02:** las dos decisiones afectan el mismo paso de escritura del saldo, así que deben tomarse juntas en el Bloque 3.
-- **Relación con ADR-04:** ADR-04 decide quién puede pedir un cambio de saldo; ADR-03, que cada petición legítima se aplique una sola vez. Las dos viven en la misma interfaz.
-- **Consequences:** se escriben al decidir.
+**Trazabilidad:** ficha §3, §4.2, S11, S14, S25 (alerta en ≤ 5 min, agregado en la fase 8); investigación A3, C6; F24, F26.
 
 ---
 
-# ADR-04: Verificación del origen de las peticiones de saldo de los proveedores
+## ESC-04 · Ráfaga de retiros del *crash* (no crítico)
 
-### Estado
+| Parte | Contenido |
+|-------|-----------|
+| **Atributo de calidad** | Eficiencia de desempeño |
+| **Fuente del estímulo** | El proveedor externo del juego *crash*, después de que 720 jugadores de una misma ronda se retiran con el multiplicador en 2,00x |
+| **Estímulo** | Envía al operador, en el mismo segundo, 720 peticiones de abono de premios |
+| **Artefacto** | El proceso de abono de premios del *crash* al saldo de los jugadores |
+| **Entorno** | Pico de diseño: 2.400 jugadores en la ronda y ~3.000 operaciones de saldo por segundo de los demás juegos |
+| **Respuesta** | Abona cada premio por el monto que liquidó el proveedor. Cada jugador ve su saldo actualizado. Las operaciones de los demás juegos siguen atendiéndose |
+| **Medida de la respuesta** | Los 720 abonos responden en **p99 ≤ 250 ms**. Saldo actualizado visible al jugador en **p95 ≤ 2 s**. **0 diferencias** entre el monto abonado y el liquidado por el proveedor. Durante la ráfaga, las operaciones de los demás juegos se mantienen en **p99 ≤ 250 ms** |
 
-**Propuesto.** Pasa a Aceptado en el Bloque 3, cuando se complete la Decision.
+**Por qué NO es crítico:** el dominante, Desempeño (3), es alto. Pero su costo cae en la corrección del premio (Adecuación funcional, 1). Esa corrección la calcula el proveedor y la certifica el laboratorio, así que cumplir este escenario no obliga al operador a sacrificar un atributo que priorizamos alto. **Se escribe sin ADR, a propósito:** muestra el criterio de selección.
 
-### Context
+**Trazabilidad:** ficha §4.1, §4.2, S5, S6, S15, S23 (saldo visible en p95 ≤ 2 s, agregado en la fase 8); mapa T6; priorización §2.2.
 
-*El escenario ESC-05, tal cual.*
+---
+
+## ESC-05 · Petición de abono falsificada a nombre de un proveedor
 
 | Parte | Contenido |
 |-------|-----------|
@@ -205,37 +125,50 @@
 | **Respuesta** | Rechaza la petición sin modificar ningún saldo, la registra con su origen y alerta al equipo de seguridad. Si llegan más peticiones no emitidas por proveedores desde el mismo origen, las sigue rechazando y las agrupa en el mismo incidente. Las peticiones legítimas de los 5 proveedores se siguen aceptando, cada una con el esquema de autenticación propio de su proveedor |
 | **Medida de la respuesta** | **100 %** de las peticiones de una batería de falsificación rechazadas (sin credencial, con la credencial de otro proveedor y copia de una petición legítima con el monto modificado), con **0 saldos modificados**, verificado en la prueba de carga y en las pruebas de penetración del laboratorio. **≤ 0,001 %** de las peticiones legítimas rechazadas por la verificación. La verificación añade **≤ 20 ms (p99)** a cada operación, y las operaciones de saldo siguen en **p99 ≤ 250 ms**. Alerta al equipo de seguridad en **≤ 5 min** |
 
-**Restricciones del proyecto que también fuerzan esta decisión:**
-- El reglamento exige autenticar todos los accesos, también los de otros sistemas (E11), autenticación en ambos sentidos y cifrado con clave de ≥ 2048 bits (E7) [F1].
-- Pruebas de penetración de caja blanca y caja negra a cargo del laboratorio (E8), y validación previa de todo cambio en la seguridad de las comunicaciones (B3) [F1].
-- Cada proveedor trae su propio esquema de autenticación y no acepta cambiarlo (S29); se suman 1 o 2 proveedores al año (S11).
-- Todo incidente de seguridad se registra y se gestiona con un procedimiento documentado (E6) [F1].
+**Casos que distingue la respuesta:**
+- petición no emitida por el proveedor → se rechaza sin tocar ningún saldo y se alerta;
+- más peticiones falsificadas desde el mismo origen → se siguen rechazando y se agrupan en un solo incidente;
+- petición legítima de cualquiera de los 5 proveedores → se acepta con el esquema de autenticación propio de ese proveedor.
 
-### Opciones consideradas
+**Por qué es crítico (T7):** la Seguridad (4) exige que nadie distinto de un proveedor pueda mover saldo. Cumplirlo presiona la Compatibilidad (3), porque la verificación tiene que funcionar con el esquema de autenticación de cada uno de los 5 proveedores sin dejar a ninguno fuera. La medida lleva las dos caras: 100 % de rechazo de lo falsificado y ≤ 0,001 % de rechazo de lo legítimo.
 
-**A · Clave fija y lista de direcciones de red permitidas por proveedor.** La interfaz solo acepta peticiones que llegan desde las direcciones de red registradas para cada proveedor y que traen la clave fija asignada a ese proveedor.
+**Relación con ESC-03:** comparten artefacto, pero no estímulo. ESC-03 trata peticiones legítimas que llegan repetidas; ESC-05, peticiones que ningún proveedor emitió.
 
-**B · Firma de cada petición con un secreto por proveedor, verificada por una pieza de traducción por proveedor.** Cada petición llega con una firma calculada sobre su contenido y su hora, con el esquema propio del proveedor. Una pieza por proveedor verifica esa firma con el secreto de ese proveedor y entrega un resultado común antes de que la petición llegue al saldo.
+**Trazabilidad:** ficha §3, §4.2, §4.4, S4, S6, S14, S26–S29; investigación E6, E7, E8, E11; mapa T7. Agregado el 1 de noviembre de 2026.
 
-**C · Un esquema único, definido por el operador, para todos los proveedores.** Todo proveedor debe conectarse presentando un certificado propio en una entrada exclusiva del operador y, además, firmar cada petición con el formato común que fija el operador.
+---
 
-| Opción | Gana | Paga | Atributo sacrificado | ¿Cumple la medida? |
-|--------|------|------|----------------------|--------------------|
-| A · Clave fija y direcciones permitidas | Es simple, todos los proveedores lo soportan y casi no añade tiempo | La clave viaja igual en cada petición: quien la obtenga puede abonar desde una dirección permitida, y una copia con el monto cambiado pasa. Si el proveedor cambia sus direcciones de red, su integración se cae | Seguridad (autenticidad e integridad); de paso, Fiabilidad | **No**: la copia con el monto modificado de la batería pasa la verificación |
-| B · Firma por petición, con una pieza por proveedor | Detecta peticiones alteradas o no emitidas por el proveedor y respeta el esquema de cada uno. Un proveedor nuevo es una pieza nueva, sin tocar el saldo | Un cálculo más en cada una de las ~3.000 operaciones por segundo (Desempeño). Un reloj desfasado puede rechazar peticiones legítimas (Fiabilidad). Cinco piezas y cinco secretos que mantener, rotar y recertificar (Mantenibilidad) | Mantenibilidad; algo de Desempeño | **Depende**: sí, si los 5 proveedores firman el contenido de sus peticiones. Hay que medir que la verificación quepa en ≤ 20 ms |
-| C · Esquema único del operador | La identidad del proveedor se comprueba al conectarse, el tráfico no autorizado no llega a la aplicación y hay un solo esquema que mantener | Los proveedores que no soportan ese esquema quedan fuera o retrasan su integración (Compatibilidad). Certificados que emitir, rotar y vigilar: uno vencido corta a un proveedor completo (Fiabilidad) | Compatibilidad | **No**: cumple el rechazo, pero incumple la aceptación de las peticiones legítimas de los 5 proveedores con su esquema propio |
+## Lista de chequeo
 
-### Pendiente para el Bloque 3
+Revisión según el Constructor y la Clínica del taller GPSMetro.
 
-- **Decision:** abierta. No elegimos todavía.
-- **Para decidir con fundamento hace falta:**
-  - la documentación del esquema de autenticación de cada uno de los 5 proveedores: ¿firman el contenido y la hora de cada petición?;
-  - medir el costo de la verificación en el pico de ~3.000 operaciones por segundo;
-  - definir qué se hace con un proveedor cuyo esquema sea solo una clave fija;
-  - evaluar si B y C se combinan: B como base y C para los proveedores que la soporten.
-- **Familias de tácticas por revisar:** *Resistir ataques* (identificar y autenticar actores, limitar acceso y exposición), *Detectar ataques* (verificar la integridad de los mensajes), *Reaccionar a ataques* (bloquear, notificar) y *Gestionar interfaces* (adaptar la interfaz o el formato).
-- **Relación con ADR-03:** ADR-04 decide quién puede pedir un cambio de saldo; ADR-03, que cada petición legítima se aplique una sola vez. Las dos viven en la misma interfaz y conviene decidirlas coordinadas.
-- **Consequences:** se escriben al decidir. Por ejemplo, lo que quede sin resolver, como la filtración del secreto de un proveedor.
+| Verificación | ESC-01 | ESC-02 | ESC-03 | ESC-04 | ESC-05 |
+|--------------|:------:|:------:|:------:|:------:|:------:|
+| La fuente es un actor concreto, no una condición | ✔ | ✔ | ✔ | ✔ | ✔ |
+| Un solo estímulo, observable por el sistema | ✔ | ✔ | ✔ | ✔ | ✔ |
+| Artefacto nombrado por su función, sin componentes de solución | ✔ | ✔ | ✔ | ✔ | ✔ |
+| Entorno con cifras (carga, franja, modo) | ✔ | ✔ | ✔ | ✔ | ✔ |
+| Respuesta observable, sin tácticas ni tecnologías | ✔ | ✔ | ✔ | ✔ | ✔ |
+| La respuesta distingue los casos relevantes | ✔ | ✔ | ✔ | ✔ | ✔ |
+| Medida con número, unidad y percentil o umbral; sin adjetivos ni promedios | ✔ | ✔ | ✔ | ✔ | ✔ |
+| Atributo correcto; no se confunde disponibilidad con corrección del dato | ✔ | ✔ | ✔ | ✔ | ✔ |
+| Dominante rastreable a un puntaje alto | 4 | 4 | 3 | 3 | 4 |
+| Tensión explícita con otro atributo | Desempeño (3) | Desempeño (3) | Fiabilidad (4) | Adec. funcional (1) | Compatibilidad (3) |
+
+**Notas de revisión:**
+- **ESC-02 es de Fiabilidad y no solo de disponibilidad.** Además de volver a estar arriba, el sistema debe tener los saldos correctos. Es la lección del caso 6 de la Clínica: un sistema que está arriba pero dice algo falso falla en Fiabilidad.
+- **ESC-03 declara Compatibilidad, aunque mide integridad del saldo.** El escenario trata de usar correctamente la información intercambiada con un sistema externo, que es la definición de interoperabilidad en el widget de ISO 25010. La integridad aparece como restricción porque es el atributo que paga.
+- **Ninguna respuesta nombra mecanismos.** Las palabras que el Constructor marca como tácticas (caché, réplica, cola, reintento…) no aparecen en artefactos ni en respuestas. "Reintento" solo describiría el estímulo, y aun ahí se evitó.
+- **Correcciones de la fase 8.** En ESC-04, la fuente y el estímulo pasaron a ser lo que el operador observa: las peticiones del proveedor, no el clic del jugador, que ocurre en el sistema del proveedor. En ESC-03 se precisó cuándo una petición es "la misma": misma combinación de proveedor, jugador e identificador.
+- **ESC-05 y ESC-03 comparten artefacto, pero no estímulo.** ESC-03 trata peticiones legítimas que llegan repetidas; ESC-05, peticiones que ningún proveedor emitió. Por eso uno se declara de Compatibilidad y el otro de Seguridad.
+
+---
+
+## Nuevo supuesto
+
+| # | Supuesto | Razón |
+|---|----------|-------|
+| S22 | El aviso a Coljuegos ante una falla grave se da en ≤ 30 min | El reglamento dice "de inmediato" (E3, E5), y "inmediato" no es verificable. Esta cifra lo vuelve medible. Agregado a la ficha. |
 
 ---
 
@@ -243,22 +176,15 @@
 
 | Criterio | Nivel buscado | Cómo se cumple |
 |----------|---------------|----------------|
-| Selección de escenarios críticos | Logrado | Cada ADR responde a un escenario con dominante alto que cuesta otro atributo alto; la selección está justificada en una línea |
-| ADR: contexto y estado | Logrado | Context idéntico al escenario (7 filas copiadas sin cambios), título numerado que nombra la decisión y estado Propuesto con lo pendiente declarado |
-| ADR: opciones y trade-offs | Logrado | Tres opciones reales por ADR, descritas como mecanismos, cada una con lo que gana, lo que paga, el atributo sacrificado y si cumple la medida |
-
-**Otros chequeos:**
-- **Ninguna opción usa nombres de tácticas ni marcas.** Por ejemplo, se escribe "una libreta de solo agregar confirmada por mayoría", no el nombre técnico del patrón.
-- **Ningún ADR elige.** La sección Decision queda abierta en los tres.
-- **Las opciones no son relleno.** En cada ADR hay al menos una opción que no cumple la medida (A en ADR-01, B en ADR-02, A en ADR-03, A y C en ADR-04). Así se ve que la medida sirve para descartar.
+| Estímulo y entorno | Logrado | Estímulos observables por el sistema; entornos con carga, franja horaria y modo de operación |
+| Respuesta | Logrado | Respuestas concretas que distinguen dos o tres casos cada una |
+| Medida de la respuesta | Logrado | Cifras verificables con su método de verificación (conciliación, cruce por marca de tiempo, percentiles) |
+| Coherencia con la priorización | Logrado | Cada dominante sale de un puntaje alto, y la tensión con otro atributo queda explícita |
 
 ---
 
-## Punto de control (cerrado el 26 de octubre de 2026)
+## Punto de control (cerrado el 25 de octubre de 2026)
 
-1. **Opciones aprobadas.** El equipo no discutió alternativas adicionales.
-2. **Las respuestas "Depende" se mantienen:** se resuelven midiendo en el Bloque 3.
-
-> **Fase 8:** el Context de ADR-03 se actualizó junto con ESC-03 (regla de identificadores repetidos). Ver `08-revision.md`, hallazgo H1.
->
-> **1 de noviembre de 2026:** se agrega ADR-04 (escenario ESC-05, tensión T7), a pedido del equipo. Ver `08-revision.md`, sección 7.
+1. **Textos aprobados.** Pasan tal cual al Context de los ADR.
+2. **S22 aprobado** y agregado a la ficha (§4.3 y supuestos).
+3. **1 de noviembre de 2026:** se agrega ESC-05 (Seguridad × Compatibilidad), por decisión del equipo al subir L4 a tensión fuerte (T7). Su texto pasa tal cual al Context de ADR-04.
