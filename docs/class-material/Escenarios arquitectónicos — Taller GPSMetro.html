@@ -1,0 +1,873 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Escenarios arquitectónicos — Taller GPSMetro</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Overpass:wght@400;600;800&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#F4F7F8; --surface:#FFFFFF; --ink:#1E293B; --muted:#52606D; --line:#D6E0E5;
+  --teal:#0F766E; --teal-ink:#FFFFFF; --teal-soft:#D5F0EC;
+  --amber:#B45309; --amber-soft:#FDF0D5; --red:#B42318; --red-soft:#FDE4E1;
+  --ok:#15803D; --ok-soft:#DCF3E3;
+  --font:"Overpass","Segoe UI",system-ui,-apple-system,sans-serif;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --bg:#0F1A20; --surface:#16242C; --ink:#E6EEF2; --muted:#9FB0BA; --line:#2A3B45;
+    --teal:#2DD4BF; --teal-ink:#06201D; --teal-soft:#123A37;
+    --amber:#F5B94A; --amber-soft:#3A2A10; --red:#F87171; --red-soft:#3B1717;
+    --ok:#4ADE80; --ok-soft:#13301E;
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#0F1A20; --surface:#16242C; --ink:#E6EEF2; --muted:#9FB0BA; --line:#2A3B45;
+  --teal:#2DD4BF; --teal-ink:#06201D; --teal-soft:#123A37;
+  --amber:#F5B94A; --amber-soft:#3A2A10; --red:#F87171; --red-soft:#3B1717;
+  --ok:#4ADE80; --ok-soft:#13301E;
+}
+:root{box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px);}
+html{scroll-padding-top:env(safe-area-inset-top,0px);}
+*,*::before,*::after{box-sizing:inherit;}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--font);font-size:16px;line-height:1.55;}
+.wrap{max-width:1080px;margin:0 auto;padding:32px 20px 64px;}
+a{color:var(--teal);}
+button{font:inherit;color:inherit;}
+:focus-visible{outline:3px solid var(--teal);outline-offset:2px;}
+h1{font-size:clamp(28px,4.4vw,44px);line-height:1.05;font-weight:800;letter-spacing:-0.02em;margin:0;}
+h2{font-size:24px;line-height:1.2;font-weight:800;margin:0 0 8px;letter-spacing:-0.01em;}
+h3{font-size:18px;line-height:1.3;font-weight:800;margin:0 0 6px;}
+p{margin:0 0 12px;max-width:72ch;}
+.muted{color:var(--muted);}
+.small{font-size:14px;}
+
+header.top{display:flex;flex-wrap:wrap;gap:16px 32px;align-items:flex-end;justify-content:space-between;margin-bottom:24px;}
+header.top .sub{margin:8px 0 0;color:var(--muted);font-size:17px;}
+.seg{display:inline-flex;border:2px solid var(--teal);border-radius:999px;overflow:hidden;}
+.seg button{border:0;background:transparent;padding:6px 16px;cursor:pointer;font-weight:600;font-size:14px;}
+.seg button[aria-pressed="true"]{background:var(--teal);color:var(--teal-ink);}
+.seg-label{font-size:13px;color:var(--muted);margin-right:8px;}
+
+nav.tabs{display:flex;gap:4px;overflow-x:auto;border-bottom:2px solid var(--line);margin-bottom:28px;}
+nav.tabs button{border:0;background:none;padding:12px 14px 10px;cursor:pointer;font-weight:600;color:var(--muted);border-bottom:4px solid transparent;margin-bottom:-2px;white-space:nowrap;}
+nav.tabs button[aria-selected="true"]{color:var(--ink);border-bottom-color:var(--teal);}
+section.panel[hidden]{display:none;}
+
+.card{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:22px;}
+.stack>*+*{margin-top:18px;}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:16px;}
+@media (max-width:720px){.grid2{grid-template-columns:1fr;}}
+
+/* La línea: el escenario como una ruta con seis paradas */
+.line{display:grid;grid-template-columns:repeat(6,1fr);position:relative;margin:10px 0 24px;}
+.line::before{content:"";position:absolute;left:calc(100%/12);right:calc(100%/12);top:19px;height:6px;background:var(--teal);border-radius:3px;}
+.st{background:none;border:0;display:flex;flex-direction:column;align-items:center;gap:8px;cursor:pointer;position:relative;padding:0 4px;text-align:center;}
+.st .dot{width:44px;height:44px;border-radius:50%;background:var(--surface);border:6px solid var(--teal);display:grid;place-items:center;font-weight:800;font-size:15px;transition:transform .15s;}
+.st .nm{font-weight:600;font-size:14px;line-height:1.2;}
+.st:hover .dot{transform:scale(1.08);}
+.st.is-active .dot{background:var(--teal);color:var(--teal-ink);}
+.st.s-ok .dot{background:var(--ok-soft);border-color:var(--ok);color:var(--ok);}
+.st.s-warn .dot{background:var(--amber-soft);border-color:var(--amber);color:var(--amber);}
+.st.s-err .dot{background:var(--red-soft);border-color:var(--red);color:var(--red);}
+.st.s-idle .dot{color:var(--muted);}
+.st.is-active .dot,.st.is-active.s-idle .dot{background:var(--teal);color:var(--teal-ink);}
+@media (max-width:640px){
+  .line{grid-template-columns:1fr;gap:10px;}
+  .line::before{left:19px;right:auto;top:22px;bottom:22px;width:6px;height:auto;}
+  .st{flex-direction:row;justify-content:flex-start;text-align:left;gap:14px;}
+}
+@media (prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important;}}
+
+.q{font-size:26px;font-weight:800;line-height:1.2;margin:0 0 10px;}
+.box{border-left:5px solid var(--teal);background:var(--teal-soft);padding:12px 16px;border-radius:0 10px 10px 0;}
+.box.warn{border-color:var(--amber);background:var(--amber-soft);}
+.box.err{border-color:var(--red);background:var(--red-soft);}
+.box h3{font-size:15px;margin-bottom:4px;}
+.box p{margin:0;}
+.lbl{font-size:13px;font-weight:600;color:var(--muted);margin-bottom:4px;display:block;}
+
+table{border-collapse:collapse;width:100%;}
+.tblwrap{overflow-x:auto;}
+th,td{text-align:left;vertical-align:top;padding:10px 12px;border-bottom:1px solid var(--line);font-size:15px;}
+th{font-size:13px;color:var(--muted);font-weight:600;}
+td.k{font-weight:600;white-space:nowrap;width:1%;}
+
+/* Escalera de refinamiento */
+.ladder td{transition:background .3s;}
+.ladder tr.new td{background:var(--teal-soft);}
+.ladder tr.hide{display:none;}
+.vague{font-size:22px;font-weight:800;text-decoration:line-through;text-decoration-color:var(--red);text-decoration-thickness:3px;}
+.vague.live{text-decoration:none;}
+.btn{border:2px solid var(--teal);background:var(--teal);color:var(--teal-ink);padding:8px 16px;border-radius:999px;cursor:pointer;font-weight:600;font-size:15px;}
+.btn.ghost{background:transparent;color:var(--teal);}
+.btn:disabled{opacity:.45;cursor:not-allowed;}
+.row{display:flex;flex-wrap:wrap;gap:10px;align-items:center;}
+
+/* Clínica */
+.chips{display:flex;flex-wrap:wrap;gap:8px;}
+.chip{border:1.5px solid var(--line);background:var(--surface);border-radius:999px;padding:5px 12px;cursor:pointer;font-size:14px;font-weight:600;}
+.chip[aria-pressed="true"]{border-color:var(--teal);background:var(--teal-soft);}
+.chip .done{color:var(--ok);margin-left:4px;}
+.fields .f{display:grid;grid-template-columns:170px 1fr;gap:12px;padding:12px 14px;border:2px solid transparent;border-radius:10px;cursor:pointer;background:none;width:100%;text-align:left;}
+.fields .f+.f{margin-top:4px;}
+.fields .f:hover{background:var(--bg);}
+.fields .f.marked{border-color:var(--red);background:var(--red-soft);}
+.fields .f .fk{font-weight:600;color:var(--muted);font-size:14px;}
+.fields .f.r-hit{border-color:var(--ok);background:var(--ok-soft);}
+.fields .f.r-miss{border-color:var(--amber);background:var(--amber-soft);}
+.fields .f.r-false{border-color:var(--line);border-style:dashed;}
+.fields .f .diag{grid-column:2;font-size:14px;margin-top:6px;}
+.fields .f .tag{font-size:12px;font-weight:800;display:block;margin-bottom:2px;}
+.r-hit .tag{color:var(--ok);} .r-miss .tag{color:var(--amber);} .r-false .tag{color:var(--muted);}
+@media (max-width:640px){.fields .f{grid-template-columns:1fr;gap:2px;}.fields .f .diag{grid-column:1;}}
+.origin{font-size:13px;color:var(--muted);}
+
+/* Constructor */
+.form label{display:block;font-weight:600;font-size:14px;margin:0 0 4px;}
+.form .hint{font-weight:400;color:var(--muted);}
+.form textarea,.form select{width:100%;font:inherit;font-size:15px;padding:10px 12px;border:1.5px solid var(--line);border-radius:10px;background:var(--bg);color:var(--ink);resize:vertical;}
+.form textarea{min-height:64px;}
+.form .fld+.fld,.form .fld+#formFields{margin-top:14px;}
+#formFields{margin-top:14px;display:block;}
+.form .fld.s-warn textarea{border-color:var(--amber);}
+.form .fld.s-err textarea{border-color:var(--red);}
+.form .fld.s-ok textarea{border-color:var(--ok);}
+.msgs{list-style:none;margin:6px 0 0;padding:0;font-size:14px;}
+.msgs li{padding:2px 0 2px 20px;position:relative;}
+.msgs li::before{position:absolute;left:0;font-weight:800;}
+.msgs li.err{color:var(--red);} .msgs li.err::before{content:"×";}
+.msgs li.warn{color:var(--amber);} .msgs li.warn::before{content:"!";}
+.msgs li.info{color:var(--muted);} .msgs li.info::before{content:"?";}
+.builder{display:grid;grid-template-columns:minmax(0,1.2fr) minmax(0,1fr);gap:20px;align-items:start;}
+@media (max-width:860px){.builder{grid-template-columns:1fr;}}
+.sticky{position:sticky;top:calc(env(safe-area-inset-top,0px) + 12px);}
+.saved-item{border:1px solid var(--line);border-radius:10px;padding:10px 12px;}
+.saved-item+.saved-item{margin-top:8px;}
+.saved-item .a{font-size:13px;font-weight:800;color:var(--teal);}
+.saved-item .m{font-size:14px;}
+.linkbtn{border:0;background:none;color:var(--teal);cursor:pointer;padding:0;font-weight:600;font-size:14px;text-decoration:underline;}
+#tsvBox{width:100%;min-height:90px;font-size:12px;font-family:ui-monospace,Menlo,Consolas,monospace;margin-top:8px;border:1.5px solid var(--line);border-radius:8px;background:var(--bg);color:var(--ink);padding:8px;}
+
+/* Banco */
+.metrics li{margin-bottom:4px;}
+ul.plain{margin:0;padding-left:20px;}
+.seed{border:1px dashed var(--teal);border-radius:10px;padding:12px 14px;}
+.seed+.seed{margin-top:10px;}
+.seed dl{margin:0 0 8px;display:grid;grid-template-columns:90px 1fr;gap:2px 10px;font-size:14px;}
+.seed dt{color:var(--muted);font-weight:600;}
+.seed dd{margin:0;}
+
+/* Caso */
+.quote{border-left:4px solid var(--line);padding:4px 0 4px 16px;margin:0 0 16px;}
+.quote p{margin:0 0 4px;font-size:17px;}
+.quote cite{font-style:normal;font-size:14px;color:var(--muted);}
+ol.flow{padding-left:22px;margin:0;}
+ol.flow li{margin-bottom:8px;}
+.sealed{border:2px dashed var(--amber);border-radius:14px;padding:18px 20px;}
+.sealed.open{border-style:solid;border-color:var(--teal);}
+.sealed .body[hidden]{display:none;}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<header class="top">
+  <div>
+    <h1>Escenarios arquitectónicos</h1>
+    <p class="sub">Taller GPSMetro: de la frase vaga al escenario que se puede medir.</p>
+  </div>
+  <div class="row">
+    <span class="seg-label">Nivel</span>
+    <div class="seg" role="group" aria-label="Nivel del curso">
+      <button type="button" data-level="pregrado" aria-pressed="true">Pregrado</button>
+      <button type="button" data-level="posgrado" aria-pressed="false">Posgrado</button>
+    </div>
+  </div>
+</header>
+
+<nav class="tabs" role="tablist" aria-label="Secciones del taller">
+  <button role="tab" data-tab="anatomia" aria-selected="true">Anatomía</button>
+  <button role="tab" data-tab="clinica" aria-selected="false">Clínica de escenarios</button>
+  <button role="tab" data-tab="caso" aria-selected="false">El caso GPSMetro</button>
+  <button role="tab" data-tab="constructor" aria-selected="false">Constructor</button>
+  <button role="tab" data-tab="banco" aria-selected="false">Estímulos y métricas</button>
+</nav>
+
+<!-- ============ ANATOMÍA ============ -->
+<section class="panel stack" id="p-anatomia" role="tabpanel">
+  <div>
+    <h2>Un escenario es una ruta con seis paradas</h2>
+    <p class="muted">Alguien o algo provoca un evento; el evento llega a una parte del sistema bajo ciertas condiciones; el sistema responde; y medimos esa respuesta. Toca cada parada.</p>
+  </div>
+  <div class="line" id="anatLine"></div>
+  <div class="card" id="anatDetail"></div>
+
+  <div class="card stack">
+    <div>
+      <h2>Del requisito vago al escenario</h2>
+      <p class="muted">Así se ve refinar una frase de especificación, una parada a la vez.</p>
+    </div>
+    <div id="vagueLine" class="vague live">«El sistema debe ser rápido.»</div>
+    <div class="tblwrap"><table class="ladder" id="ladder"></table></div>
+    <div class="box" id="ladderNote"></div>
+    <div class="row">
+      <button class="btn ghost" id="ladPrev" type="button">Paso anterior</button>
+      <button class="btn" id="ladNext" type="button">Siguiente paso</button>
+      <span class="muted small" id="ladCount"></span>
+    </div>
+  </div>
+</section>
+
+<!-- ============ CLÍNICA ============ -->
+<section class="panel stack" id="p-clinica" role="tabpanel" hidden>
+  <div>
+    <h2>Clínica: ¿qué está mal en este escenario?</h2>
+    <p class="muted">Marca las partes que consideres defectuosas y pide el diagnóstico. Algunos casos vienen de ejemplos que circulan como «correctos». Uno de ellos no tiene defectos.</p>
+  </div>
+  <div class="chips" id="caseChips"></div>
+  <div class="card stack" id="caseCard"></div>
+</section>
+
+<!-- ============ CASO ============ -->
+<section class="panel stack" id="p-caso" role="tabpanel" hidden>
+  <div class="card stack">
+    <div>
+      <h2>Sistema de monitoreo de transporte público en tiempo real</h2>
+      <p>GPSMetro permitirá a los usuarios de la ciudad ver la ubicación de los buses en tiempo real, consultar rutas, conocer el tiempo estimado de llegada a una parada, recibir alertas sobre retrasos o cambios en el servicio y consultar el historial de trayectos de una ruta.</p>
+      <p>Las posiciones llegan desde dispositivos GPS instalados en los vehículos. Los usuarios acceden por aplicación móvil y web, y el uso se concentra en las horas pico, cuando miles de personas consultan al mismo tiempo.</p>
+    </div>
+    <div id="caseLevel"></div>
+  </div>
+
+  <div class="card stack">
+    <h2>Equipos y atributos</h2>
+    <div class="tblwrap"><table>
+      <thead><tr><th>Equipo</th><th>Atributo</th><th>Qué evalúa</th></tr></thead>
+      <tbody id="teamTable"></tbody>
+    </table></div>
+  </div>
+
+  <div class="card stack">
+    <h2>Ruta de la sesión</h2>
+    <ol class="flow">
+      <li><strong>Clínica en plenaria.</strong> Diagnosticamos juntos dos o tres casos de la pestaña Clínica antes de escribir.</li>
+      <li><strong>Análisis del atributo.</strong> Cada equipo discute qué significa su atributo en GPSMetro y en qué situaciones se vuelve crítico.</li>
+      <li><strong>Construcción.</strong> Mínimo tres escenarios completos por equipo, en el Constructor, con medida cuantificable.</li>
+      <li><strong>Sobre 1.</strong> Se abre el primer evento; cada equipo verifica si alguno de sus escenarios lo habría detectado.</li>
+      <li><strong>Presentación cruzada.</strong> 5 a 7 minutos por equipo. Otro equipo actúa como revisor usando la rúbrica de abajo.</li>
+      <li><strong>Sobre 2.</strong> Cierre: ¿qué escenarios cambian su entorno o su medida?</li>
+    </ol>
+    <p class="small muted" style="margin-top:12px">Documenten en la <a href="https://docs.google.com/spreadsheets/d/11o7fWtIal_CJpT_uiPbdF8tu_AZkUB4X636TFrDMsJA/edit?usp=sharing" target="_blank" rel="noopener">plantilla compartida</a>. Desde el Constructor, cada escenario se copia con un clic y se pega en la celda a la derecha de «Atributo de calidad» del bloque de su grupo.</p>
+    <div class="box warn"><h3>Regla de oro de esta sesión</h3><p>No se proponen soluciones ni tácticas. Si en la respuesta aparece «caché», «réplica» o «microservicios», el escenario está describiendo un diseño, no una necesidad. Las tácticas llegan en el siguiente bloque, y necesitan escenarios limpios para poder compararse.</p></div>
+  </div>
+
+  <div class="card stack">
+    <h2>Rúbrica para el equipo revisor</h2>
+    <div class="tblwrap"><table>
+      <thead><tr><th>Criterio</th><th>Se ve así cuando está bien</th><th>Error más común</th><th>Pregunta para el equipo</th></tr></thead>
+      <tbody id="rubric"></tbody>
+    </table></div>
+  </div>
+
+  <div class="stack">
+    <h2>Eventos sellados</h2>
+    <p class="muted">Ábranse solo cuando el docente lo indique.</p>
+    <div id="sealed"></div>
+  </div>
+</section>
+
+<!-- ============ CONSTRUCTOR ============ -->
+<section class="panel stack" id="p-constructor" role="tabpanel" hidden>
+  <div>
+    <h2>Constructor de escenarios</h2>
+    <p class="muted">Escribe tu escenario; cada parada se revisa mientras escribes. Las alertas son pistas para discutir, no veredictos: tu equipo decide.</p>
+  </div>
+  <div class="line" id="buildLine"></div>
+  <div class="builder">
+    <div class="card form" id="form">
+      <div class="fld">
+        <label for="f-atributo">Atributo de calidad</label>
+        <select id="f-atributo"></select>
+      </div>
+      <div id="formFields"></div>
+      <div class="row" style="margin-top:18px">
+        <button class="btn" id="saveBtn" type="button">Guardar escenario</button>
+        <button class="btn ghost" id="exampleBtn" type="button">Cargar ejemplo</button>
+        <button class="btn ghost" id="clearBtn" type="button">Limpiar</button>
+      </div>
+      <p class="small muted" id="saveHint" style="margin-top:8px"></p>
+    </div>
+    <div class="sticky stack">
+      <div class="card">
+        <h3>Escenarios de tu equipo</h3>
+        <p class="small muted">Se guardan solo en este navegador.</p>
+        <div id="savedList"></div>
+        <div class="box" style="margin-top:14px"><h3>Cómo pasarlo a la plantilla</h3><p class="small">1. Pulsa «Copiar» en el escenario. 2. En la plantilla, busca el bloque de tu grupo y haz clic en la celda vacía a la derecha de «Atributo de calidad». 3. Pega (Ctrl+V o Cmd+V): las siete filas se llenan hacia abajo. 4. Escribe el ID en la fila «ID Escenario».</p></div>
+        <p class="small muted" id="copyMsg" style="margin:8px 0 0"></p>
+        <textarea id="tsvBox" hidden readonly aria-label="Escenario listo para pegar"></textarea>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ BANCO ============ -->
+<section class="panel stack" id="p-banco" role="tabpanel" hidden>
+  <div>
+    <h2>Semillas y métricas por atributo</h2>
+    <p class="muted">Elige un atributo para ver situaciones típicas, métricas que sí se pueden verificar y puntos de partida para GPSMetro.</p>
+  </div>
+  <div class="chips" id="attrChips"></div>
+  <div class="grid2" id="attrDetail"></div>
+
+  <div class="card stack">
+    <div>
+      <h2>Fuentes y estímulos</h2>
+      <p class="muted">La fuente es quién o qué inicia la situación; el estímulo es lo que ocurre o se solicita.</p>
+    </div>
+    <div id="sourceTables"></div>
+    <div class="box warn"><h3>¿Y la hora pico?</h3><p>La hora pico no origina nada: es el entorno en el que ocurren los estímulos. Lo mismo pasa con «alta demanda» o «temporada alta». Si la pones como fuente, pregúntate quién está enviando esas solicitudes.</p></div>
+  </div>
+</section>
+
+</div>
+
+<script>
+/* ---------------- Datos ---------------- */
+const FIELDS = [
+  {k:"fuente", n:"Fuente del estímulo", s:"Fuente", q:"¿Quién o qué lo origina?",
+   def:"La entidad que genera el estímulo: una persona, otro sistema, un componente interno o la infraestructura física.",
+   ex:"Pasajeros en un paradero usando la app móvil. O el dispositivo GPS de un bus.",
+   an:"El cliente que hace el pedido.",
+   err:"Poner una condición en lugar de un actor: «hora pico», «aumento de usuarios». Eso es entorno o estímulo.",
+   ph:"Ej.: Pasajeros en un paradero usando la app móvil"},
+  {k:"estimulo", n:"Estímulo", s:"Estímulo", q:"¿Qué ocurre, exactamente?",
+   def:"El evento concreto que llega al sistema y exige una reacción. Un escenario, un estímulo.",
+   ex:"Solicitan el tiempo estimado de llegada de las rutas que pasan por su parada.",
+   an:"Pide un plato.",
+   err:"Describir una actividad general («usan la app») o meter dos eventos en uno.",
+   ph:"Ej.: Solicitan el tiempo estimado de llegada de su parada"},
+  {k:"artefacto", n:"Artefacto", s:"Artefacto", q:"¿Qué parte recibe el golpe?",
+   def:"La porción del sistema que recibe el estímulo: un servicio, un módulo, un canal, un almacén de datos, el sistema completo si de verdad es así.",
+   ex:"Servicio de consulta de tiempos de llegada.",
+   an:"La cocina.",
+   err:"Decir «el sistema» por reflejo, o nombrar un componente de una solución que aún no se ha decidido («el caché Redis»).",
+   ph:"Ej.: Servicio de consulta de tiempos de llegada"},
+  {k:"entorno", n:"Entorno", s:"Entorno", q:"¿Bajo qué condiciones?",
+   def:"El estado del sistema y del contexto cuando llega el estímulo: carga, franja horaria, modo degradado, despliegue, tiempo de diseño.",
+   ex:"Hora pico de la mañana (6:00–8:00), 1.100 buses en operación, hasta 6.000 consultas por segundo.",
+   an:"Hora pico, restaurante lleno.",
+   err:"«Operación normal» sin cifras. El mismo estímulo en otro entorno es otro escenario, con otra medida.",
+   ph:"Ej.: Hora pico 6:00–8:00, 1.100 buses, 6.000 consultas/s"},
+  {k:"respuesta", n:"Respuesta", s:"Respuesta", q:"¿Qué hace el sistema, visto desde afuera?",
+   def:"El comportamiento observable del sistema ante el estímulo. Lo que un usuario o un probador podría ver sin conocer el diseño interno.",
+   ex:"Devuelve la lista de próximos buses con su tiempo estimado y la hora de la última posición recibida.",
+   an:"Preparan y entregan el plato.",
+   err:"Describir la solución: «usa caché», «redirige a una réplica», «autoescala». Eso es una táctica.",
+   ph:"Ej.: Devuelve los próximos buses con su tiempo estimado"},
+  {k:"medida", n:"Medida de respuesta", s:"Medida", q:"¿Cómo sabremos que lo logró?",
+   def:"Un criterio cuantificable y verificable: tiempo, percentil, porcentaje, conteo, esfuerzo. Es lo que convierte el escenario en una prueba.",
+   ex:"p95 ≤ 800 ms y p99 ≤ 2 s; ningún tiempo estimado calculado con posiciones de más de 60 s sin advertirlo.",
+   an:"El plato llega en menos de 15 minutos.",
+   err:"Adjetivos («rápido», «aceptable»), promedios que esconden los casos lentos, o metas imposibles de verificar («100% seguro»).",
+   ph:"Ej.: p95 ≤ 800 ms, p99 ≤ 2 s"}
+];
+const FK = FIELDS.map(f=>f.k);
+
+const LADDER = [
+  {k:null, note:"Nadie puede diseñar contra esta frase ni probar si se cumplió. ¿Rápido para quién, haciendo qué, en qué momento?"},
+  {k:"fuente", v:"Pasajeros en un paradero usando la app móvil.", note:"Ya sabemos quién espera. Un pasajero en la calle tolera menos espera que un analista en su escritorio."},
+  {k:"estimulo", v:"Solicitan el tiempo estimado de llegada de las rutas que pasan por su parada.", note:"«Rápido» ahora se refiere a una operación concreta, no a todo el sistema."},
+  {k:"artefacto", v:"Servicio de consulta de tiempos de llegada.", note:"Sabemos dónde mirar cuando analicemos el diseño. Todavía no decimos cómo está construido."},
+  {k:"entorno", v:"Hora pico de la mañana (6:00–8:00), 1.100 buses en operación, hasta 6.000 consultas por segundo.", note:"Sin esta línea, cualquier diseño pasa la prueba a las 3 de la mañana."},
+  {k:"respuesta", v:"Devuelve la lista de próximos buses con su tiempo estimado y la hora de la última posición recibida.", note:"Es observable desde afuera. Fíjate que exigir la hora de la última posición introduce frescura del dato: un tiempo rápido pero basado en datos viejos también es un fallo."},
+  {k:"medida", v:"p95 ≤ 800 ms y p99 ≤ 2 s; ningún tiempo estimado calculado con posiciones de más de 60 s sin advertirlo al usuario.", note:"Ahora dos arquitecturas distintas se pueden comparar contra la misma vara. Eso es lo que hace un escenario."}
+];
+
+const ATTRS = [
+  {id:"rend", team:1, n:"Rendimiento", en:"Performance efficiency", ev:"Tiempo de respuesta, throughput y uso de recursos",
+   sit:["Muchas consultas simultáneas","Grandes volúmenes de datos","Latencia en consultas"],
+   met:["Latencia por percentil: p95, p99 (ms)","Throughput sostenido (consultas/s)","Frescura del dato mostrado (s)","Uso de CPU o memoria bajo una carga dada (%)"],
+   anti:["«rápido»","«tiempo promedio» como única medida","«sin demoras»"],
+   seeds:[
+     {fuente:"Pasajeros en un paradero usando la app", estimulo:"Solicitan el tiempo estimado de llegada de su parada", entorno:"Hora pico 6:00–8:00, 6.000 consultas por segundo"},
+     {fuente:"Analista de planeación del Metro", estimulo:"Consulta el historial de trayectos de una ruta del último año", entorno:"Horario laboral, en simultáneo con la hora pico de la tarde"},
+     {fuente:"Dispositivos GPS de 1.100 buses", estimulo:"Envían su posición cada 10 segundos", entorno:"Hora pico, red celular congestionada"}]},
+  {id:"disp", team:2, n:"Disponibilidad", en:"Availability", ev:"Capacidad del sistema de mantenerse operativo",
+   sit:["Caída de servicios","Pérdida de conexión con sistemas externos","Mantenimiento del sistema"],
+   met:["Disponibilidad por ventana definida (p. ej. mensual, franja 4:30–23:00) (%)","Tiempo medio de recuperación, MTTR (min)","Tiempo de detección de la falla (s)","Sesiones afectadas durante la falla (%)"],
+   anti:["«siempre disponible»","«100% de disponibilidad»","disponibilidad sin ventana de medición"],
+   seeds:[
+     {fuente:"Falla de hardware en el servidor que calcula tiempos de llegada", estimulo:"El servidor deja de responder abruptamente", entorno:"Hora pico, 20.000 usuarios activos"},
+     {fuente:"Pipeline de despliegue", estimulo:"Despliega una nueva versión de la app web", entorno:"Franja de operación, 8.000 usuarios activos"},
+     {fuente:"Operador de red celular", estimulo:"Pierde cobertura en una zona de la ciudad durante 15 minutos", entorno:"Hora pico, 300 buses en la zona afectada"}]},
+  {id:"fiab", team:3, n:"Fiabilidad", en:"Reliability", ev:"Capacidad del sistema de operar sin fallos",
+   sit:["Errores inesperados","Corrupción de datos","Fallos intermitentes"],
+   met:["Tasa de respuestas erróneas (%)","Posiciones obsoletas mostradas como actuales (conteo)","Error de la estimación de llegada, p90 (min)","Tiempo medio entre fallos, MTBF (h)"],
+   anti:["«sin errores»","«confiable»","medir solo uptime"],
+   seeds:[
+     {fuente:"Dispositivo GPS de un bus", estimulo:"Reporta un salto de 5 km fuera de su ruta", entorno:"Operación normal"},
+     {fuente:"Dispositivos GPS de 180 buses de una misma marca", estimulo:"Envían posiciones desordenadas en el tiempo", entorno:"Red celular inestable, hora pico"},
+     {fuente:"Centro de control del operador", estimulo:"Registra un desvío por obra vial en una ruta", entorno:"Hora pico, 40 buses en la ruta afectada"}]},
+  {id:"seg", team:4, n:"Seguridad", en:"Security", ev:"Protección de información y control de acceso",
+   sit:["Acceso no autorizado","Manipulación de datos","Interceptación de información"],
+   met:["Intentos no autorizados bloqueados (%)","Tiempo hasta la alerta (min)","Registros expuestos (conteo)","Tiempo de revocación de una credencial comprometida (min)"],
+   anti:["«totalmente seguro»","«cifrado»","nombrar tecnologías como medida"],
+   seeds:[
+     {fuente:"Atacante con credenciales robadas de un conductor", estimulo:"Envía posiciones falsas de un bus desde un dispositivo no registrado", entorno:"Operación normal, red celular pública"},
+     {fuente:"Usuario autenticado de la app", estimulo:"Intenta consultar el historial de viajes de otra persona", entorno:"Operación normal"},
+     {fuente:"Bot externo", estimulo:"Descarga masivamente las posiciones de todos los buses por la API pública", entorno:"Hora pico"}]},
+  {id:"mant", team:5, n:"Mantenibilidad", en:"Maintainability / Modifiability", ev:"Facilidad para realizar cambios en el sistema",
+   sit:["Cambios regulatorios","Incorporación de nuevas funcionalidades","Refactorización del sistema"],
+   met:["Esfuerzo del cambio (persona-días)","Módulos modificados (conteo)","Tiempo hasta producción (días)","Defectos introducidos por el cambio (conteo)"],
+   anti:["«fácil de cambiar»","«flexible»","«modular» como medida"],
+   seeds:[
+     {fuente:"Secretaría de Movilidad", estimulo:"Exige agregar una ruta nueva con 25 paradas", entorno:"Sistema en producción, cambio planificado"},
+     {fuente:"Operador de buses", estimulo:"Cambia de proveedor de GPS, con otro formato de mensaje", entorno:"Tiempo de desarrollo, equipo de 4 personas"},
+     {fuente:"Equipo de producto", estimulo:"Solicita alertas de accesibilidad (ascensores fuera de servicio)", entorno:"Tiempo de desarrollo"}]},
+  {id:"esc", team:6, n:"Escalabilidad", en:"Scalability", ev:"Capacidad de soportar crecimiento en usuarios o carga",
+   sit:["Crecimiento en usuarios","Aumento en volumen de datos","Expansión a nuevas ciudades"],
+   met:["Carga máxima sostenida manteniendo la misma medida de rendimiento","Tiempo para absorber el crecimiento (días)","Costo de operación por usuario adicional","Degradación permitida durante el crecimiento (%)"],
+   anti:["«escala infinitamente»","«soporta muchos usuarios»"],
+   seeds:[
+     {fuente:"Área metropolitana", estimulo:"Incorpora 3 municipios y 600 buses adicionales", entorno:"Plazo de 6 meses, sistema en producción"},
+     {fuente:"Campaña de comunicación del Metro", estimulo:"Triplica los usuarios activos en una semana", entorno:"Hora pico"},
+     {fuente:"Almacén de historial de posiciones", estimulo:"Acumula 2 años de posiciones reportadas cada 10 s", entorno:"Operación normal"}]},
+  {id:"usa", team:7, n:"Usabilidad", en:"Usability", ev:"Facilidad de uso y experiencia del usuario",
+   sit:["Usuarios nuevos","Interfaces complejas","Errores de interacción"],
+   met:["Tiempo para completar una tarea (s)","Éxito en el primer intento (%)","Pasos o toques por tarea","Criterios de accesibilidad cumplidos (p. ej. WCAG nivel AA)"],
+   anti:["«intuitiva»","«amigable»","«fácil de usar»"],
+   seeds:[
+     {fuente:"Adulta mayor que usa la app por primera vez", estimulo:"Quiere saber cuándo llega su bus", entorno:"En el paradero, sin ayuda, con sol directo en la pantalla"},
+     {fuente:"Usuario con lector de pantalla", estimulo:"Consulta una alerta de desvío de su ruta", entorno:"Operación normal"},
+     {fuente:"Pasajero caminando hacia la parada", estimulo:"Se suscribe a las alertas de su ruta", entorno:"En movimiento, usando una sola mano"}]},
+  {id:"inter", team:8, n:"Interoperabilidad", en:"Interoperability / Compatibility", ev:"Capacidad de integrarse con otros sistemas",
+   sit:["Integración con APIs externas","Intercambio de datos con otros sistemas","Actualización de protocolos"],
+   met:["Mensajes intercambiados e interpretados correctamente (%)","Tiempo de integración de un nuevo consumidor (días)","Retraso de publicación de datos abiertos (s)","Versiones de protocolo soportadas en paralelo"],
+   anti:["«compatible con todo»","«usa estándares»"],
+   seeds:[
+     {fuente:"Plataforma de datos abiertos de la alcaldía", estimulo:"Consume el feed de posiciones en tiempo real", entorno:"Operación normal"},
+     {fuente:"Sistema de recaudo", estimulo:"Notifica que una tarjeta se validó en un bus", entorno:"Hora pico, 900 validaciones por minuto"},
+     {fuente:"Proveedor de dispositivos GPS", estimulo:"Actualiza su protocolo de mensajes a una nueva versión", entorno:"Sistema en producción, flota mixta"}]}
+];
+
+const CASES = [
+  {t:"Caso 1", o:"Ejemplo circulante: hospital, monolito", a:"Escalabilidad",
+   v:{fuente:"Incremento de pacientes por temporada alta (epidemias o campañas de salud).",
+      estimulo:"Las solicitudes de registro, consulta y facturación se duplican durante una campaña masiva de vacunación.",
+      artefacto:"Sistema centralizado que gestiona todas las operaciones hospitalarias.",
+      entorno:"Infraestructura on-premise con servidores limitados.",
+      respuesta:"El sistema permite escalar verticalmente (aumentar recursos del servidor físico) para manejar mayor carga.",
+      medida:"Debe manejar hasta el doble de su carga habitual sin caídas luego de una reconfiguración de hardware, en un lapso no mayor a 2 horas."},
+   d:{fuente:"Es una condición, no un actor. Las solicitudes las originan el personal de admisión y los pacientes; el incremento ya está en el estímulo.",
+      respuesta:"Escalar verticalmente es una decisión de diseño. La respuesta observable es que el sistema procesa la carga duplicada sin rechazar solicitudes.",
+      medida:"«Carga habitual» no está cuantificada. Sin línea base, «el doble» no se puede verificar."},
+   fix:{atributo:"Escalabilidad", fuente:"Personal de admisión y pacientes que se registran en línea.", estimulo:"Registran 2.400 solicitudes por hora, el doble de la línea base de 1.200 por hora.", artefacto:"Módulos de admisión y facturación.", entorno:"Jornada de campaña de 7:00 a 17:00, infraestructura on-premise.", respuesta:"Procesa todas las solicitudes sin rechazarlas ni perder registros.", medida:"0 solicitudes rechazadas; p95 de registro ≤ 3 s; capacidad lista en ≤ 2 h desde que se anuncia la campaña."}},
+  {t:"Caso 2", o:"Ejemplo circulante: streaming, distribuido", a:"Disponibilidad",
+   v:{fuente:"Usuarios finales.", estimulo:"Un servicio o nodo crítico falla.", artefacto:"Sistema de microservicios del servicio de streaming.", entorno:"Operación normal, cualquier zona geográfica.", respuesta:"Redirige automáticamente las solicitudes a una réplica disponible, evitando la interrupción del servicio.", medida:"Restablecer el servicio en menos de 2 segundos para el usuario final, con una disponibilidad del 99,99%."},
+   d:{fuente:"Los usuarios no provocan la falla. Para este estímulo la fuente es interna: el hardware o el software del nodo que falla.",
+      artefacto:"«Microservicios» presupone un estilo arquitectónico que todavía no se ha decidido. Nombra el servicio por su función: el servicio de reproducción.",
+      respuesta:"Redirigir a una réplica es la táctica. Lo observable es que las reproducciones en curso continúan sin que el usuario tenga que reintentar."},
+   fix:{atributo:"Disponibilidad", fuente:"Falla de hardware o software en un nodo del servicio de reproducción.", estimulo:"El nodo deja de responder abruptamente.", artefacto:"Servicio de reproducción de video.", entorno:"Operación normal, 200.000 reproducciones concurrentes.", respuesta:"Las reproducciones en curso continúan y las nuevas solicitudes son atendidas.", medida:"Interrupción percibida ≤ 2 s; ≤ 0,1% de sesiones abortadas; disponibilidad mensual ≥ 99,99%."}},
+  {t:"Caso 3", o:"Ejemplo circulante: streaming, distribuido", a:"Seguridad",
+   v:{fuente:"Actor malicioso.", estimulo:"Intento de acceso no autorizado a contenido protegido o a los datos de los usuarios.", artefacto:"Módulo de autenticación y autorización.", entorno:"Cualquier red pública o privada.", respuesta:"Verifica la identidad mediante OAuth2 o JWT, cifra los datos en tránsito con TLS/SSL y restringe el acceso a contenido no autorizado.", medida:"Denegar el acceso no autorizado en menos de 1 segundo, con una tasa de error de autenticación menor al 0,01% y cifrado activo en el 100% de las transacciones."},
+   d:{estimulo:"Mezcla dos estímulos con riesgos y respuestas distintas: piratear contenido y robar datos personales. Un escenario, un estímulo.",
+      respuesta:"OAuth2, JWT y TLS son tecnologías, no comportamiento. Lo observable: el acceso se niega, se registra y se alerta.",
+      medida:"«Cifrado en el 100%» es una propiedad del diseño, no una medida de la respuesta al ataque. Y «tasa de error de autenticación» es ambigua: ¿falsos positivos o falsos negativos?"},
+   fix:{atributo:"Seguridad", fuente:"Atacante externo con credenciales filtradas de un suscriptor.", estimulo:"Intenta descargar datos de pago de otros suscriptores a través de la API de perfiles.", artefacto:"Servicio de perfiles de usuario.", entorno:"Operación normal, acceso desde Internet.", respuesta:"Niega el acceso a datos de terceros, registra el intento y bloquea la sesión.", medida:"0 registros de terceros expuestos; sesión bloqueada tras ≤ 3 intentos; alerta al equipo de seguridad en ≤ 5 min."}},
+  {t:"Caso 4", o:"Ejemplo circulante: hospital, monolito", a:"Rendimiento",
+   v:{fuente:"Médico en consulta.", estimulo:"Solicita el historial clínico completo del paciente.", artefacto:"Módulo de gestión de historias clínicas.", entorno:"Operación en horario normal con múltiples sesiones activas.", respuesta:"Entrega el historial completo al médico en la misma sesión.", medida:"El historial debe mostrarse en menos de 2 segundos, con un tiempo máximo de consulta a base de datos de 500 ms."},
+   d:{entorno:"«Múltiples sesiones» no dice cuántas. Con 20 sesiones y con 400 son escenarios distintos.",
+      medida:"Los 500 ms para la base de datos prescriben el diseño interno. Y «menos de 2 segundos» no dice si es siempre o el 95% de las veces, ni para historiales de qué tamaño."},
+   note:"La estructura es sólida: es el caso más cercano a estar bien.",
+   fix:{atributo:"Rendimiento", fuente:"Médico en consulta.", estimulo:"Solicita el historial clínico completo del paciente.", artefacto:"Módulo de gestión de historias clínicas.", entorno:"Horario de consulta, 250 sesiones activas, historiales de hasta 10 años.", respuesta:"Entrega el historial completo al médico en la misma sesión.", medida:"p95 ≤ 2 s y p99 ≤ 4 s para historiales de hasta 10 años."}},
+  {t:"Caso 5", o:"GPSMetro", a:"Rendimiento",
+   v:{fuente:"Pasajeros.", estimulo:"Usan la app.", artefacto:"El sistema.", entorno:"Hora pico.", respuesta:"El sistema responde rápido.", medida:"Tiempo de respuesta aceptable."},
+   d:{estimulo:"«Usan la app» no es un evento. ¿Qué piden: ubicación, tiempos de llegada, rutas?",
+      artefacto:"«El sistema» no orienta ningún análisis. ¿Qué parte recibe la carga?",
+      entorno:"¿Cuántos buses, cuántos usuarios, qué franja? Sin cifras no hay condición que reproducir.",
+      respuesta:"«Rápido» es una medida disfrazada. La respuesta dice qué entrega el sistema.",
+      medida:"«Aceptable» para quién. Sin número no hay forma de saber si se cumplió."},
+   fix:{atributo:"Rendimiento", fuente:"Pasajeros en un paradero usando la app móvil.", estimulo:"Solicitan el tiempo estimado de llegada de las rutas que pasan por su parada.", artefacto:"Servicio de consulta de tiempos de llegada.", entorno:"Hora pico de la mañana (6:00–8:00), 1.100 buses en operación, hasta 6.000 consultas por segundo.", respuesta:"Devuelve la lista de próximos buses con su tiempo estimado y la hora de la última posición recibida.", medida:"p95 ≤ 800 ms y p99 ≤ 2 s; ningún tiempo estimado calculado con posiciones de más de 60 s sin advertirlo."}},
+  {t:"Caso 6", o:"GPSMetro", a:"Disponibilidad",
+   v:{fuente:"Dispositivos GPS de 180 buses de la marca B.", estimulo:"Envían posiciones con hasta 4 minutos de retraso por congestión de la red celular.", artefacto:"Servicio de ingesta de posiciones.", entorno:"Hora pico de la tarde, 1.100 buses en operación.", respuesta:"El sistema sigue en línea y muestra las posiciones recibidas en el mapa.", medida:"Disponibilidad del mapa ≥ 99,9%."},
+   d:{atributo:"El sistema nunca se cae; el problema es que muestra información falsa. Eso es fiabilidad (corrección del dato), no disponibilidad. Un sistema puede estar arriba y estar mintiendo.",
+      respuesta:"Mostrar posiciones de hace 4 minutos como si fueran actuales es justamente la falla. Se espera que el sistema detecte la antigüedad del dato y lo marque o lo excluya.",
+      medida:"El uptime se cumple aunque la app muestre buses fantasma. Mide lo que importa: posiciones obsoletas presentadas como actuales."},
+   fix:{atributo:"Fiabilidad", fuente:"Dispositivos GPS de 180 buses de la marca B.", estimulo:"Envían posiciones con hasta 4 minutos de retraso por congestión de la red celular.", artefacto:"Servicio de ingesta de posiciones.", entorno:"Hora pico de la tarde, 1.100 buses en operación.", respuesta:"Detecta las posiciones con más de 60 s de antigüedad, las marca como desactualizadas en la app y las excluye del cálculo de tiempos de llegada.", medida:"0 posiciones con más de 60 s presentadas como actuales; detección en ≤ 30 s desde su recepción."}},
+  {t:"Caso 7", o:"GPSMetro", a:"Mantenibilidad",
+   v:{fuente:"Secretaría de Movilidad.", estimulo:"Sale una nueva regulación.", artefacto:"Módulo de alertas.", entorno:"Tiempo de desarrollo.", respuesta:"El cambio se implementa fácilmente gracias a la arquitectura de microservicios.", medida:"En poco tiempo."},
+   d:{estimulo:"¿Qué exige la regulación? Sin el cambio concreto no se puede estimar su impacto.",
+      respuesta:"Mezcla un adjetivo («fácilmente») con una solución («microservicios»). La respuesta es: el cambio se hace, se prueba y se despliega sin afectar otras partes.",
+      medida:"«Poco tiempo» no es verificable. Usa esfuerzo, módulos tocados o tiempo hasta producción."},
+   fix:{atributo:"Mantenibilidad", fuente:"Secretaría de Movilidad.", estimulo:"Exige que toda alerta de desvío incluya rutas alternas y se envíe también por SMS a usuarios sin app.", artefacto:"Módulo de alertas.", entorno:"Tiempo de desarrollo, equipo de 4 desarrolladores.", respuesta:"El equipo incorpora el nuevo canal y el nuevo contenido, lo prueba y lo despliega sin modificar los módulos de ubicación ni de tiempos de llegada.", medida:"≤ 10 persona-días; 0 cambios fuera del módulo de alertas; en producción en ≤ 3 semanas."}},
+  {t:"Caso 8", o:"GPSMetro", a:"Seguridad",
+   v:{fuente:"Atacante externo con credenciales robadas de un conductor.", estimulo:"Intenta enviar posiciones falsas de un bus desde un dispositivo no registrado.", artefacto:"API de ingesta de posiciones GPS.", entorno:"Operación normal, red celular pública.", respuesta:"Rechaza las posiciones, no las publica a los usuarios, registra el intento y notifica al centro de control.", medida:"100% de las posiciones de dispositivos no registrados rechazadas; alerta en el centro de control en ≤ 60 s; 0 posiciones falsas visibles en la app."},
+   d:{},
+   note:"No tiene defectos de forma: fuente concreta, un solo estímulo, respuesta observable sin nombrar tecnologías, medida verificable. Una discusión legítima: ¿cómo se verificaría ese «100%» en una prueba?"}
+];
+
+const RUBRIC = [
+  ["Fuente y estímulo","Un actor concreto y un único evento","Poner una condición como fuente («hora pico»)","¿Quién, exactamente, dispara esto?"],
+  ["Entorno","Condiciones cuantificadas: carga, franja, modo","«Operación normal» sin cifras","¿Cambia la medida si esto pasa a las 3 de la mañana?"],
+  ["Artefacto","Una parte identificable por su función","«El sistema», o un componente de solución","¿Qué parte sufre primero?"],
+  ["Respuesta","Comportamiento observable desde afuera","Describir la táctica o la tecnología","¿Un usuario podría ver esto sin conocer el diseño?"],
+  ["Medida","Número, unidad y percentil o umbral","Adjetivos o promedios","¿Con qué prueba demostrarían que se cumplió?"],
+  ["Atributo","El escenario ejerce el atributo declarado","Confundir disponibilidad con fiabilidad","Si el sistema está arriba pero dice algo falso, ¿qué atributo falló?"],
+  ["Relevancia","Situación realista y crítica para el negocio","Escenarios triviales que cualquier sistema cumple","¿Qué perdería el Metro si este escenario falla?"]
+];
+
+const SOURCES = [
+  {c:"Personas", r:[["Administrador del sistema","Modifica una regla de negocio desde el panel de configuración"],["Pasajero","Consulta cuándo llega el próximo bus"],["Conductor del bus","Apaga el dispositivo GPS accidentalmente"],["Técnico de mantenimiento","Actualiza el software de un visor en una estación"],["Usuario malicioso","Intenta interceptar o falsificar la señal GPS"]]},
+  {c:"Sistemas y componentes", r:[["Dispositivo GPS del bus","Envía una nueva posición cada 10 segundos"],["API de clima de terceros","Notifica condiciones climáticas extremas"],["Sistema de gestión del Metro","Solicita estadísticas de los buses de los últimos 7 días"],["Servicio de autenticación","Rechaza un token caducado"],["Base de datos","Se queda sin espacio para nuevas escrituras"]]},
+  {c:"Infraestructura física", r:[["Red eléctrica","Corte que deja un visor sin conexión"],["Red celular","Entrega paquetes GPS con retraso o incompletos"],["Servidor","Falla de disco en el nodo que guarda el historial"]]},
+  {c:"Negocio y organización", r:[["Planeación del Metro","Crea una estación nueva que debe aparecer en el sistema"],["Área de comunicaciones","Lanza una funcionalidad y los usuarios la adoptan masivamente"],["Centro de control","Reporta un bloqueo de vía que cambia la estimación de llegada"],["Auditoría externa","Exige trazabilidad completa de todos los mensajes procesados"]]},
+  {c:"Desarrollo y pruebas", r:[["Ingeniero de QA","Ejecuta una prueba de carga sobre la API de visores"],["Pipeline de CI/CD","Despliega una nueva versión del estimador de llegadas"],["Analista","Corre un script para analizar los registros del día anterior"]]}
+];
+
+const SEALED_ITER = 250000;
+const SEALED = [{"salt": "NM3yCIKC3LgThtZIwCBkTA==", "iv": "4/c6TP9o81M2avat", "ct": "nd22p/+3PvqbrRuIBkigsras8W+Pq9xF8bHkanKiKTSrhSCqvaqleHpio+Ty4vsXETCivdmero6piUEjU3adKxMZxtzgzETt3As73kXzaepMPNwOtZDcD1MYLKUdDbY2XYik1I21fyedlcK5JvAxLVcM2Kf19+IZsYY+GFA5rz9aLwcr6w+ahDX1g29inst+OUVqUtbdsrbz1uClBidz5/ivVk0KgQJWiK4fhkYF3huQrb2pN8AlYAGrpyHAUj9TTcaFTNTWcmntwwy4CjKoMe3lRzQjWsAtKyv4TLdC7KlxyDHQ2alFxYQS2WGvjuA6QA62EaWYjFrrQbu+jRwgD2nwj7kGPdnGKyjjc+ffrlu36OjlLcZZS1s6XvOyjwfNrxAIXSZGY0nDog5T55avp0aG4qJUmyRKAB5eGeVYXI1GN1VdAOiV9Uv9cDSuI8+hPyT7vKObcNb3rAxiKiZL186RUVDBb6NPYvwc5xJ3iD6INB4JjlqUeU+4Kn4sWNRORqrH+vQ7RozparqbFBRhcM3AI+1zUQBeKfWyKsfPOchU4otEEZKM9EJlM5yFq9EvlNWSCORCKZRR/GnHx3W5F/bRSq6nry9QKPtujwBuDLSyw3o9mSHeWobulTRy2o/b+M43upTpXVR31uaCtGI6UbLjJCIgqGsMA3FL831JHgRTVdLeWKqeBqID1CYt0V1vMv2zA1FqBLFhzK90+zlh9uvR3l5rkp6zYUdAndAPSyb4kWHi/kynQ5hcWdlfM+sB6DLiNAd/d2k="}, {"salt": "dGkyyx7k5yrHjewkJ5fjWQ==", "iv": "rhlYQcyZqTi4eztj", "ct": "Pet6vpErFFVu5fN7UVVqU55KMxcb8ljXC39u1hNKanLPtaOCVgSNnvVaCVjzwPTkHQi2AAtmE0E2aPFJM048WU/TyxAGc4E2xfqF7X0dhIydi+5cG1Ql1iTFqCmDR+TcffZL9TogMXPuccfCK+HlFLYuF5FqFGeYs6cFmA+XtHEww5zZ44LayVaQGH4tLtit9ZIko2IiNcyFIkOJE51N/kfztuLzrMt3a5RFgMYB6YQSjfntGO7Ku6pSleDfWLzI8yXzysYbAjM0zElWq5lsN4jc3pQ+oebHkH1Rgfyj+pyNRcPXNaRjDq7NSdql78z20kmPoaQpyJYoUobthqWMlNJPcC279HvDeMcwH9zkFBkTEiHiVNwgVOWgFykNg0z6UJPQc33GM1tJe9g9OOTKin0MsUVza49qw+dltzSfgamC3q1mTwf1YBSfBng70johgfmZ3a2wA9NLTipbgLDbk8qXNyxZ7GUc5EFyGIrqOJJxAiBvgbh++qzT4N3n16wB/OmD5DCK/qSVVV8ZOhBPlrXelWxobFkZMPx5/G8tr6u6u1Z4dU1PI2oc5hcnHPE/e839hOf1n5I2SC6GbxqBqlyqvExKor6c5nM="}];
+
+/* ---------------- Estado ---------------- */
+const store = {
+  get(k,d){try{const v=localStorage.getItem(k);return v?JSON.parse(v):d;}catch(e){return d;}},
+  set(k,v){try{localStorage.setItem(k,JSON.stringify(v));}catch(e){}}
+};
+let level = store.get("gpsm.nivel","pregrado");
+let opened = [null,null]; /* contenido descifrado solo en memoria */
+let saved = store.get("gpsm.escenarios",[]);
+let editingId = null;
+
+const $ = s=>document.querySelector(s);
+const esc = s=>String(s??"").replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+
+/* ---------------- Tabs y nivel ---------------- */
+document.querySelectorAll("nav.tabs button").forEach(b=>b.addEventListener("click",()=>showTab(b.dataset.tab)));
+function showTab(id){
+  document.querySelectorAll("nav.tabs button").forEach(b=>b.setAttribute("aria-selected",b.dataset.tab===id));
+  document.querySelectorAll("section.panel").forEach(p=>p.hidden = p.id!=="p-"+id);
+}
+document.querySelectorAll("[data-level]").forEach(b=>b.addEventListener("click",()=>{level=b.dataset.level;store.set("gpsm.nivel",level);applyLevel();}));
+function applyLevel(){
+  document.querySelectorAll("[data-level]").forEach(b=>b.setAttribute("aria-pressed",b.dataset.level===level));
+  renderCaseLevel(); renderFormFields(); lintAll();
+}
+
+/* ---------------- La línea ---------------- */
+function renderLine(el, states, active, onPick){
+  el.innerHTML = FIELDS.map((f,i)=>{
+    const s = states[f.k]||"idle";
+    const icon = s==="ok"?"✓":s==="warn"?"!":s==="err"?"×":(i+1);
+    return `<button type="button" class="st s-${s}${active===f.k?" is-active":""}" data-k="${f.k}" aria-label="${f.n}"><span class="dot" aria-hidden="true">${icon}</span><span class="nm">${f.s}</span></button>`;
+  }).join("");
+  el.querySelectorAll(".st").forEach(b=>b.addEventListener("click",()=>onPick(b.dataset.k)));
+}
+
+/* ---------------- Anatomía ---------------- */
+let anatK = "fuente";
+function renderAnat(){
+  renderLine($("#anatLine"),{},anatK,k=>{anatK=k;renderAnat();});
+  const f = FIELDS.find(x=>x.k===anatK);
+  $("#anatDetail").innerHTML = `
+    <p class="lbl">${f.n}</p>
+    <p class="q">${f.q}</p>
+    <p>${f.def}</p>
+    <div class="grid2" style="margin:16px 0">
+      <div><span class="lbl">En GPSMetro</span><p>${f.ex}</p></div>
+      <div><span class="lbl">En el restaurante</span><p>${f.an}</p></div>
+    </div>
+    <div class="box warn"><h3>Error frecuente</h3><p>${f.err}</p></div>`;
+}
+let ladStep = 0;
+function renderLadder(){
+  $("#ladder").innerHTML = LADDER.slice(1).map((s,i)=>{
+    const f = FIELDS.find(x=>x.k===s.k);
+    const cls = i+1>ladStep?"hide":(i+1===ladStep?"new":"");
+    return `<tr class="${cls}"><td class="k">${f.n}</td><td>${s.v}</td></tr>`;
+  }).join("");
+  $("#vagueLine").classList.toggle("live", ladStep===0);
+  $("#ladderNote").innerHTML = `<p>${LADDER[ladStep].note}</p>`;
+  $("#ladPrev").disabled = ladStep===0;
+  $("#ladNext").disabled = ladStep===LADDER.length-1;
+  $("#ladCount").textContent = `Paso ${ladStep} de ${LADDER.length-1}`;
+}
+$("#ladPrev").addEventListener("click",()=>{ladStep=Math.max(0,ladStep-1);renderLadder();});
+$("#ladNext").addEventListener("click",()=>{ladStep=Math.min(LADDER.length-1,ladStep+1);renderLadder();});
+
+/* ---------------- Clínica ---------------- */
+let caseIdx = 0;
+const caseState = CASES.map(()=>({marks:new Set(), revealed:false}));
+function renderChips(){
+  $("#caseChips").innerHTML = CASES.map((c,i)=>`<button type="button" class="chip" aria-pressed="${i===caseIdx}" data-i="${i}">${c.t}: ${c.a}${caseState[i].revealed?'<span class="done" aria-label="revisado">✓</span>':""}</button>`).join("");
+  $("#caseChips").querySelectorAll(".chip").forEach(b=>b.addEventListener("click",()=>{caseIdx=+b.dataset.i;renderClinic();}));
+}
+function renderClinic(){
+  renderChips();
+  const c = CASES[caseIdx], st = caseState[caseIdx];
+  const rows = [{k:"atributo",n:"Atributo declarado",v:c.a}].concat(FIELDS.map(f=>({k:f.k,n:f.n,v:c.v[f.k]})));
+  const defects = Object.keys(c.d);
+  let hits=0, misses=0, falses=0;
+  const html = rows.map(r=>{
+    let cls = "", diag = "";
+    const isDef = defects.includes(r.k), marked = st.marks.has(r.k);
+    if(st.revealed){
+      if(isDef && marked){cls="r-hit";hits++;diag=`<div class="diag"><span class="tag">Bien visto</span>${c.d[r.k]}</div>`;}
+      else if(isDef){cls="r-miss";misses++;diag=`<div class="diag"><span class="tag">Se te pasó</span>${c.d[r.k]}</div>`;}
+      else if(marked){cls="r-false";falses++;diag=`<div class="diag"><span class="tag">Este estaba bien</span></div>`;}
+    } else if(marked) cls="marked";
+    return `<button type="button" class="f ${cls}" data-k="${r.k}" ${st.revealed?"disabled":""} aria-pressed="${marked}"><span class="fk">${r.n}</span><span>${esc(r.v)}</span>${diag}</button>`;
+  }).join("");
+  let result = "";
+  if(st.revealed){
+    if(defects.length===0){
+      result = st.marks.size===0
+        ? `<div class="box"><h3>Correcto: no marcaste nada</h3><p>${c.note}</p></div>`
+        : `<div class="box warn"><h3>Este escenario estaba bien formado</h3><p>${c.note}</p></div>`;
+    } else {
+      result = `<div class="box${misses?" warn":""}"><h3>Encontraste ${hits} de ${defects.length} defectos${falses?`, con ${falses} falsa${falses>1?"s":""} alarma${falses>1?"s":""}`:""}</h3>${c.note?`<p>${c.note}</p>`:""}</div>`;
+      result += `<div><h3>Una versión corregida</h3><div class="tblwrap"><table><tbody>
+        <tr><td class="k">Atributo</td><td>${c.fix.atributo}</td></tr>
+        ${FIELDS.map(f=>`<tr><td class="k">${f.n}</td><td>${c.fix[f.k]}</td></tr>`).join("")}
+      </tbody></table></div><p class="small muted" style="margin-top:8px">Es una corrección posible, no la única. Discutan si la suya es mejor.</p></div>`;
+    }
+  }
+  $("#caseCard").innerHTML = `
+    <div class="row" style="justify-content:space-between"><h3 style="margin:0">${c.t}</h3><span class="origin">${c.o}</span></div>
+    <div class="fields">${html}</div>
+    <div class="row">
+      ${st.revealed?`<button class="btn ghost" id="cReset" type="button">Intentar de nuevo</button>`:`<button class="btn" id="cCheck" type="button">Ver diagnóstico</button><span class="small muted">${st.marks.size} parte${st.marks.size===1?"":"s"} marcada${st.marks.size===1?"":"s"}</span>`}
+      ${caseIdx<CASES.length-1?`<button class="btn ghost" id="cNext" type="button">Siguiente caso</button>`:""}
+    </div>${result}`;
+  $("#caseCard").querySelectorAll(".f").forEach(b=>b.addEventListener("click",()=>{
+    if(st.revealed) return;
+    st.marks.has(b.dataset.k)?st.marks.delete(b.dataset.k):st.marks.add(b.dataset.k);
+    renderClinic();
+  }));
+  $("#cCheck")?.addEventListener("click",()=>{st.revealed=true;renderClinic();});
+  $("#cReset")?.addEventListener("click",()=>{st.revealed=false;st.marks.clear();renderClinic();});
+  $("#cNext")?.addEventListener("click",()=>{caseIdx++;renderClinic();window.scrollTo({top:$("#caseChips").offsetTop-20,behavior:"smooth"});});
+}
+
+/* ---------------- Caso ---------------- */
+function renderCaseLevel(){
+  if(level==="pregrado"){
+    $("#caseLevel").innerHTML = `
+      <h3>Datos del sistema</h3>
+      <p class="muted small">Usen estas cifras en sus entornos y medidas. No necesitan inventar contexto.</p>
+      <div class="tblwrap"><table><tbody>
+        <tr><td class="k">Flota</td><td>1.100 buses en 85 rutas; 2.400 paradas</td></tr>
+        <tr><td class="k">Posiciones GPS</td><td>Cada bus reporta cada 10 s por red celular; dos marcas de dispositivo</td></tr>
+        <tr><td class="k">Usuarios</td><td>400.000 registrados; hasta 45.000 simultáneos en hora pico</td></tr>
+        <tr><td class="k">Horas pico</td><td>6:00–8:00 y 17:00–19:30; hasta 6.000 consultas por segundo</td></tr>
+        <tr><td class="k">Operación</td><td>El servicio de buses opera de 4:30 a 23:00</td></tr>
+        <tr><td class="k">Historial</td><td>Se conservan 2 años de posiciones</td></tr>
+        <tr><td class="k">Integraciones</td><td>Centro de control del operador, sistema de recaudo, plataforma de datos abiertos de la alcaldía</td></tr>
+        <tr><td class="k">Alertas</td><td>Llegan a los usuarios suscritos a una ruta; hoy son 120.000 suscripciones</td></tr>
+      </tbody></table></div>`;
+  } else {
+    $("#caseLevel").innerHTML = `
+      <h3>Lo que dijeron en la reunión de levantamiento</h3>
+      <p class="muted small">No hay cifras oficiales. Cada escenario debe declarar los supuestos de los que salen sus números.</p>
+      <blockquote class="quote"><p>«En la mañana esto revienta. La gente abre la app cuando ya está en el paradero, y si el bus no aparece, se van a las redes a decir que el sistema no sirve.»</p><cite>Gerente de operaciones del Metro</cite></blockquote>
+      <blockquote class="quote"><p>«Los GPS los compró el operador anterior. Hay de dos marcas y una de ellas manda la posición cuando le da la gana. Y la alcaldía quiere publicar datos abiertos, pero todavía no sabemos en qué formato.»</p><cite>Líder de TI del operador</cite></blockquote>
+      <blockquote class="quote"><p>«El año entrante entramos a tres municipios más. No me pregunten cuántos buses, eso lo están negociando.»</p><cite>Director de planeación</cite></blockquote>
+      <blockquote class="quote"><p>«Muchos adultos mayores usan esto. Y ojo: la posición de un bus no debería servir para que alguien sepa cuándo un conductor queda solo en la terminal.»</p><cite>Veedora ciudadana</cite></blockquote>`;
+  }
+}
+function renderTeams(){
+  $("#teamTable").innerHTML = ATTRS.map(a=>`<tr><td>Equipo ${a.team}</td><td><strong>${a.n}</strong> <span class="muted small">${a.en}</span></td><td>${a.ev}</td></tr>`).join("");
+  $("#rubric").innerHTML = RUBRIC.map(r=>`<tr><td class="k">${r[0]}</td><td>${r[1]}</td><td>${r[2]}</td><td>${r[3]}</td></tr>`).join("");
+}
+async function unseal(i,pw){
+  const S=SEALED[i], dec=x=>Uint8Array.from(atob(x),c=>c.charCodeAt(0));
+  const base=await crypto.subtle.importKey("raw",new TextEncoder().encode(pw.trim().toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g,"")),"PBKDF2",false,["deriveKey"]);
+  const key=await crypto.subtle.deriveKey({name:"PBKDF2",salt:dec(S.salt),iterations:SEALED_ITER,hash:"SHA-256"},base,{name:"AES-GCM",length:256},false,["decrypt"]);
+  const pt=await crypto.subtle.decrypt({name:"AES-GCM",iv:dec(S.iv)},key,dec(S.ct));
+  return JSON.parse(new TextDecoder().decode(pt));
+}
+function renderSealed(){
+  $("#sealed").innerHTML = SEALED.map((_,i)=>{
+    const s=opened[i];
+    if(s) return `<div class="sealed open" style="margin-bottom:14px">
+      <div class="row" style="justify-content:space-between"><h3 style="margin:0">${esc(s.t)}</h3>
+      <button class="btn ghost" type="button" data-close="${i}">Volver a sellar</button></div>
+      <div class="body" style="margin-top:12px"><p>${esc(s.b)}</p><div class="box"><h3>Tarea</h3><p>${esc(s.task)}</p></div></div></div>`;
+    return `<div class="sealed" style="margin-bottom:14px">
+      <h3 style="margin:0 0 10px">Sobre ${i+1}</h3>
+      <form class="row" data-open="${i}" autocomplete="off">
+        <label class="small" for="pw${i}">Contraseña</label>
+        <input id="pw${i}" type="password" style="font:inherit;padding:7px 12px;border:1.5px solid var(--line);border-radius:999px;background:var(--bg);color:var(--ink);min-width:0;flex:1 1 160px;max-width:260px">
+        <button class="btn" type="submit">Abrir sobre</button>
+        <span class="small" id="pwmsg${i}" role="status" style="color:var(--red)"></span>
+      </form></div>`;
+  }).join("");
+  $("#sealed").querySelectorAll("form[data-open]").forEach(f=>f.addEventListener("submit",async ev=>{
+    ev.preventDefault(); const i=+f.dataset.open, msg=$("#pwmsg"+i), pw=$("#pw"+i).value;
+    if(!pw){msg.textContent="Escribe la contraseña.";return;}
+    msg.style.color="var(--muted)"; msg.textContent="Verificando…";
+    try{ opened[i]=await unseal(i,pw); renderSealed(); }
+    catch(e){ msg.style.color="var(--red)"; msg.textContent = window.crypto&&crypto.subtle ? "Contraseña incorrecta." : "Este navegador no permite abrir el sobre."; }
+  }));
+  $("#sealed").querySelectorAll("[data-close]").forEach(b=>b.addEventListener("click",()=>{opened[+b.dataset.close]=null;renderSealed();}));
+}
+
+/* ---------------- Constructor ---------------- */
+function renderFormFields(){
+  const vals = readForm();
+  const extra = level==="posgrado"?[{k:"supuestos",n:"Supuestos declarados",q:"¿De dónde salen sus cifras?",ph:"Ej.: Asumimos 40.000 usuarios simultáneos porque…"}]:[];
+  $("#formFields").innerHTML = FIELDS.concat(extra).map(f=>`
+    <div class="fld" id="w-${f.k}">
+      <label for="f-${f.k}">${f.n} <span class="hint">${f.q}</span></label>
+      <textarea id="f-${f.k}" placeholder="${esc(f.ph)}" rows="2">${esc(vals[f.k]||"")}</textarea>
+      <ul class="msgs" id="m-${f.k}"></ul>
+    </div>`).join("");
+  $("#formFields").querySelectorAll("textarea").forEach(t=>t.addEventListener("input",lintAll));
+}
+$("#f-atributo").innerHTML = ATTRS.map(a=>`<option value="${a.n}">Equipo ${a.team}: ${a.n}</option>`).join("");
+$("#f-atributo").addEventListener("change",lintAll);
+function readForm(){
+  const o = {atributo:$("#f-atributo").value};
+  document.querySelectorAll("#formFields textarea").forEach(t=>o[t.id.slice(2)]=t.value.trim());
+  return o;
+}
+function setForm(o){
+  if(o.atributo) $("#f-atributo").value=o.atributo;
+  FK.concat(["supuestos"]).forEach(k=>{const t=$("#f-"+k); if(t) t.value=o[k]||"";});
+  lintAll();
+}
+
+const norm = s=>s.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g,"");
+const VAGUE = ["rapid","lent","buen","adecuad","aceptable","eficien","facil","intuitiv","optim","robust","confiable","razonable","pronto","poco tiempo","sin problemas","correctamente","amigable","agil","fluid","inmediat","oportun","suficiente"];
+const TACTICS = ["cache","redis","memcache","replica","balance","load balancer","cdn","microservicio","kafka","rabbit","cola de mensaje","circuit breaker","autoescal","escalar horizontal","escalar vertical","escala horizontal","escala vertical","escalamiento","kubernetes","docker","contenedor","oauth","jwt","tls","ssl","2fa","doble factor","sharding","particion","cqrs","canary","blue-green","blue green","failover","redundan","cluster","serverless","api gateway","websocket","heartbeat","reintento","retry","bulkhead","elasticsearch","mongodb","postgres","mysql","aws","azure","kubernetes"];
+const CONDITIONS = ["hora pico","aumento","incremento","temporada","alta demanda","pico de","crecimiento","sobrecarga","picos"];
+const UNITS = /(\d\s*(ms|s|h|min|%|seg|k)\b|milisegundo|segundo|minuto|hora|dia|por ciento|usuari|solicitud|consulta|peticion|req|paso|toque|clic|click|persona|modulo|mensaje|intento|registro|posicion|veces|bus|evento|transaccion|error|falla|sesion|criterio|km|semana|mes)/;
+let ORIG = "";
+const find = (txt,list)=>{
+  for(const w of list){
+    const m = new RegExp("(^|[^a-z0-9])("+w.replace(/[.*+?^${}()|[\]\\]/g,"\\$&")+")").exec(txt);
+    if(m){ const st = m.index+m[1].length; let en = st+w.length; while(en<txt.length && /[a-z0-9]/.test(txt[en])) en++; return ORIG.length===txt.length ? ORIG.slice(st,en) : txt.slice(st,en); }
+  }
+  return null;
+};
+const f2 = (o,n,k,list)=>{ ORIG = (o[k]||"").toLowerCase(); return find(n[k],list); };
+
+function lint(o){
+  const m = {}; FK.concat(["supuestos"]).forEach(k=>m[k]=[]);
+  const add=(k,l,t)=>m[k].push({l,t});
+  const n = {}; Object.keys(o).forEach(k=>n[k]=norm(o[k]||""));
+  const attr = n.atributo;
+  if(o.fuente){
+    const c=f2(o,n,"fuente",CONDITIONS); if(c) add("fuente","warn",`«${c}» parece una condición, no un actor. ¿Quién o qué envía el evento? La condición va en el entorno.`);
+  }
+  if(o.estimulo){
+    if(n.estimulo.split(/\s+/).length<4) add("estimulo","warn","Muy corto: ¿qué evento concreto ocurre?");
+    if(/\bo\b/.test(n.estimulo)) add("estimulo","info","¿Son dos estímulos? Un escenario, un evento.");
+  }
+  if(o.artefacto){
+    if(/^(el |la |todo el |toda la )?(sistema|aplicacion|app|plataforma|software)( completo| completa)?\.?$/.test(n.artefacto)) add("artefacto","warn","Demasiado amplio. ¿Qué parte recibe el estímulo primero?");
+    const t=f2(o,n,"artefacto",TACTICS); if(t) add("artefacto","warn",`«${t}» es un componente de solución que aún no se ha decidido. Nómbralo por su función.`);
+  }
+  if(o.entorno){
+    if(/^operacion normal\.?$/.test(n.entorno)) add("entorno","warn","«Operación normal» necesita cifras: usuarios, buses, consultas por segundo, franja.");
+    else if(!/\d/.test(n.entorno) && /(normal|pico|alta|carga|muchos|varios|multiples)/.test(n.entorno)) add("entorno","warn","¿Cuánto? Cuantifica la carga o la franja para que el escenario sea reproducible.");
+  }
+  if(o.respuesta){
+    const t=f2(o,n,"respuesta",TACTICS); if(t) add("respuesta","warn",`Menciona «${t}»: eso es una decisión de diseño. Describe lo que se observa desde afuera; las tácticas vienen después.`);
+    const v=f2(o,n,"respuesta",VAGUE); if(v) add("respuesta","warn",`«${v}» es un juicio, no un comportamiento. ¿Qué entrega o hace el sistema?`);
+  }
+  if(o.medida){
+    if(!/\d/.test(n.medida)) add("medida","err","Sin número: no hay forma de verificar si se cumplió.");
+    else if(!UNITS.test(n.medida)) add("medida","warn","Hay número, pero ¿en qué unidad?");
+    const v=f2(o,n,"medida",VAGUE); if(v) add("medida","warn",`«${v}» no se puede medir.`);
+    if(/promedio|\bmedia\b/.test(n.medida)) add("medida","warn","Un promedio esconde los casos lentos. Considera p95 o p99.");
+    if(attr.startsWith("disponib") && /100\s*%/.test(n.medida)) add("medida","warn","100% de disponibilidad no es alcanzable ni verificable. Define una meta y una ventana (p. ej. 99,9% mensual en franja de operación).");
+    if(attr.startsWith("rendim") && /(ms|segundo|\d\s*s\b)/.test(n.medida) && !/(p\d\d|percentil|%|de las|de los)/.test(n.medida)) add("medida","info","¿Siempre, o el 95% de las veces? Declara el percentil.");
+    if(attr.startsWith("disponib") && /(dato|posicion|incorrect|obsolet|desactualiz)/.test(n.medida+" "+n.respuesta)) add("medida","info","¿Estás midiendo si el sistema está arriba, o si lo que muestra es correcto? Lo segundo es fiabilidad.");
+  }
+  if(level==="posgrado" && !o.supuestos && FK.every(k=>o[k])) add("supuestos","info","Declara al menos un supuesto: ¿de dónde salieron tus cifras?");
+  return m;
+}
+function stateOf(val,msgs){
+  if(!val) return "idle";
+  if(msgs.some(x=>x.l==="err")) return "err";
+  if(msgs.some(x=>x.l==="warn")) return "warn";
+  return "ok";
+}
+function lintAll(){
+  const o = readForm(), m = lint(o), states = {};
+  FK.concat(["supuestos"]).forEach(k=>{
+    const ul=$("#m-"+k); if(!ul) return;
+    ul.innerHTML = m[k].map(x=>`<li class="${x.l}">${esc(x.t)}</li>`).join("");
+    const s = stateOf(o[k],m[k]); states[k]=s;
+    $("#w-"+k).className = "fld s-"+s;
+  });
+  renderLine($("#buildLine"),states,null,k=>{const t=$("#f-"+k);t.focus();t.scrollIntoView({block:"center",behavior:"smooth"});});
+  const filled = FK.filter(k=>o[k]).length, clean = FK.filter(k=>states[k]==="ok").length;
+  $("#saveBtn").disabled = filled<6;
+  $("#saveBtn").textContent = editingId?"Actualizar escenario":"Guardar escenario";
+  $("#saveHint").textContent = filled<6 ? `Faltan ${6-filled} parada${6-filled===1?"":"s"} por completar.` : clean<6 ? `${6-clean} parada${6-clean===1?"":"s"} con alertas. Puedes guardar igual si tu equipo lo defiende.` : "Todas las paradas sin alertas.";
+}
+$("#saveBtn").addEventListener("click",()=>{
+  const o = readForm();
+  if(editingId){ const i=saved.findIndex(x=>x.id===editingId); if(i>=0) saved[i]={...o,id:editingId}; editingId=null; }
+  else saved.push({...o,id:Date.now().toString(36)});
+  store.set("gpsm.escenarios",saved); setForm({atributo:o.atributo}); renderSaved();
+});
+$("#clearBtn").addEventListener("click",()=>{editingId=null;setForm({atributo:$("#f-atributo").value});});
+$("#exampleBtn").addEventListener("click",()=>{editingId=null;setForm({atributo:"Rendimiento",fuente:"Pasajeros.",estimulo:"Usan la app.",artefacto:"El sistema.",entorno:"Hora pico.",respuesta:"El sistema responde rápido usando caché.",medida:"Tiempo de respuesta aceptable."});});
+function renderSaved(){
+  if(!saved.length){ $("#savedList").innerHTML = `<p class="small muted">Aún no hay escenarios. Completa las seis paradas y guárdalo aquí.</p>`; return; }
+  $("#savedList").innerHTML = saved.map((s,i)=>`
+    <div class="saved-item"><div class="a">${i+1}. ${esc(s.atributo)}</div>
+    <div class="m">${esc(s.estimulo)}</div><div class="m muted">${esc(s.medida)}</div>
+    <div class="row" style="margin-top:4px"><button class="linkbtn" data-c="${s.id}">Copiar</button><button class="linkbtn" data-e="${s.id}">Editar</button><button class="linkbtn" data-d="${s.id}">Eliminar</button></div></div>`).join("");
+  $("#savedList").querySelectorAll("[data-c]").forEach(b=>b.addEventListener("click",()=>{const i=saved.findIndex(x=>x.id===b.dataset.c);copyScenario(saved[i],i);}));
+  $("#savedList").querySelectorAll("[data-e]").forEach(b=>b.addEventListener("click",()=>{const s=saved.find(x=>x.id===b.dataset.e);editingId=s.id;setForm(s);$("#form").scrollIntoView({behavior:"smooth"});}));
+  $("#savedList").querySelectorAll("[data-d]").forEach(b=>b.addEventListener("click",()=>{if(!confirm("¿Eliminar este escenario?"))return;saved=saved.filter(x=>x.id!==b.dataset.d);if(editingId===b.dataset.d)editingId=null;store.set("gpsm.escenarios",saved);renderSaved();lintAll();}));
+}
+async function copyScenario(s,i){
+  const clean = v=>String(v||"").replace(/[\t\n\r]+/g," ");
+  const txt = [s.atributo].concat(FK.map(k=>s[k])).map(clean).join("\n");
+  const box=$("#tsvBox"); box.value=txt; box.hidden=true;
+  try{ await navigator.clipboard.writeText(txt); $("#copyMsg").textContent=`Escenario ${i+1} copiado. Pégalo en la celda a la derecha de «Atributo de calidad».`; }
+  catch(e){ box.hidden=false; box.focus(); box.select(); $("#copyMsg").textContent="Tu navegador no permitió copiar automáticamente. El texto quedó seleccionado abajo: usa Ctrl+C o Cmd+C."; }
+}
+/* ---------------- Banco ---------------- */
+let attrId = "rend";
+function renderBank(){
+  $("#attrChips").innerHTML = ATTRS.map(a=>`<button type="button" class="chip" aria-pressed="${a.id===attrId}" data-a="${a.id}">${a.n}</button>`).join("");
+  $("#attrChips").querySelectorAll(".chip").forEach(b=>b.addEventListener("click",()=>{attrId=b.dataset.a;renderBank();}));
+  const a = ATTRS.find(x=>x.id===attrId);
+  $("#attrDetail").innerHTML = `
+    <div class="card stack">
+      <div><h3>${a.n}</h3><p class="muted small" style="margin:0">${a.en}. ${a.ev}.</p></div>
+      <div><span class="lbl">Situaciones típicas</span><ul class="plain">${a.sit.map(s=>`<li>${s}</li>`).join("")}</ul></div>
+      <div><span class="lbl">Métricas verificables</span><ul class="plain metrics">${a.met.map(s=>`<li>${s}</li>`).join("")}</ul></div>
+      <div class="box err"><h3>No son métricas</h3><p>${a.anti.join(", ")}</p></div>
+    </div>
+    <div class="card">
+      <h3>Puntos de partida en GPSMetro</h3>
+      <p class="small muted">Tres de las seis paradas ya están. Tu equipo completa artefacto, respuesta y medida.</p>
+      ${a.seeds.map((s,i)=>`<div class="seed"><dl><dt>Fuente</dt><dd>${s.fuente}</dd><dt>Estímulo</dt><dd>${s.estimulo}</dd><dt>Entorno</dt><dd>${s.entorno}</dd></dl><button class="linkbtn" data-seed="${i}">Llevar al constructor</button></div>`).join("")}
+    </div>`;
+  $("#attrDetail").querySelectorAll("[data-seed]").forEach(b=>b.addEventListener("click",()=>{
+    const s=a.seeds[+b.dataset.seed]; editingId=null;
+    setForm({atributo:a.n,fuente:s.fuente+".",estimulo:s.estimulo+".",entorno:s.entorno+"."});
+    showTab("constructor"); window.scrollTo({top:0,behavior:"smooth"});
+  }));
+}
+function renderSources(){
+  $("#sourceTables").innerHTML = SOURCES.map(g=>`
+    <h3 style="margin-top:16px">${g.c}</h3>
+    <div class="tblwrap"><table><thead><tr><th>Fuente</th><th>Estímulo</th></tr></thead><tbody>
+    ${g.r.map(r=>`<tr><td>${r[0]}</td><td>${r[1]}</td></tr>`).join("")}</tbody></table></div>`).join("");
+}
+
+/* ---------------- Inicio ---------------- */
+renderAnat(); renderLadder(); renderClinic(); renderTeams(); renderSealed(); renderBank(); renderSources();
+renderFormFields(); applyLevel(); renderSaved();
+</script>
+</body>
+</html>

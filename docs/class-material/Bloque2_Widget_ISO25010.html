@@ -1,0 +1,612 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<title>ISO/IEC 25010 — Ronda en vivo</title>
+<style>
+  :root{
+    --ink:#1E293B; --slate:#475569; --slate-light:#94A3B8;
+    --teal-dark:#0F766E; --teal-mid:#0D9488; --teal-pale:#CCFBF1; --teal-faint:#F0FDFA;
+    --gold:#B45309; --gold-pale:#FEF3C7;
+    --bg:#F8FAFC; --card:#FFFFFF; --border:#E2E8F0;
+  }
+  *{box-sizing:border-box;}
+  body{margin:0;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Helvetica,Arial,sans-serif;background:var(--bg);color:var(--ink);}
+  .wrap{max-width:1100px;margin:0 auto;padding:28px 24px 48px;}
+  header{margin-bottom:20px;}
+  .kicker{font-size:12px;font-weight:700;letter-spacing:0.08em;color:var(--teal-mid);text-transform:uppercase;}
+  h1{font-family:Georgia,"Iowan Old Style",serif;font-size:28px;margin:4px 0 2px;font-weight:normal;color:var(--ink);}
+  .sub{color:var(--slate);font-size:14px;margin:0;}
+  nav.tabs{display:flex;gap:28px;border-bottom:1px solid var(--border);margin:22px 0 24px;}
+  .tab{padding:10px 2px;cursor:pointer;font-size:15px;color:var(--slate);border-bottom:2px solid transparent;user-select:none;}
+  .tab.active{color:var(--teal-dark);border-bottom-color:var(--teal-dark);font-weight:600;}
+  .panel{display:none;}
+  .panel.active{display:block;}
+  .grid{display:grid;grid-template-columns:340px 1fr;gap:24px;align-items:start;}
+  @media (max-width:820px){.grid{grid-template-columns:1fr;}}
+  .card{background:var(--card);border:1px solid var(--border);border-radius:10px;padding:18px 20px;}
+  label{display:block;font-size:12px;color:var(--slate);margin-bottom:4px;font-weight:600;}
+  select, input[type=text]{width:100%;padding:8px 10px;border:1px solid var(--border);border-radius:6px;font-size:14px;color:var(--ink);background:#fff;}
+  .field{margin-bottom:14px;}
+  .desc{font-size:13px;color:var(--slate);line-height:1.5;background:var(--teal-faint);border-left:3px solid var(--teal-mid);padding:10px 12px;border-radius:0 6px 6px 0;margin-top:8px;}
+  .chips{display:flex;flex-wrap:wrap;gap:6px;margin-top:6px;}
+  .chip{font-size:12px;padding:5px 10px;border-radius:14px;border:1px solid var(--border);cursor:pointer;color:var(--slate);background:#fff;user-select:none;}
+  .chip.on{background:var(--teal-pale);border-color:var(--teal-mid);color:var(--teal-dark);font-weight:600;}
+  .slider-row{display:flex;align-items:center;gap:10px;margin-bottom:8px;}
+  .slider-row label{margin:0;flex:0 0 108px;font-weight:500;color:var(--ink);font-size:12.5px;}
+  input[type=range]{flex:1;accent-color:var(--teal-mid);}
+  .slider-val{width:18px;text-align:right;font-size:13px;font-weight:600;color:var(--teal-dark);}
+  button{background:var(--teal-dark);color:#fff;border:none;padding:10px 16px;border-radius:6px;font-size:14px;cursor:pointer;font-weight:600;}
+  button:hover{background:var(--teal-mid);}
+  button.ghost{background:none;color:var(--slate);border:1px solid var(--border);font-weight:500;}
+  button.ghost:hover{background:#F1F5F9;}
+  .row-between{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;}
+  table{width:100%;border-collapse:collapse;font-size:12.5px;margin-top:14px;}
+  th,td{padding:6px 8px;text-align:center;border-bottom:1px solid var(--border);}
+  th{color:var(--slate);font-weight:600;font-size:11px;text-transform:uppercase;letter-spacing:0.03em;}
+  td:first-child,th:first-child{text-align:left;}
+  tr.avg-row td{font-weight:700;color:var(--teal-dark);background:var(--teal-faint);}
+  .del{cursor:pointer;color:var(--slate-light);font-weight:700;}
+  .del:hover{color:#B91C1C;}
+  .empty-note{color:var(--slate-light);font-size:13px;padding:20px 0;text-align:center;}
+  .cheat-grid{display:grid;grid-template-columns:1fr 1fr;gap:28px;align-items:start;}
+  @media (max-width:820px){.cheat-grid{grid-template-columns:1fr;}}
+  .subitem{font-size:12.5px;line-height:1.45;padding:9px 0;border-bottom:1px dashed var(--border);}
+  .subitem:last-child{border-bottom:none;}
+  .note{font-size:12px;color:var(--slate-light);margin-top:6px;}
+  .tension-group-title{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:0.06em;color:var(--slate-light);margin:18px 0 8px;}
+  .tension-row{display:flex;gap:14px;background:var(--card);border:1px solid var(--border);border-radius:8px;padding:12px 16px;margin-bottom:8px;align-items:flex-start;}
+  .tsign{flex:0 0 30px;height:30px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:16px;color:#fff;}
+  .tsign.strong{background:#DC2626;}
+  .tsign.mild{background:#D97706;}
+  .tsign.synergy{background:#16A34A;}
+  .tsign.none{background:#CBD5E1;color:var(--slate);font-size:13px;}
+  .trow-title{font-weight:600;font-size:14px;margin-bottom:3px;}
+  .trow-text{font-size:13px;color:var(--slate);line-height:1.5;margin-bottom:4px;}
+  .trow-ex{font-size:12.5px;color:var(--teal-dark);line-height:1.4;}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <div class="kicker">Bloque 2 · Atributos de calidad y escenarios</div>
+    <h1>ISO/IEC 25010 — ronda en vivo</h1>
+    <p class="sub">Cada equipo prioriza el escenario en pantalla. El radar se actualiza en vivo con cada equipo.</p>
+  </header>
+
+  <nav class="tabs">
+    <div class="tab active" data-tab="live">Ronda en vivo</div>
+    <div class="tab" data-tab="cheat">Cheatsheet ISO 25010</div>
+    <div class="tab" data-tab="tensions">Tensiones</div>
+  </nav>
+
+  <!-- ======================= RONDA EN VIVO ======================= -->
+  <section class="panel active" id="panel-live">
+    <div class="grid">
+      <div class="card">
+        <div class="field">
+          <label>Escenario</label>
+          <select id="scenarioSelect"></select>
+        </div>
+        <div class="field">
+          <label>Variación</label>
+          <select id="variationSelect">
+            <option value="a">Variación A</option>
+            <option value="b">Variación B</option>
+          </select>
+        </div>
+        <div class="desc" id="scenarioDesc"></div>
+
+        <div class="field" style="margin-top:16px;">
+          <label>Atributos incluidos en la ronda</label>
+          <div class="chips" id="attrChips"></div>
+          <div class="note">Mínimo 3 atributos activos.</div>
+        </div>
+
+        <hr style="border:none;border-top:1px solid var(--border);margin:16px 0;">
+
+        <div class="field">
+          <label>Nombre del equipo</label>
+          <input type="text" id="teamName" placeholder="Equipo 1">
+        </div>
+        <div id="sliders"></div>
+        <button id="addTeamBtn" style="width:100%;margin-top:6px;">Agregar equipo a la ronda</button>
+      </div>
+
+      <div class="card">
+        <div class="row-between">
+          <strong style="font-size:14px;">Radar de la ronda</strong>
+          <button class="ghost" id="resetBtn">Reiniciar ronda</button>
+        </div>
+        <div style="position:relative;height:360px;">
+          <canvas id="radarChart"></canvas>
+        </div>
+        <div id="tableWrap"></div>
+      </div>
+    </div>
+
+    <div class="card" id="compareCard" style="margin-top:16px;">
+      <div class="row-between">
+        <strong style="font-size:14px;">Comparación Variación A vs Variación B</strong>
+        <span class="note" id="compareCount" style="margin:0;"></span>
+      </div>
+      <div style="position:relative;height:320px;">
+        <canvas id="compareChart"></canvas>
+      </div>
+      <div class="empty-note" id="compareEmpty"></div>
+    </div>
+  </section>
+
+  <!-- ======================= CHEATSHEET ======================= -->
+  <section class="panel" id="panel-cheat">
+    <div class="cheat-grid">
+      <div class="card">
+        <div style="position:relative;height:340px;">
+          <canvas id="cheatChart"></canvas>
+        </div>
+        <div class="note" style="text-align:center;">Haz clic en un gajo para ver su definición</div>
+      </div>
+      <div class="card" id="cheatDetail"></div>
+    </div>
+  </section>
+
+  <!-- ======================= TENSIONES ======================= -->
+  <section class="panel" id="panel-tensions">
+    <div class="card">
+      <label style="margin-bottom:8px;">Elige un atributo para ver sus tensiones típicas con los demás</label>
+      <div class="chips" id="tensionAttrChips"></div>
+    </div>
+    <div id="tensionList" style="margin-top:16px;"></div>
+  </section>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
+<script>
+const TENSIONS = [
+  {a:'seg', b:'usab', level:'strong', text:'Más controles de seguridad (autenticación, validaciones) añaden fricción a la experiencia del usuario.', ex:'Un límite estricto de intentos de login reduce el riesgo de fuerza bruta, pero bloquea a usuarios legítimos que se equivocan de contraseña.'},
+  {a:'seg', b:'perf', level:'strong', text:'El cifrado, la validación de tokens y las verificaciones de autorización consumen tiempo de procesamiento en cada solicitud.', ex:'Validar una firma criptográfica en cada transacción añade latencia medible bajo alta concurrencia.'},
+  {a:'perf', b:'mant', level:'strong', text:'Las optimizaciones de bajo nivel (caché manual, código especializado) suelen sacrificar claridad y modularidad.', ex:'Una consulta SQL optimizada manualmente con hints específicos del motor es más rápida pero más frágil ante cambios.'},
+  {a:'perf', b:'port', level:'mild', text:'Optimizar para una plataforma específica reduce la capacidad de ejecutar el sistema en otros entornos.', ex:'Usar instrucciones específicas de un procesador mejora el desempeño pero ata el sistema a esa arquitectura.'},
+  {a:'fiab', b:'perf', level:'mild', text:'Los mecanismos de tolerancia a fallos (reintentos, redundancia, replicación) consumen recursos y tiempo adicional.', ex:'Escribir en dos réplicas antes de confirmar una transacción aumenta la fiabilidad pero añade latencia.'},
+  {a:'seg', b:'mant', level:'mild', text:'Los controles de seguridad añaden capas y validaciones que incrementan la complejidad del código.', ex:'Un sistema de permisos granular es más seguro pero más difícil de modificar sin introducir huecos.'},
+  {a:'compat', b:'seg', level:'mild', text:'Ampliar la interoperabilidad expone más puntos de integración, y cada uno es una superficie de ataque potencial.', ex:'Exponer una API pública para integrarse con terceros multiplica los vectores de ataque posibles.'},
+  {a:'usab', b:'perf', level:'mild', text:'Las confirmaciones y validaciones que protegen al usuario de errores añaden pasos y tiempo a la interacción.', ex:'Pedir confirmación explícita antes de una transferencia grande añade fricción, no solo protección.'},
+  {a:'mant', b:'fiab', level:'synergy', text:'Un sistema modular es más fácil de diagnosticar y aislar cuando falla, lo que favorece la fiabilidad.', ex:'Separar servicios por responsabilidad permite que la falla de uno no derribe a los demás.'},
+  {a:'mant', b:'port', level:'synergy', text:'El desacoplamiento que exige la mantenibilidad también facilita adaptar el sistema a nuevos entornos.', ex:'Aislar el acceso a datos detrás de una interfaz permite tanto cambiarlo fácilmente como portarlo a otro motor de base de datos.'},
+  {a:'compat', b:'mant', level:'synergy', text:'Diseñar con estándares de interoperabilidad suele forzar interfaces más limpias y desacopladas.', ex:'Adoptar un estándar como HL7/FHIR obliga a definir contratos claros entre módulos, lo que también facilita mantenerlos.'},
+  {a:'func', b:'mant', level:'mild', text:'Agregar funciones sin refactorizar acumula complejidad y degrada la mantenibilidad con el tiempo.', ex:'Cada regla de negocio añadida directamente al mismo método, sin reestructurar, lo hace cada vez más difícil de modificar.'},
+  {a:'func', b:'perf', level:'mild', text:'Cubrir más casos de uso y validaciones amplía el código que se ejecuta en cada solicitud, lo que puede afectar el tiempo de respuesta.', ex:'Agregar validaciones exhaustivas a cada campo de un formulario para cubrir todos los casos posibles añade procesamiento en cada envío.'},
+  {a:'func', b:'usab', level:'mild', text:'Cuantas más funciones expone un sistema, más difícil es mantener una interfaz simple y fácil de aprender.', ex:'Un formulario con 40 campos porque el sistema soporta todos los casos posibles resulta abrumador de usar.'},
+  {a:'func', b:'seg', level:'mild', text:'Cada función adicional expuesta es una superficie potencial de explotación.', ex:'Un endpoint adicional para exportar datos masivamente añade valor funcional, pero también un vector de fuga de datos si no se protege igual de bien que el resto.'},
+  {a:'func', b:'port', level:'mild', text:'Las funciones muy específicas de una plataforma reducen la capacidad de portar el sistema a otros entornos.', ex:'Una función que usa notificaciones push nativas de un sistema operativo ata esa función a esa plataforma.'},
+  {a:'perf', b:'compat', level:'mild', text:'Traducir información entre formatos o protocolos estándar para interoperar añade procesamiento frente a un formato propio optimizado.', ex:'Convertir cada mensaje a un formato estándar como XML añade tiempo de procesamiento frente a un formato binario propio.'},
+  {a:'compat', b:'fiab', level:'mild', text:'Depender de sistemas externos para interoperar introduce puntos de falla adicionales fuera del control propio.', ex:'Si el sistema de pagos externo con el que se integra cae, la interoperabilidad se convierte en un punto de fallo para toda la transacción.'},
+  {a:'compat', b:'port', level:'synergy', text:'Adoptar estándares abiertos de interoperabilidad suele apoyarse en las mismas abstracciones que facilitan portar el sistema a otros entornos.', ex:'Adoptar un estándar como HL7/FHIR no solo permite intercambiar información con otros sistemas, sino que también facilita migrar el propio sistema a otra plataforma que soporte el mismo estándar.'},
+  {a:'usab', b:'port', level:'mild', text:'Mantener una buena experiencia en cada plataforma exige adaptar la interfaz a sus particularidades, lo que tensiona con reutilizar el mismo código en todas partes.', ex:'Una interfaz que se siente natural en escritorio puede no ser usable en móvil sin adaptaciones específicas, lo que complica portar el mismo código a ambos.'},
+  {a:'fiab', b:'seg', level:'mild', text:'Ante una falla, priorizar disponibilidad puede llevar a \u2018fallar abierto\u2019 (permitir acceso), mientras que la seguridad exige \u2018fallar cerrado\u2019 (denegar por defecto) — son instintos de diseño opuestos ante el mismo incidente.', ex:'Si el servicio de autenticación cae, ¿el sistema deja pasar a todos para no interrumpir el servicio, o bloquea a todos para no arriesgar un acceso indebido?'},
+  {a:'seg', b:'port', level:'mild', text:'Los mecanismos de seguridad que dependen de un proveedor o plataforma específica reducen la portabilidad del sistema.', ex:'Usar el almacenamiento seguro nativo de un sistema operativo específico para guardar credenciales ata esa función a esa plataforma.'},
+];
+const TENSION_COLOR = {strong:'#DC2626', mild:'#D97706', synergy:'#16A34A'};
+function tensionKey(a,b){ return [a,b].sort().join('|'); }
+const TENSION_MAP = {};
+TENSIONS.forEach(t => { TENSION_MAP[tensionKey(t.a,t.b)] = t; });
+
+const ATTRS = [
+
+  {id:'func',  label:'Adecuación funcional',   short:'Func.',    color:'#0D9488', def:'Grado en que el sistema ofrece funciones que satisfacen las necesidades declaradas e implícitas en las condiciones especificadas.', subs:[
+    {name:'Completitud funcional', def:'Cobertura de todas las tareas y objetivos de usuario especificados.', ex:'Un sistema de nómina que calcula todos los tipos de deducciones legales requeridas, sin dejar ningún caso sin cubrir.'},
+    {name:'Corrección funcional', def:'El sistema entrega resultados correctos, con la precisión requerida.', ex:'Un motor de facturación que calcula el IVA exactamente según la tarifa vigente, sin errores de redondeo.'},
+    {name:'Pertinencia funcional', def:'Las funciones facilitan el cumplimiento de tareas y objetivos específicos.', ex:'Una app de transporte que solo expone al pasajero las funciones que necesita durante el viaje.'},
+  ]},
+  {id:'perf',  label:'Eficiencia de desempeño',short:'Desemp.',  color:'#2563EB', def:'Desempeño del sistema en relación con la cantidad de recursos utilizados, bajo condiciones establecidas.', subs:[
+    {name:'Comportamiento temporal', def:'Tiempos de respuesta, procesamiento y throughput ante una carga determinada.', ex:'Una API de búsqueda que responde en menos de 200 ms al 95% de las peticiones.'},
+    {name:'Utilización de recursos', def:'Cantidad y tipo de recursos usados al desempeñar sus funciones.', ex:'Una app móvil que no supera 150 MB de RAM en segundo plano para evitar que el sistema operativo la cierre.'},
+    {name:'Capacidad', def:'Los límites máximos de un parámetro cumplen los requisitos.', ex:'Una plataforma de votación que soporta 50.000 votantes concurrentes en la última hora de la jornada.'},
+  ]},
+  {id:'compat',label:'Compatibilidad',         short:'Compat.',  color:'#7C3AED', def:'Capacidad de dos o más sistemas de intercambiar información y/o cumplir sus funciones compartiendo el mismo entorno.', subs:[
+    {name:'Coexistencia', def:'Operar eficientemente compartiendo un entorno común con otros productos, sin afectarlos.', ex:'Un agente de monitoreo en el mismo servidor que la app principal, sin competir por CPU al punto de degradarla.'},
+    {name:'Interoperabilidad', def:'Capacidad de intercambiar información y de usar la información intercambiada.', ex:'Un sistema hospitalario que exporta resultados de laboratorio en formato HL7 para que otro sistema los consuma sin transformación manual.'},
+  ]},
+  {id:'usab',  label:'Usabilidad',             short:'Usab.',    color:'#D97706', def:'Grado en que el sistema puede ser usado por usuarios específicos para alcanzar objetivos con eficacia, eficiencia y satisfacción.', subs:[
+    {name:'Reconocibilidad de adecuación', def:'Los usuarios pueden reconocer si el producto es adecuado para sus necesidades.', ex:'La pantalla de inicio de una app bancaria comunica de inmediato qué operaciones puede resolver ahí un usuario nuevo.'},
+    {name:'Capacidad de aprendizaje', def:'Facilidad con la que los usuarios logran usarlo con eficacia y satisfacción al aprender.', ex:'Un cajero automático que un usuario nuevo puede operar sin ayuda tras un solo intento.'},
+    {name:'Capacidad de operación', def:'Facilidad para operar y controlar el producto.', ex:'Atajos de teclado consistentes en un editor de código que reducen los pasos para tareas repetitivas.'},
+    {name:'Protección contra errores de usuario', def:'El sistema protege a los usuarios de cometer errores.', ex:'Un formulario de transferencia bancaria que exige confirmación explícita antes de mover montos grandes.'},
+    {name:'Estética de la interfaz', def:'La interfaz permite una interacción agradable y satisfactoria.', ex:'Consistencia visual y espaciado cuidado en una app de lectura que reduce la fatiga visual.'},
+    {name:'Accesibilidad', def:'Uso por personas con el rango más amplio de características, incluida discapacidad.', ex:'Soporte de lector de pantalla y contraste suficiente en un portal de trámites del Estado.'},
+  ]},
+  {id:'fiab',  label:'Fiabilidad',             short:'Fiab.',    color:'#16A34A', def:'Grado en que el sistema desempeña funciones específicas bajo condiciones específicas durante un período determinado.', subs:[
+    {name:'Madurez', def:'El sistema satisface las necesidades de fiabilidad bajo operación normal.', ex:'Una tasa de errores en producción menor al 0.1% después de seis meses de estabilización.'},
+    {name:'Disponibilidad', def:'El sistema está operativo y accesible cuando se requiere su uso.', ex:'Un sistema de e-commerce con 99.95% de uptime mensual comprometido en el SLA.'},
+    {name:'Tolerancia a fallos', def:'El sistema opera según lo previsto a pesar de fallas de hardware o software.', ex:'Un servicio que sigue respondiendo con datos en caché si la base de datos principal cae momentáneamente.'},
+    {name:'Capacidad de recuperación', def:'Puede recuperar datos afectados y restablecer el estado deseado tras una interrupción.', ex:'Un sistema de reservas que restaura una transacción interrumpida a partir de su log de eventos.'},
+  ]},
+  {id:'seg',   label:'Seguridad',              short:'Segur.',   color:'#DC2626', def:'Grado en que el sistema protege información y datos, de modo que otros tengan el nivel de acceso apropiado a su autorización.', subs:[
+    {name:'Confidencialidad', def:'Los datos son accesibles solo para quienes están autorizados.', ex:'Cifrado de los datos sensibles del paciente en una historia clínica electrónica.'},
+    {name:'Integridad', def:'Se previene el acceso o modificación no autorizados de los datos.', ex:'Sumas de verificación (checksums) que detectan si un archivo de transacciones fue alterado en tránsito.'},
+    {name:'No repudio', def:'Las acciones o eventos pueden probarse de modo que no puedan negarse después.', ex:'La firma electrónica de un contrato que impide que una de las partes niegue haberlo firmado.'},
+    {name:'Responsabilidad', def:'Las acciones de una entidad pueden rastrearse de forma única hasta ella.', ex:'Un log de auditoría que registra qué usuario aprobó cada crédito y en qué momento.'},
+    {name:'Autenticidad', def:'Se puede probar que la identidad de un sujeto o recurso es la declarada.', ex:'Autenticación multifactor que confirma que quien inicia sesión es realmente el dueño de la cuenta.'},
+  ]},
+  {id:'mant',  label:'Mantenibilidad',         short:'Manten.',  color:'#475569', def:'Grado de eficacia y eficiencia con el que el sistema puede ser modificado por los responsables de su mantenimiento.', subs:[
+    {name:'Modularidad', def:'Compuesto de componentes discretos: un cambio en uno impacta mínimamente a los demás.', ex:'Separar el módulo de pagos del de inventario, para que un cambio en la pasarela no obligue a tocar el inventario.'},
+    {name:'Reusabilidad', def:'Un activo puede usarse en más de un sistema o en la construcción de otros activos.', ex:'Una librería de validación de documentos de identidad reutilizada en varios productos de la empresa.'},
+    {name:'Analizabilidad', def:'Facilidad para evaluar el impacto de un cambio o diagnosticar deficiencias.', ex:'Trazas y logs estructurados que permiten identificar en minutos cuál servicio causó una caída.'},
+    {name:'Capacidad de modificación', def:'Puede modificarse sin introducir defectos ni degradar la calidad existente.', ex:'Agregar un nuevo método de pago sin reescribir el flujo de checkout completo.'},
+    {name:'Capacidad de prueba', def:'Facilidad para establecer y verificar criterios de prueba del sistema.', ex:'Inyección de dependencias que permite probar la lógica de negocio sin una base de datos real.'},
+  ]},
+  {id:'port',  label:'Portabilidad',           short:'Portab.',  color:'#DB2777', def:'Grado de eficacia y eficiencia con el que el sistema puede transferirse de un entorno operacional a otro.', subs:[
+    {name:'Adaptabilidad', def:'Se adapta a diferentes entornos sin aplicar acciones distintas a las previstas.', ex:'Una app que ajusta su interfaz entre modo claro y oscuro según el sistema operativo.'},
+    {name:'Capacidad de instalación', def:'Puede instalarse o desinstalarse con éxito en un entorno específico.', ex:'Un instalador que detecta dependencias faltantes y las resuelve automáticamente.'},
+    {name:'Capacidad de reemplazo', def:'Puede reemplazar a otro producto para el mismo propósito en el mismo entorno.', ex:'Migrar de un motor de base de datos a otro compatible sin reescribir la capa de acceso a datos.'},
+  ]},
+];
+
+const SCENARIOS = [
+  {domain:'Plataforma de streaming de video',
+    a:'Plataforma educativa regional: catálogo curricular fijo, ~100 usuarios activos al año, financiada por una gobernación, uso esporádico.',
+    aRnf:['~100 usuarios activos al año, picos de 15 concurrentes en horario de clase','Catálogo de 200 videos, actualizado 2 veces al año','Hosting básico/gratuito, sin CDN dedicada','Debe funcionar con 2 Mbps o menos (zonas rurales)'],
+    b:'Streaming masivo tipo servicio global: catálogo dinámico con estrenos, picos de millones de usuarios concurrentes, monetización por suscripción.',
+    bRnf:['Picos de hasta 3 millones de usuarios concurrentes','SLA de disponibilidad 99.95%; inicio de reproducción <100 ms','Catálogo de +50.000 títulos con recomendaciones','Protección de contenido con DRM y licenciamiento por región']},
+  {domain:'Historia clínica electrónica',
+    a:'Clínica rural: conectividad intermitente, pocos usuarios, historia clínica básica de consulta externa.',
+    aRnf:['Debe operar offline hasta 8 horas y sincronizar al reconectar','~5 profesionales de salud, 50 pacientes/día','Cumplimiento básico de Habeas Data (Ley 1581 de 2012)'],
+    b:'Hospital de alta complejidad: múltiples especialidades, integración con laboratorio e imágenes, uso ininterrumpido.',
+    bRnf:['Disponibilidad 99.99% (urgencias 24/7); recuperación <15 min','Integración HL7/FHIR con 10+ sistemas externos','Retención de historia clínica mínimo 20 años','+2.000 pacientes/día, cientos de usuarios concurrentes']},
+  {domain:'Videojuego multijugador',
+    a:'Juego social casual entre amigos: partidas cortas, pocos jugadores por sala, sin dinero real.',
+    aRnf:['Salas de hasta 8 jugadores; partidas de 10-15 min','Tolerancia de latencia hasta 150 ms','Sin transacciones monetarias'],
+    b:'Título competitivo de esports: torneos con premios, necesidad de anti-trampas y resultados verificables.',
+    bRnf:['Latencia objetivo <30 ms; tick rate 128 Hz','Picos de 100.000 jugadores concurrentes en torneo','Anti-trampas en tiempo real, resultados auditables','Premios en dinero: trazabilidad legal de resultados']},
+  {domain:'Sistema de votación electrónica',
+    a:'Elección estudiantil universitaria: resultado no vinculante legalmente, bajo escrutinio público.',
+    aRnf:['~5.000 estudiantes habilitados; ventana de 8 horas','Sin auditoría externa obligatoria'],
+    b:'Elección presidencial nacional: alto escrutinio legal y mediático, resultado vinculante e impugnable.',
+    bRnf:['~35 millones de votantes habilitados; ventana de un día','Confidencialidad del voto exigida constitucionalmente','Disponibilidad 100% durante la jornada']},
+  {domain:'Aplicación de mensajería',
+    a:'Chat grupal entre amigos: uso casual, contenido de bajo riesgo si se filtra.',
+    aRnf:['Grupos de hasta 50 personas; texto e imágenes','Cifrado extremo a extremo deseable, no obligatorio'],
+    b:'App usada por periodistas en zona de conflicto: comunicación sensible, riesgo real para las fuentes.',
+    bRnf:['Cifrado extremo a extremo obligatorio, sin metadatos de contacto','Debe operar bajo censura/DPI con ofuscación de tráfico','Eliminación de mensajes sin rastro recuperable']},
+  {domain:'Plataforma de trading',
+    a:'Inversionista retail individual: operaciones esporádicas, montos personales.',
+    aRnf:['Decenas de operaciones al mes; montos <10M COP','Respuesta aceptable: 1-2 segundos'],
+    b:'Fondo de alta frecuencia (HFT): miles de operaciones automatizadas por segundo.',
+    bRnf:['Miles de operaciones/segundo; latencia <1 ms','Trazabilidad regulatoria de cada operación','Orden de ejecución exacto y verificable']},
+  {domain:'Control de tráfico aéreo',
+    a:'Aeropuerto regional pequeño: pocos vuelos diarios, tráfico predecible.',
+    aRnf:['10-20 vuelos/día; un único controlador en turno'],
+    b:'Hub internacional: alto volumen de aeronaves simultáneas, coordinación en tiempo real.',
+    bRnf:['+1.000 vuelos/día; decenas de aeronaves simultáneas','Cero downtime; redundancia activa-activa','Cumplimiento normativo OACI']},
+  {domain:'Sistema de citas médicas',
+    a:'Clínica de barrio: agenda simple, un único punto de atención.',
+    aRnf:['Agenda de 3 médicos; ~30 citas/día'],
+    b:'Red nacional de EPS: millones de citas, integración con múltiples prestadores y aseguradoras.',
+    bRnf:['Millones de citas/mes; cientos de IPS integradas','Picos al abrirse la agenda mensual','Cumplimiento de interoperabilidad en salud (RIPS/PISIS)']},
+  {domain:'Sistema de biblioteca',
+    a:'Biblioteca escolar: catálogo pequeño, préstamos físicos gestionados localmente.',
+    aRnf:['Catálogo de 2.000 libros físicos; sin concurrencia significativa'],
+    b:'Biblioteca nacional digital: millones de documentos, acceso público masivo y simultáneo.',
+    bRnf:['+5 millones de documentos digitalizados','Acceso simultáneo de miles de usuarios','Múltiples formatos y accesibilidad con lectores de pantalla']},
+  {domain:'Plataforma de e-commerce',
+    a:'Tienda artesanal local: catálogo pequeño, bajo tráfico, un solo vendedor.',
+    aRnf:['Catálogo de 50 productos; ~5 pedidos/día'],
+    b:'Marketplace masivo: millones de transacciones, múltiples vendedores, picos estacionales.',
+    bRnf:['Millones de transacciones/mes; picos de 10x en descuentos','Cumplimiento PCI-DSS; prevención de fraude en tiempo real','Integración con cientos de vendedores vía API']},
+];
+
+let selected = new Set(ATTRS.map(a=>a.id));
+let teams = [];
+let radarChart = null;
+let compareChart = null;
+let snapshots = {}; // { [scenarioIdx]: { a: {attrIds, avg:{id:val}, n}, b: {...} } }
+let lastScenarioIdx = 0;
+let lastVariation = 'a';
+
+function activeAttrs(){ return ATTRS.filter(a=>selected.has(a.id)); }
+
+function currentScenarioIdx(){ return +document.getElementById('scenarioSelect').value; }
+function currentVariation(){ return document.getElementById('variationSelect').value; }
+
+function saveSnapshot(idx, v){
+  if(teams.length===0) return;
+  const attrs = activeAttrs();
+  const avg = {};
+  attrs.forEach(a=>{
+    const vals = teams.map(t=>t.scores[a.id]||0);
+    avg[a.id] = vals.reduce((s,x)=>s+x,0)/vals.length;
+  });
+  if(!snapshots[idx]) snapshots[idx] = {};
+  snapshots[idx][v] = { attrIds: attrs.map(a=>a.id), avg, n: teams.length };
+}
+
+function renderCompare(){
+  const idx = currentScenarioIdx();
+  const snap = snapshots[idx] || {};
+  const a = snap.a, b = snap.b;
+  const countEl = document.getElementById('compareCount');
+  const emptyEl = document.getElementById('compareEmpty');
+  const canvasWrap = document.getElementById('compareChart').parentElement;
+  if(!a || !b){
+    canvasWrap.style.display = 'none';
+    countEl.textContent = '';
+    if(!a && !b){
+      emptyEl.textContent = 'Corran una ronda con la Variación A y otra con la Variación B de este escenario (cambiando el selector arriba) para ver la comparación aquí.';
+    } else {
+      emptyEl.textContent = `Ya tienen la ${a ? 'Variación A' : 'Variación B'} guardada (${(a||b).n} equipo(s)). Corran la otra variación para completar la comparación.`;
+    }
+    if(compareChart){ compareChart.destroy(); compareChart = null; }
+    return;
+  }
+  canvasWrap.style.display = 'block';
+  emptyEl.textContent = '';
+  countEl.textContent = `Variación A: ${a.n} equipo(s) · Variación B: ${b.n} equipo(s)`;
+  const commonIds = a.attrIds.filter(id => b.attrIds.includes(id));
+  const attrsCommon = ATTRS.filter(x=>commonIds.includes(x.id));
+  const labels = attrsCommon.map(x=>x.short);
+  const ctx = document.getElementById('compareChart');
+  if(compareChart) compareChart.destroy();
+  compareChart = new Chart(ctx, {
+    type:'radar',
+    data:{ labels, datasets:[
+      { label:'Variación A', data: attrsCommon.map(x=>a.avg[x.id]), borderColor:'#0D9488', backgroundColor:'rgba(13,148,136,0.15)', borderWidth:3, pointRadius:3 },
+      { label:'Variación B', data: attrsCommon.map(x=>b.avg[x.id]), borderColor:'#B45309', backgroundColor:'rgba(180,83,9,0.15)', borderWidth:3, pointRadius:3 },
+    ]},
+    options:{
+      responsive:true, maintainAspectRatio:false,
+      plugins:{ legend:{ display:true, position:'bottom', labels:{ boxWidth:12, font:{size:12} } } },
+      scales:{ r:{ min:0, max:5, ticks:{ stepSize:1, backdropColor:'transparent' }, pointLabels:{ font:{size:12} } } }
+    }
+  });
+}
+
+function populateScenarioSelect(){
+  const sel = document.getElementById('scenarioSelect');
+  sel.innerHTML = SCENARIOS.map((s,i)=>`<option value="${i}">${i+1}. ${s.domain}</option>`).join('');
+}
+
+function updateDesc(){
+  const idx = +document.getElementById('scenarioSelect').value;
+  const v = document.getElementById('variationSelect').value;
+  const s = SCENARIOS[idx];
+  const text = v === 'a' ? s.a : s.b;
+  const rnf = v === 'a' ? s.aRnf : s.bRnf;
+  document.getElementById('scenarioDesc').innerHTML =
+    text + '<ul style="margin:8px 0 0;padding-left:18px;">' +
+    rnf.map(r=>`<li style="margin-bottom:3px;">${r}</li>`).join('') +
+    '</ul>';
+}
+
+function renderChips(){
+  const box = document.getElementById('attrChips');
+  box.innerHTML = ATTRS.map(a=>`<div class="chip ${selected.has(a.id)?'on':''}" data-id="${a.id}">${a.label}</div>`).join('');
+  box.querySelectorAll('.chip').forEach(chip=>{
+    chip.addEventListener('click', ()=>{
+      const id = chip.dataset.id;
+      if(selected.has(id)){
+        if(selected.size<=3){ return; }
+        saveSnapshot(lastScenarioIdx, lastVariation);
+        selected.delete(id);
+      } else {
+        saveSnapshot(lastScenarioIdx, lastVariation);
+        selected.add(id);
+      }
+      renderChips();
+      renderSliders();
+      teams = [];
+      renderAll();
+    });
+  });
+}
+
+function renderSliders(){
+  const box = document.getElementById('sliders');
+  box.innerHTML = activeAttrs().map(a=>`
+    <div class="slider-row">
+      <label>${a.label}</label>
+      <input type="range" min="1" max="5" step="1" value="3" data-id="${a.id}" oninput="this.nextElementSibling.textContent=this.value">
+      <span class="slider-val">3</span>
+    </div>`).join('');
+}
+
+function addTeam(){
+  const nameInput = document.getElementById('teamName');
+  const name = nameInput.value.trim() || `Equipo ${teams.length+1}`;
+  const scores = {};
+  document.querySelectorAll('#sliders input[type=range]').forEach(r=>{ scores[r.dataset.id] = +r.value; });
+  teams.push({id:'t'+Date.now(), name, scores});
+  nameInput.value = '';
+  renderSliders();
+  renderAll();
+}
+
+function removeTeam(id){
+  teams = teams.filter(t=>t.id!==id);
+  renderAll();
+}
+
+function renderTable(){
+  const attrs = activeAttrs();
+  const wrap = document.getElementById('tableWrap');
+  if(teams.length===0){ wrap.innerHTML = '<div class="empty-note">Aún no hay equipos en esta ronda.</div>'; return; }
+  let html = '<table><thead><tr><th>Equipo</th>' + attrs.map(a=>`<th>${a.short}</th>`).join('') + '<th></th></tr></thead><tbody>';
+  teams.forEach(t=>{
+    html += `<tr><td>${t.name}</td>` + attrs.map(a=>`<td>${t.scores[a.id]}</td>`).join('') + `<td class="del" onclick="removeTeam('${t.id}')">✕</td></tr>`;
+  });
+  const avgRow = attrs.map(a=>{
+    const vals = teams.map(t=>t.scores[a.id]||0);
+    const avg = vals.reduce((s,v)=>s+v,0)/vals.length;
+    return `<td>${avg.toFixed(1)}</td>`;
+  }).join('');
+  html += `<tr class="avg-row"><td>Promedio</td>${avgRow}<td></td></tr>`;
+  html += '</tbody></table>';
+  wrap.innerHTML = html;
+}
+
+function renderRadar(){
+  const attrs = activeAttrs();
+  const labels = attrs.map(a=>a.short);
+  const datasets = teams.map(t=>({
+    label:t.name,
+    data: attrs.map(a=>t.scores[a.id]||0),
+    borderColor:'rgba(13,148,136,0.45)',
+    backgroundColor:'rgba(13,148,136,0.07)',
+    borderWidth:1.5, pointRadius:2, order:2,
+  }));
+  if(teams.length>0){
+    const avgData = attrs.map(a=>{
+      const vals = teams.map(t=>t.scores[a.id]||0);
+      return vals.reduce((s,v)=>s+v,0)/vals.length;
+    });
+    datasets.push({label:'Promedio', data:avgData, borderColor:'#1E293B', backgroundColor:'rgba(30,41,59,0.12)', borderWidth:3, pointRadius:3, order:1});
+  }
+  const ctx = document.getElementById('radarChart');
+  if(radarChart) radarChart.destroy();
+  radarChart = new Chart(ctx, {
+    type:'radar',
+    data:{ labels, datasets },
+    options:{
+      responsive:true, maintainAspectRatio:false,
+      plugins:{ legend:{ display:false } },
+      scales:{ r:{ min:0, max:5, ticks:{ stepSize:1, backdropColor:'transparent' }, pointLabels:{ font:{size:12} } } }
+    }
+  });
+}
+
+function renderAll(){ renderTable(); renderRadar(); renderCompare(); }
+
+// -------- cheatsheet --------
+let cheatChart = null;
+function renderCheatsheet(){
+  const ctx = document.getElementById('cheatChart');
+  cheatChart = new Chart(ctx, {
+    type:'doughnut',
+    data:{ labels: ATTRS.map(a=>a.label), datasets:[{ data: ATTRS.map(()=>1), backgroundColor: ATTRS.map(a=>a.color), borderColor:'#fff', borderWidth:2 }] },
+    options:{
+      responsive:true, maintainAspectRatio:false,
+      plugins:{ legend:{ display:false }, tooltip:{ callbacks:{ label:(c)=>ATTRS[c.dataIndex].label } } },
+      onClick:(evt, els)=>{ if(els.length){ showAttrDetail(ATTRS[els[0].index]); } }
+    }
+  });
+  showAttrDetail(ATTRS[0]);
+}
+
+function showAttrDetail(a){
+  document.getElementById('cheatDetail').innerHTML = `
+    <div style="width:10px;height:10px;border-radius:50%;background:${a.color};display:inline-block;margin-right:8px;"></div>
+    <strong style="font-size:16px;">${a.label}</strong>
+    <p style="font-size:13.5px;color:var(--slate);line-height:1.5;margin:10px 0 14px;">${a.def}</p>
+    <div style="font-size:11px;color:var(--slate-light);text-transform:uppercase;letter-spacing:0.05em;margin-bottom:4px;">Subcaracterísticas</div>
+    ${a.subs.map(s=>`
+      <div class="subitem">
+        <div style="font-weight:600;color:var(--ink);margin-bottom:3px;">${s.name}</div>
+        <div style="color:var(--slate);margin-bottom:4px;">${s.def}</div>
+        <div style="color:var(--teal-dark);"><em>Ejemplo:</em> ${s.ex}</div>
+      </div>`).join('')}
+  `;
+}
+
+// -------- tensions panel --------
+let selectedTensionAttr = null;
+
+function renderTensionChips(){
+  const box = document.getElementById('tensionAttrChips');
+  box.innerHTML = ATTRS.map(a=>`<div class="chip ${selectedTensionAttr===a.id?'on':''}" data-id="${a.id}">${a.label}</div>`).join('');
+  box.querySelectorAll('.chip').forEach(chip=>{
+    chip.addEventListener('click', ()=>{
+      selectedTensionAttr = chip.dataset.id;
+      renderTensionChips();
+      renderTensionList();
+    });
+  });
+}
+
+function renderTensionList(){
+  const box = document.getElementById('tensionList');
+  if(!selectedTensionAttr){ box.innerHTML = '<div class="empty-note">Elige un atributo arriba para ver sus tensiones y sinergias típicas.</div>'; return; }
+  const selected = ATTRS.find(a=>a.id===selectedTensionAttr);
+  const others = ATTRS.filter(a=>a.id!==selectedTensionAttr);
+  const groups = { strong: [], mild: [], synergy: [], none: [] };
+  others.forEach(o=>{
+    const t = TENSION_MAP[tensionKey(selectedTensionAttr, o.id)];
+    groups[t ? t.level : 'none'].push({ o, t });
+  });
+  const groupMeta = {
+    strong:  { title: 'Tensiones fuertes',  sign: '\u2212' },
+    mild:    { title: 'Tensiones leves',    sign: '\u2212' },
+    synergy: { title: 'Sinergias',          sign: '+' },
+    none:    { title: 'Sin relación documentada', sign: '?' },
+  };
+  let html = `<div style="font-size:15px;font-weight:600;margin-bottom:4px;">${selected.label} frente a los demás atributos</div>`;
+  ['strong','mild','synergy','none'].forEach(level=>{
+    const items = groups[level];
+    if(items.length===0) return;
+    html += `<div class="tension-group-title">${groupMeta[level].title}</div>`;
+    items.forEach(({o,t})=>{
+      if(level==='none'){
+        html += `<div class="tension-row">
+          <div class="tsign none">?</div>
+          <div>
+            <div class="trow-title">${selected.label} × ${o.label}</div>
+            <div class="trow-text">No hay una relación documentada entre estos dos atributos aquí — no significa que nunca compitan, depende del escenario concreto.</div>
+          </div>
+        </div>`;
+      } else {
+        html += `<div class="tension-row">
+          <div class="tsign ${level}">${groupMeta[level].sign}</div>
+          <div>
+            <div class="trow-title">${selected.label} × ${o.label}</div>
+            <div class="trow-text">${t.text}</div>
+            <div class="trow-ex"><em>Ejemplo:</em> ${t.ex}</div>
+          </div>
+        </div>`;
+      }
+    });
+  });
+  box.innerHTML = html;
+}
+
+// -------- init --------
+populateScenarioSelect();
+updateDesc();
+renderChips();
+renderSliders();
+renderAll();
+renderCheatsheet();
+renderTensionChips();
+renderTensionList();
+
+document.getElementById('scenarioSelect').addEventListener('change', ()=>{
+  saveSnapshot(lastScenarioIdx, lastVariation);
+  updateDesc();
+  teams=[];
+  renderAll();
+  lastScenarioIdx = currentScenarioIdx();
+  lastVariation = currentVariation();
+});
+document.getElementById('variationSelect').addEventListener('change', ()=>{
+  saveSnapshot(lastScenarioIdx, lastVariation);
+  updateDesc();
+  teams=[];
+  renderAll();
+  lastScenarioIdx = currentScenarioIdx();
+  lastVariation = currentVariation();
+});
+document.getElementById('addTeamBtn').addEventListener('click', addTeam);
+document.getElementById('resetBtn').addEventListener('click', ()=>{
+  saveSnapshot(lastScenarioIdx, lastVariation);
+  teams=[];
+  renderAll();
+});
+
+document.querySelectorAll('.tab').forEach(tab=>{
+  tab.addEventListener('click', ()=>{
+    document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
+    document.querySelectorAll('.panel').forEach(p=>p.classList.remove('active'));
+    tab.classList.add('active');
+    document.getElementById('panel-'+tab.dataset.tab).classList.add('active');
+  });
+});
+</script>
+</body>
+</html>
