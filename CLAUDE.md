@@ -58,7 +58,7 @@ Estas reglas cruzan varios archivos. Romper una rompe la cadena completa.
 | El escenario es el Context | El Context de cada ADR es su escenario copiado tal cual. Si cambia el escenario, cambia el Context y la presentación |
 | Los ADR no se reescriben | Un ADR cambia de estado (Propuesto, Aceptado, reemplazado por otro) y se enlaza; no se borra ni se edita para cambiar la historia |
 | Un ADR por escenario crítico | Es crítico si su atributo dominante es alto y cumplirlo le cuesta a otro atributo alto. Un escenario por tensión, no por atributo |
-| Presupuesto de 18 puntos | Ocho atributos ISO 25010, de 1 a 5, suma exacta 18, máximo tres atributos en 4 o más. Reparto adoptado: Seguridad 4, Fiabilidad 4, Compatibilidad 3, Desempeño 3 y el resto en 1 |
+| Presupuesto de 18 puntos | Ocho atributos ISO 25010, de 1 a 5, suma exacta 18, máximo tres atributos en 4 o más. Reparto adoptado: Seguridad 4, Fiabilidad 3, Compatibilidad 3, Desempeño 3, Adecuación funcional 2 y el resto en 1. Es alto un atributo con 3 o más |
 | Identificadores estables | `ESC-NN`, `ADR-NN`, `T#` (tensiones fuertes), `L#` (leves), `S#`, `F#`, `H#` (hallazgos). No se renumeran: un elemento que cambia de categoría recibe un identificador nuevo y los demás conservan el suyo |
 | Vocabulario ISO 25010 | Se usan las ocho características del widget del curso. La tabla de equivalencias con los términos del taller GPSMetro está en `bloque-2/00-plan-de-trabajo.md` §5 |
 | Alcance | Solo juegos de casino de proveedores externos. Fuera: apuestas deportivas, juegos propios, póker entre jugadores y bingo |

@@ -45,11 +45,11 @@
 |----|-------------------|:----------------:|-------------------|:--------------:|-----------|
 | K1 | Seguridad (4) | ✔ | Desempeño (3): evaluar contra la lista recién recibida, en el camino del retiro, mientras corre la reconsulta masiva en pleno pico | ✔ | **Crítico** |
 | K2 | Seguridad (4) | ✔ | Desempeño (3) | ✔ | Crítico, pero **misma tensión que K1** |
-| K3 | Fiabilidad (4) | ✔ | Desempeño (3): asegurar que ninguna operación confirmada se pierda alarga cada una de las ~3.000 por segundo | ✔ | **Crítico** |
-| K4 | Desempeño (3) | ✔ | Fiabilidad (4) | ✔ | Crítico, pero **misma tensión que K3** |
-| K5 | Compatibilidad (3) | ✔ | Fiabilidad (4): aceptar el protocolo del proveedor (reintentos, reversiones) arriesga la integridad del saldo | ✔ | **Crítico** |
-| K6 | Seguridad (4) | ✔ | Fiabilidad (4) | ✔ | Pasa la prueba, pero **la decisión ya está tomada** (fallo cerrado, restricción 9) |
-| K7 | Desempeño (3) | ✔ | Adecuación funcional (1): la corrección del premio, que además calcula el proveedor | ✘ | **No crítico.** Es importante, pero cumplirlo no sacrifica un atributo alto |
+| K3 | Fiabilidad (3) | ✔ | Desempeño (3): asegurar que ninguna operación confirmada se pierda alarga cada una de las ~3.000 por segundo | ✔ | **Crítico** |
+| K4 | Desempeño (3) | ✔ | Fiabilidad (3) | ✔ | Crítico, pero **misma tensión que K3** |
+| K5 | Compatibilidad (3) | ✔ | Fiabilidad (3): aceptar el protocolo del proveedor (reintentos, reversiones) arriesga la integridad del saldo | ✔ | **Crítico** |
+| K6 | Seguridad (4) | ✔ | Fiabilidad (3) | ✔ | Pasa la prueba, pero **la decisión ya está tomada** (fallo cerrado, restricción 9) |
+| K7 | Desempeño (3) | ✔ | Adecuación funcional (2): la corrección del premio, que además calcula el proveedor | ✘ | **No crítico.** Es importante, pero cumplirlo no sacrifica un atributo alto |
 | K8 | Mantenibilidad (1) | ✘ | Seguridad (4) | ✔ | No crítico. El dominante no está entre los altos (riesgo asumido en la fase 4) |
 | K9 | Seguridad (4) | ✔ | Usabilidad (1) | ✘ | No crítico. Además, el bloqueo a los 5 intentos es piso regulatorio fijo |
 | K10 | Seguridad (4) | ✔ | Compatibilidad (3): exigir un esquema estricto a todos choca con el esquema propio de cada proveedor | ✔ | **Crítico** |
@@ -70,7 +70,7 @@
 
 ### Justificación de la selección (en una línea)
 
-> Elegimos ESC-01, ESC-02, ESC-03 y ESC-05 como críticos porque son las únicas tensiones fuertes entre dos atributos altos (T1, T2, T3 y T7), con un escenario por tensión. ESC-04 se escribe sin ADR porque su costo cae en un atributo que priorizamos bajo.
+> Elegimos ESC-01, ESC-02, ESC-03 y ESC-05 como críticos porque son las únicas tensiones fuertes entre dos atributos altos (T1, T2, T3 y T7), con un escenario por tensión. ESC-04 se escribe sin ADR porque su costo cae en un atributo que no está entre los altos.
 
 ### Por qué quedan fuera los demás
 
@@ -114,3 +114,4 @@ Con ESC-05 se alcanza el máximo de 5 escenarios que permite el material. K9 (bl
 1. **Aprobado (25 de octubre):** 4 escenarios, 3 de ellos críticos (3 ADRs). *Actualizado por el punto 3.*
 2. **Aprobado:** el fallo cerrado entra como restricción en el Context de ADR-01 y no tiene ADR propio.
 3. **1 de noviembre de 2026:** al subir L4 a tensión fuerte (T7), el equipo agrega ESC-05 con ADR-04. La selección pasa a 5 escenarios, 4 de ellos críticos (4 ADRs).
+4. **13 de noviembre de 2026:** por la retroalimentación del profesor cambian dos puntajes: Fiabilidad pasa de 4 a 3 y Adecuación funcional de 1 a 2 (`04` §8, punto 4). La prueba de criticidad da el mismo resultado en los diez candidatos, así que la selección no cambia.

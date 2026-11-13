@@ -18,9 +18,9 @@
 | ID | Atributo dominante (puntaje) | Paga | Tensión | ¿Crítico? | ADR |
 |----|------------------------------|------|---------|:---------:|-----|
 | ESC-01 | Seguridad (4) | Desempeño (3) | T1 | ✔ | ADR-01 |
-| ESC-02 | Fiabilidad (4) | Desempeño (3) | T2 | ✔ | ADR-02 |
-| ESC-03 | Compatibilidad (3) | Fiabilidad (4) | T3 | ✔ | ADR-03 |
-| ESC-04 | Eficiencia de desempeño (3) | Adecuación funcional (1) | T6 | ✘ | — |
+| ESC-02 | Fiabilidad (3) | Desempeño (3) | T2 | ✔ | ADR-02 |
+| ESC-03 | Compatibilidad (3) | Fiabilidad (3) | T3 | ✔ | ADR-03 |
+| ESC-04 | Eficiencia de desempeño (3) | Adecuación funcional (2) | T6 | ✘ | — |
 | ESC-05 | Seguridad (4) | Compatibilidad (3) | T7 | ✔ | ADR-04 |
 
 ---
@@ -65,7 +65,7 @@
 - operación en curso sin confirmar → sin efecto, con ambos saldos coincidiendo;
 - jugada incompleta → resultado visible al volver.
 
-**Por qué es crítico (T2):** la Fiabilidad (4) exige que ninguna de las ~3.000 operaciones por segundo que se confirmaron se pierda en la caída. Esa garantía tiene que cumplirse **sin que la confirmación supere p99 ≤ 250 ms** en el pico, y por eso presiona el Desempeño (3).
+**Por qué es crítico (T2):** la Fiabilidad (3) exige que ninguna de las ~3.000 operaciones por segundo que se confirmaron se pierda en la caída. Esa garantía tiene que cumplirse **sin que la confirmación supere p99 ≤ 250 ms** en el pico, y por eso presiona el Desempeño (3).
 
 **Trazabilidad:** ficha §4.2, §4.3, S6, S13, S14; investigación C6, D6, E1–E5. El aviso a Coljuegos en ≤ 30 min concreta el "de inmediato" del reglamento **[nuevo supuesto S22]**. La vuelta a p99 ≤ 250 ms en 5 min se respalda con S24 (agregado en la fase 8).
 
@@ -89,7 +89,7 @@
 - mismo proveedor, jugador e identificador con datos distintos → se rechaza y genera alerta;
 - mismo identificador para otro jugador → es una operación nueva, porque algunos proveedores solo garantizan identificadores únicos por jugador [F26].
 
-**Por qué es crítico (T3):** la Compatibilidad (3) exige aceptar el protocolo de cada proveedor tal como viene, con sus repeticiones, sus reversiones y sus tiempos de espera. Cada variante es una forma de descontar o abonar dos veces, así que cumplirla presiona la Fiabilidad (4) del saldo.
+**Por qué es crítico (T3):** la Compatibilidad (3) exige aceptar el protocolo de cada proveedor tal como viene, con sus repeticiones, sus reversiones y sus tiempos de espera. Cada variante es una forma de descontar o abonar dos veces, así que cumplirla presiona la Fiabilidad (3) del saldo.
 
 **Trazabilidad:** ficha §3, §4.2, S11, S14, S25 (alerta en ≤ 5 min, agregado en la fase 8); investigación A3, C6; F24, F26.
 
@@ -107,7 +107,7 @@
 | **Respuesta** | Abona cada premio por el monto que liquidó el proveedor. Cada jugador ve su saldo actualizado. Las operaciones de los demás juegos siguen atendiéndose |
 | **Medida de la respuesta** | Los 720 abonos responden en **p99 ≤ 250 ms**. Saldo actualizado visible al jugador en **p95 ≤ 2 s**. **0 diferencias** entre el monto abonado y el liquidado por el proveedor. Durante la ráfaga, las operaciones de los demás juegos se mantienen en **p99 ≤ 250 ms** |
 
-**Por qué NO es crítico:** el dominante, Desempeño (3), es alto. Pero su costo cae en la corrección del premio (Adecuación funcional, 1). Esa corrección la calcula el proveedor y la certifica el laboratorio, así que cumplir este escenario no obliga al operador a sacrificar un atributo que priorizamos alto. **Se escribe sin ADR, a propósito:** muestra el criterio de selección.
+**Por qué NO es crítico:** el dominante, Desempeño (3), es alto. Pero su costo cae en la corrección del premio (Adecuación funcional, 2), que no está entre los altos. Esa corrección la calcula el proveedor y la certifica el laboratorio, así que cumplir este escenario no obliga al operador a sacrificar un atributo que priorizamos alto. **Se escribe sin ADR, a propósito:** muestra el criterio de selección.
 
 **Trazabilidad:** ficha §4.1, §4.2, S5, S6, S15, S23 (saldo visible en p95 ≤ 2 s, agregado en la fase 8); mapa T6; priorización §2.2.
 
@@ -152,8 +152,8 @@ Revisión según el Constructor y la Clínica del taller GPSMetro.
 | La respuesta distingue los casos relevantes | ✔ | ✔ | ✔ | ✔ | ✔ |
 | Medida con número, unidad y percentil o umbral; sin adjetivos ni promedios | ✔ | ✔ | ✔ | ✔ | ✔ |
 | Atributo correcto; no se confunde disponibilidad con corrección del dato | ✔ | ✔ | ✔ | ✔ | ✔ |
-| Dominante rastreable a un puntaje alto | 4 | 4 | 3 | 3 | 4 |
-| Tensión explícita con otro atributo | Desempeño (3) | Desempeño (3) | Fiabilidad (4) | Adec. funcional (1) | Compatibilidad (3) |
+| Dominante rastreable a un puntaje alto | 4 | 3 | 3 | 3 | 4 |
+| Tensión explícita con otro atributo | Desempeño (3) | Desempeño (3) | Fiabilidad (3) | Adec. funcional (2) | Compatibilidad (3) |
 
 **Notas de revisión:**
 - **ESC-02 es de Fiabilidad y no solo de disponibilidad.** Además de volver a estar arriba, el sistema debe tener los saldos correctos. Es la lección del caso 6 de la Clínica: un sistema que está arriba pero dice algo falso falla en Fiabilidad.
@@ -188,3 +188,4 @@ Revisión según el Constructor y la Clínica del taller GPSMetro.
 1. **Textos aprobados.** Pasan tal cual al Context de los ADR.
 2. **S22 aprobado** y agregado a la ficha (§4.3 y supuestos).
 3. **1 de noviembre de 2026:** se agrega ESC-05 (Seguridad × Compatibilidad), por decisión del equipo al subir L4 a tensión fuerte (T7). Su texto pasa tal cual al Context de ADR-04.
+4. **13 de noviembre de 2026:** por la retroalimentación del profesor cambian dos puntajes: Fiabilidad pasa de 4 a 3 y Adecuación funcional de 1 a 2 (`04` §8, punto 4). Se actualizan los puntajes citados en el resumen, en las notas de criticidad y en la lista de chequeo. El bloque de 7 filas de cada escenario no cambia, así que el Context de los ADR tampoco.

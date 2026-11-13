@@ -17,13 +17,13 @@
 
 ## Selección de los ADR
 
-> Hay un ADR por cada escenario crítico: ESC-01, ESC-02, ESC-03 y ESC-05. Son las únicas tensiones fuertes entre dos atributos priorizados altos (T1 Seguridad × Desempeño, T2 Fiabilidad × Desempeño, T3 Compatibilidad × Fiabilidad y T7 Seguridad × Compatibilidad). ESC-04 no lleva ADR porque su costo cae en un atributo priorizado bajo (Adecuación funcional, 1).
+> Hay un ADR por cada escenario crítico: ESC-01, ESC-02, ESC-03 y ESC-05. Son las únicas tensiones fuertes entre dos atributos priorizados altos (T1 Seguridad × Desempeño, T2 Fiabilidad × Desempeño, T3 Compatibilidad × Fiabilidad y T7 Seguridad × Compatibilidad). ESC-04 no lleva ADR porque su costo cae en un atributo que no está entre los altos (Adecuación funcional, 2).
 
 | ADR | Escenario | Atributo dominante | Atributo que paga |
 |-----|-----------|--------------------|-------------------|
 | ADR-01 | ESC-01 | Seguridad (4) | Desempeño (3) |
-| ADR-02 | ESC-02 | Fiabilidad (4) | Desempeño (3) |
-| ADR-03 | ESC-03 | Compatibilidad (3) | Fiabilidad (4) |
+| ADR-02 | ESC-02 | Fiabilidad (3) | Desempeño (3) |
+| ADR-03 | ESC-03 | Compatibilidad (3) | Fiabilidad (3) |
 | ADR-04 | ESC-05 | Seguridad (4) | Compatibilidad (3) |
 
 ---
@@ -262,3 +262,5 @@
 > **Fase 8:** el Context de ADR-03 se actualizó junto con ESC-03 (regla de identificadores repetidos). Ver `08-revision.md`, hallazgo H1.
 >
 > **1 de noviembre de 2026:** se agrega ADR-04 (escenario ESC-05, tensión T7), a pedido del equipo. Ver `08-revision.md`, sección 7.
+>
+> **13 de noviembre de 2026:** cambian los puntajes de Fiabilidad (4 → 3) y de Adecuación funcional (1 → 2) en la sección "Selección de los ADR". El texto de los cuatro ADR no cambia: su Context, sus opciones y su estado siguen igual. Ver `08-revision.md`, sección 8.

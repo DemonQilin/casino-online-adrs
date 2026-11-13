@@ -90,7 +90,7 @@ No son errores, pero un evaluador podría leerlos distinto. Para cada uno dejamo
 | # | Riesgo | Defensa |
 |---|--------|---------|
 | R1 | La fuente de ESC-02 es "una falla de hardware". Alguien podría decir que no es un actor. | En escenarios de fiabilidad, la fuente típica es una falla interna. No es una condición del entorno: la carga y la franja horaria sí están en el entorno. |
-| R2 | El dominante de ESC-03 (Compatibilidad) tiene 3, no 4. ¿Está "entre los más altos"? | Los 10 puntos libres se concentran solo en los cuatro altos; los demás quedaron en 1 (`04` §1, párrafo "Qué cuenta como alto"). Además, cumplirlo cuesta Fiabilidad, que tiene 4. |
+| R2 | El dominante de ESC-03 (Compatibilidad) tiene 3, no 4. ¿Está "entre los más altos"? | Es alto un atributo con 3 puntos o más: 9 de los 10 puntos libres se concentran en los cuatro altos (`04` §1, párrafo "Qué cuenta como alto"). Además, cumplirlo cuesta Fiabilidad, que también es alta. *Defensa actualizada el 13 de noviembre de 2026 (sección 8).* |
 | R3 | Varias cifras clave son estimaciones (S10, S14, S15, S23–S25). | Están declaradas con su razón, como pide el plan. Las respuestas "Depende" de los ADR muestran que lo que falta se resuelve midiendo. |
 | R4 | *Resuelto el 1 de noviembre:* la entrega pasa a 4 ADRs (sección 7). El riesgo nuevo es que pregunten por qué T7 no era fuerte desde el comienzo. | `03`, T7, apartado "Por qué se promovió de leve a fuerte": al revisar la primera presentación se vio que la interfaz de saldo es la puerta por la que entra el dinero, y su protección depende de cómo autentica cada proveedor. |
 
@@ -145,3 +145,43 @@ El plan pide una lectura de alguien que no haya participado en la redacción. Pr
 - Cada cifra de ESC-05 tiene origen en la ficha: S4, S6, S14 y S26–S29.
 
 **Pendiente:** la revisión en frío (sección 5) debe incluir ESC-05 y ADR-04.
+---
+
+## 8. Cambio posterior a la exposición (13 de noviembre de 2026)
+
+**Origen:** retroalimentación del profesor a la exposición del Bloque 2. Señaló que la Adecuación funcional podría ser más alta, sin fijar un puntaje.
+
+**Decisión del equipo:** subir la Adecuación funcional de 1 a 2 y bajar la Fiabilidad de 4 a 3. El reparto vigente es Seguridad 4, Fiabilidad 3, Desempeño 3, Compatibilidad 3, Adecuación funcional 2, Usabilidad 1, Mantenibilidad 1 y Portabilidad 1.
+
+**Por qué el profesor tiene razón.** La justificación del 1 decía que las funciones "las dicta el reglamento" y que la lógica de juego es del proveedor. El widget de ISO 25010 del curso contradice el primer argumento: su ejemplo de completitud funcional es un sistema que cubre todos los casos que exige la ley. El segundo argumento solo cubre el resultado del juego: el saldo nunca negativo (C6), los límites de depósito (C9), la autoexclusión (C5), el plazo de la orden de retiro (C7) y las reglas fiscales (L8) los calcula el operador.
+
+**Por qué el punto sale de Fiabilidad.** La sinergia S2 del mapa ya decía que el saldo nunca negativo es a la vez regla funcional y garantía de fiabilidad, pero ese peso estaba atribuido entero a Fiabilidad. Las alternativas están en `04` §5.2: sacar el punto de Seguridad contradice la regla de fallo cerrado, y sacarlo de Desempeño o de Compatibilidad elimina dos ADR.
+
+**Qué no cambia:**
+- Las tensiones críticas siguen siendo T1, T2, T3 y T7. Los cuatro atributos altos son los mismos, ahora con 4, 3, 3 y 3.
+- ESC-04 sigue sin ADR: con 2, la Adecuación funcional no está entre los altos.
+- El texto de los cinco escenarios y de los cuatro ADR. Solo cambian los puntajes que se citan alrededor.
+
+**Documentos actualizados:**
+
+| Archivo | Cambio |
+|---------|--------|
+| `04` | Reparto vigente, justificación de Fiabilidad (3) y de Adecuación funcional (2), "Lo que nos costó", tensiones críticas, variantes del ajuste (§5.2), verificación aritmética y punto de control |
+| `05` | Puntajes de la prueba de criticidad (K3 a K7), justificación en una línea y punto de control |
+| `06` | Puntajes del resumen, de las notas de criticidad de ESC-02, ESC-03 y ESC-04, y de la lista de chequeo; punto de control |
+| `07` | Puntajes de la sección "Selección de los ADR" y nota de cambio. Ningún ADR se edita |
+| `08` | Defensa del riesgo R2 y esta sección |
+| `Casino Andino.html` | Constante `ATTRS` (puntajes y textos de Fiabilidad, Adecuación funcional, Seguridad y Compatibilidad), radar, "Qué cuenta como alto", "Lo que nos costó", ESC-04 y preguntas de sustentación |
+| `CLAUDE.md` | Reparto adoptado en la tabla de reglas |
+
+**Riesgo nuevo:**
+
+| # | Riesgo | Defensa |
+|---|--------|---------|
+| R5 | Con Fiabilidad en 3, dos de los cuatro escenarios críticos (ESC-02 y ESC-03) tienen dominante en 3, y T2 y T3 quedan entre dos atributos de 3. Alguien podría decir que ya no son "los más altos". | El corte de atributo alto es 3 y está escrito en `04` §1. Esos tres atributos concentran 6 de los 10 puntos libres, y el siguiente atributo tiene 2. Si el profesor pide más para la Adecuación funcional, la alternativa es la variante E de `04` §5.2, con un quinto ADR. |
+
+**Verificaciones repetidas:**
+- El reparto vigente suma 18 (4 + 3 + 3 + 3 + 2 + 1 + 1 + 1), con todos los atributos entre 1 y 5 y un solo atributo en 4 o más.
+- El Context de los cuatro ADR sigue idéntico a su escenario: el cambio no toca ninguna fila de los escenarios ni el cuerpo de los ADR.
+- No se agregó ninguna cifra nueva a escenarios ni ADR, así que no hay supuestos nuevos.
+- La presentación HTML muestra el mismo reparto y los mismos cuatro escenarios críticos.

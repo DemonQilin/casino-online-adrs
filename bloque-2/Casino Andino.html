@@ -317,13 +317,13 @@ footer{margin-top:48px;padding-top:16px;border-top:1px solid var(--line);font-si
     </div>
     <div class="radar-grid">
       <figure class="radar">
-        <svg id="radar" viewBox="0 0 560 400" role="img" aria-label="Distribución de los 18 puntos: Seguridad 4, Fiabilidad 4, Desempeño 3, Compatibilidad 3, y Funcional, Usabilidad, Mantenibilidad y Portabilidad en 1"></svg>
-        <figcaption class="note">Reparto adoptado: 4 + 4 + 3 + 3 + 1 + 1 + 1 + 1 = 18</figcaption>
+        <svg id="radar" viewBox="0 0 560 400" role="img" aria-label="Distribución de los 18 puntos: Seguridad 4, Fiabilidad 3, Desempeño 3, Compatibilidad 3, Funcional 2, y Usabilidad, Mantenibilidad y Portabilidad en 1"></svg>
+        <figcaption class="note">Reparto adoptado: 4 + 3 + 3 + 3 + 2 + 1 + 1 + 1 = 18</figcaption>
       </figure>
       <div class="radar-side">
         <div class="callout">
           <h3>Qué cuenta como alto</h3>
-          <p>Los 10 puntos libres van todos a cuatro atributos (3 + 3 + 2 + 2); los otros cuatro se quedan en el mínimo. Por eso un 3 cuenta como alto: son puntos que se les quitaron a los demás. Un escenario es crítico cuando su atributo dominante es alto y cumplirlo le cuesta a otro atributo alto.</p>
+          <p>Es alto un atributo con 3 puntos o más. De los 10 puntos libres, 9 van a cuatro atributos (3 + 2 + 2 + 2); el punto restante saca a la Adecuación funcional del mínimo, sin llevarla al grupo de los altos. Por eso un 3 cuenta como alto: son puntos que se les quitaron a los demás. Un escenario es crítico cuando su atributo dominante es alto y cumplirlo le cuesta a otro atributo alto.</p>
         </div>
         <div>
           <div class="lbl" style="margin-bottom:8px">Escenarios críticos con este reparto</div>
@@ -337,10 +337,11 @@ footer{margin-top:48px;padding-top:16px;border-top:1px solid var(--line);font-si
       <div class="tblwrap"><table>
         <thead><tr><th>Para subir…</th><th>…bajamos</th><th>Consecuencia que aceptamos</th></tr></thead>
         <tbody>
-          <tr><td>Seguridad y Fiabilidad a 4</td><td>Usabilidad a 1</td><td>Más fricción que la competencia, incluidos los sitios ilegales. Retiros detenidos si fallan los controles antilavado.</td></tr>
+          <tr><td>Seguridad a 4 y Fiabilidad a 3</td><td>Usabilidad a 1</td><td>Más fricción que la competencia, incluidos los sitios ilegales. Retiros detenidos si fallan los controles antilavado.</td></tr>
           <tr><td>Compatibilidad a 3</td><td>Mantenibilidad a 1</td><td>Cada cambio regulatorio y cada proveedor nuevo cuesta más.</td></tr>
-          <tr><td>Desempeño a 3</td><td>Adecuación funcional a 1</td><td>La corrección del premio del crash queda del lado del proveedor.</td></tr>
-          <tr><td>Que Desempeño y Compatibilidad sigan en 3</td><td>Que Seguridad no llegue a 5</td><td>La preferencia por la seguridad se expresa como regla (fallo cerrado), no como puntaje.</td></tr>
+          <tr><td>Adecuación funcional a 2</td><td>Fiabilidad de 4 a 3</td><td>No buscamos más continuidad que la que exigen el regulador y nuestras metas; ese punto va a que las reglas del dinero se cumplan completas y exactas.</td></tr>
+          <tr><td>Desempeño a 3</td><td>Que Adecuación funcional no pase de 2</td><td>La corrección del premio del crash queda del lado del proveedor.</td></tr>
+          <tr><td>Que Fiabilidad, Desempeño y Compatibilidad sigan en 3</td><td>Que Seguridad no llegue a 5</td><td>La preferencia por la seguridad se expresa con el puntaje más alto y con la regla de fallo cerrado, no con un 5.</td></tr>
           <tr><td>Todo lo anterior</td><td>Portabilidad a 1</td><td>Mudarse de centro de datos será caro y obligará a recertificar.</td></tr>
         </tbody>
       </table></div>
@@ -384,7 +385,7 @@ footer{margin-top:48px;padding-top:16px;border-top:1px solid var(--line);font-si
   <section class="panel" id="p-escenarios" role="tabpanel" hidden>
     <div>
       <h2>Cinco escenarios de calidad</h2>
-      <p class="sub">Uno por tensión, no uno por atributo. Cuatro son críticos y llevan ADR. ESC-04 se escribe sin ADR a propósito: es importante, pero su costo cae en un atributo que priorizamos bajo.</p>
+      <p class="sub">Uno por tensión, no uno por atributo. Cuatro son críticos y llevan ADR. ESC-04 se escribe sin ADR a propósito: es importante, pero su costo cae en un atributo que no está entre los altos.</p>
     </div>
     <div class="pills" id="scPills"></div>
     <label class="toggle"><input type="checkbox" id="simple" checked> Mostrar la versión en simple</label>
@@ -452,20 +453,20 @@ const esc = s => String(s);
 const TOTAL = 18;
 const ATTRS = [
   {id:'seg', name:'Seguridad', short:'Seguridad', pts:4,
-   why:'Casino Andino guarda dinero de otras personas, y la ley lo trata así: el reglamento de Coljuegos exige bloquear cuentas tras intentos fallidos, detectar suplantaciones, autenticar todo acceso y prevenir el lavado de activos, que en nuestro caso se hace con SARLAFT. Además, Seguridad aparece en cuatro de las siete tensiones fuertes del mapa: casi toda decisión pasa por ella. No le damos 5 porque eso obligaría a bajar Desempeño o Compatibilidad a 2, y cuando choca con Fiabilidad ya gana por una regla del equipo: fallo cerrado en los retiros.',
+   why:'Casino Andino guarda dinero de otras personas, y la ley lo trata así: el reglamento de Coljuegos exige bloquear cuentas tras intentos fallidos, detectar suplantaciones, autenticar todo acceso y prevenir el lavado de activos, que en nuestro caso se hace con SARLAFT. Además, Seguridad aparece en cuatro de las siete tensiones fuertes del mapa: casi toda decisión pasa por ella. No le damos 5 porque eso obligaría a bajar Fiabilidad, Desempeño o Compatibilidad a 2, y cuando choca con Fiabilidad ya gana por una regla del equipo: fallo cerrado en los retiros.',
    acc:'<b>Lo que aceptamos:</b> más controles significan más pasos para el jugador y más trabajo en cada operación.'},
-  {id:'fiab', name:'Fiabilidad', short:'Fiabilidad', pts:4,
-   why:'Cada jugada mueve dinero real, y el reglamento no deja margen: el saldo nunca puede quedar negativo, toda jugada debe poder reconstruirse y el operador debe tener un sistema alterno certificado, listo para seguir operando si el principal cae. Perder una transacción ya confirmada es perderle dinero a un jugador. Está en dos tensiones fuertes, y empata con Seguridad por la misma razón que ella no llega a 5.',
-   acc:'<b>Lo que aceptamos:</b> no buscamos más disponibilidad que la que pide el negocio, 99,9 % al mes; el esfuerzo va a que el saldo sea exacto.'},
+  {id:'fiab', name:'Fiabilidad', short:'Fiabilidad', pts:3,
+   why:'Cada jugada mueve dinero real, y el reglamento no deja margen: el saldo nunca puede quedar negativo, toda jugada debe poder reconstruirse y el operador debe tener un sistema alterno certificado, listo para seguir operando si el principal cae. Perder una transacción ya confirmada es perderle dinero a un jugador. Por eso es alto, y está en dos tensiones fuertes. No llega a 4 porque parte de lo que le cargábamos es corrección funcional: que el saldo quede bien calculado es una regla del negocio, y ese punto pasó a Adecuación funcional. Cuando choca con Seguridad, además, gana Seguridad por la regla de fallo cerrado.',
+   acc:'<b>Lo que aceptamos:</b> no buscamos más disponibilidad que la que pide el negocio, 99,9 % al mes.'},
   {id:'perf', name:'Eficiencia de desempeño', short:'Desempeño', pts:3,
    why:'Una noche de quincena puede haber hasta 12.000 personas jugando a la vez, y cada jugada hace que el proveedor nos pida descontar y abonar saldo. Si tardamos en responder, el proveedor da la jugada por fallida. Por eso es alto, y está en tres tensiones fuertes. No llega a 4 porque un problema de desempeño casi siempre se traduce en lentitud, no en dinero perdido, y porque el juego y su video los sirve el proveedor, no nosotros.',
    acc:'<b>Lo que aceptamos:</b> no optimizamos más allá de lo que el proveedor necesita para no cortar la jugada.'},
   {id:'compat', name:'Compatibilidad', short:'Compatibilidad', pts:3,
-   why:'Sin integraciones no hay casino: cinco proveedores ponen todos los juegos, cada uno con su propio protocolo y su propia forma de autenticarse, y el sistema de inspección de Coljuegos es obligatorio y tiene su propio formato. Por eso es alto: está en dos tensiones fuertes contra atributos altos. Tiene 3, el mínimo para seguir siendo alto, por dos razones. Subirla a 4 obligaría a bajar Desempeño a 2, y perderíamos dos tensiones críticas. Y cuando una integración falla, el daño cae en Fiabilidad y Seguridad, que ya están en 4. Como los protocolos los definen los proveedores y el regulador, nuestro trabajo es cumplir ese contrato con exactitud, y eso no mejora con más puntos.',
+   why:'Sin integraciones no hay casino: cinco proveedores ponen todos los juegos, cada uno con su propio protocolo y su propia forma de autenticarse, y el sistema de inspección de Coljuegos es obligatorio y tiene su propio formato. Por eso es alto: está en dos tensiones fuertes contra atributos altos. Tiene 3, el mínimo para seguir siendo alto, por dos razones. Subirla a 4 obligaría a bajar a 2 otro atributo alto, y perderíamos dos tensiones críticas. Y cuando una integración falla, el daño cae en Fiabilidad y Seguridad, que ya son altos. Como los protocolos los definen los proveedores y el regulador, nuestro trabajo es cumplir ese contrato con exactitud, y eso no mejora con más puntos.',
    acc:'<b>Lo que aceptamos:</b> cada proveedor nuevo es trabajo de integración y, a veces, de recertificación.'},
-  {id:'func', name:'Adecuación funcional', short:'Funcional', pts:1,
-   why:'Lo que el sistema debe hacer ya viene escrito en los requerimientos técnicos de Coljuegos: los campos del registro, la autoexclusión, los límites, el historial. Ahí no hay mucho que decidir, solo cumplir. Y la lógica de los juegos, sus resultados y su retorno al jugador son del proveedor, certificados por un laboratorio.',
-   acc:'<b>Lo que aceptamos:</b> la exactitud de los premios queda del lado del proveedor.'},
+  {id:'func', name:'Adecuación funcional', short:'Funcional', pts:2,
+   why:'Lo que el sistema debe hacer ya viene escrito en los requerimientos técnicos de Coljuegos: los campos del registro, la autoexclusión, los límites, el historial. Que la lista venga de la norma no le quita peso: dejar un caso sin cubrir es un incumplimiento. Y hay reglas del dinero que calculamos nosotros, no el proveedor: el saldo nunca negativo, los límites de depósito, la autoexclusión que bloquea apuestas pero permite retirar. Por eso sale del mínimo. No llega a 3 porque la lógica de los juegos, sus resultados y su retorno al jugador son del proveedor, certificados por un laboratorio, y porque la mayoría de estas funciones se cumple o no se cumple, sin mucho que decidir.',
+   acc:'<b>Lo que aceptamos:</b> la exactitud de los premios queda del lado del proveedor. Para subirla bajamos Fiabilidad de 4 a 3.'},
   {id:'usab', name:'Usabilidad', short:'Usabilidad', pts:1,
    why:'Buena parte de la fricción no la decidimos nosotros: la impone la regulación, con el bloqueo tras intentos fallidos, el cierre de sesión por inactividad y un registro largo. Y la pantalla donde el jugador pasa su tiempo es la del juego, que hace el proveedor. Su única tensión fuerte es contra Seguridad, y ahí elegimos Seguridad.',
    acc:'<b>Lo que aceptamos:</b> una experiencia con más pasos que la de los sitios ilegales, que no tienen estos controles.'},
@@ -580,7 +581,7 @@ const SC = [
    casos:['Petición nueva → se aplica.','Petición repetida idéntica → misma respuesta, sin volver a aplicarse.','Mismo proveedor, jugador e identificador con datos distintos → se rechaza y genera alerta.','Mismo identificador para otro jugador → es una operación nueva: algunos proveedores solo garantizan identificadores únicos por jugador.'],
    checks:['Reenviar cada petición entre 2 y 5 veces, a veces al mismo tiempo, durante una prueba de carga.','Conciliar a diario los saldos con cada proveedor y con el reporte a Coljuegos.','Enviar un identificador repetido con otro monto y medir el tiempo hasta la alerta.']},
   {id:'ESC-04', name:'Ráfaga de retiros del crash', dom:'perf', cost:'func', tens:'T6', adr:null,
-   tension:'El dominante, Desempeño, es alto. Pero su costo cae en la corrección del premio (Adecuación funcional, 1), que calcula el proveedor y certifica el laboratorio. Cumplirlo no obliga a sacrificar un atributo que priorizamos alto.',
+   tension:'El dominante, Desempeño, es alto. Pero su costo cae en la corrección del premio (Adecuación funcional, 2), que no está entre los altos y que calcula el proveedor y certifica el laboratorio. Cumplirlo no obliga a sacrificar un atributo que priorizamos alto.',
    p:[
     ['Eficiencia de desempeño','Aguantar la ráfaga de cobros del avión.'],
     ['El proveedor externo del juego <i>crash</i>, después de que 720 jugadores de una misma ronda se retiran con el multiplicador en 2,00x','El proveedor del avión, justo cuando 720 jugadores se retiran a la vez.'],
@@ -658,10 +659,11 @@ const ADR = [
 
 /* ---------- Sustentación ---------- */
 const QA = [
-  ['¿Por qué Seguridad y Fiabilidad empatan en 4 y ninguna llega a 5?','Subir cualquiera a 5 obliga a bajar Desempeño o Compatibilidad a 2, y eso saca una tensión fuerte del foco. Cuando Seguridad y Fiabilidad chocan, el desempate ya existe como regla: fallo cerrado en los retiros. Gana Seguridad sin gastar un punto en decirlo.'],
-  ['¿Por qué un 3 cuenta como atributo alto?','Porque los 10 puntos libres van todos a Seguridad, Fiabilidad, Desempeño y Compatibilidad (3 + 3 + 2 + 2). Los otros cuatro se quedan en el mínimo. Un 3 son puntos que se les quitaron a los demás.'],
+  ['¿Por qué Seguridad es el único 4 y no llega a 5?','Subirla a 5 obliga a bajar Fiabilidad, Desempeño o Compatibilidad a 2, y eso saca dos tensiones fuertes del foco. Cuando Seguridad y Fiabilidad chocan, el desempate ya existe como regla: fallo cerrado en los retiros. Gana Seguridad, y ahora el puntaje dice lo mismo que la regla.'],
+  ['¿Por qué Adecuación funcional subió a 2 y no a 3?','Subió por la retroalimentación del profesor a la primera exposición: que las funciones vengan del reglamento no les quita peso, y hay reglas del dinero que calcula el operador, como el saldo nunca negativo y los límites de depósito. El punto salió de Fiabilidad, porque ese peso ya lo compartían las dos. No llega a 3 porque la lógica del juego y el premio son del proveedor. Con 3 sería un atributo alto: la tensión del crash pasaría a crítica, haría falta un quinto ADR y Seguridad perdería su 4.'],
+  ['¿Por qué un 3 cuenta como atributo alto?','Porque 9 de los 10 puntos libres van a Seguridad, Fiabilidad, Desempeño y Compatibilidad (3 + 2 + 2 + 2). El punto restante saca a la Adecuación funcional del mínimo, y los otros tres atributos se quedan en 1. Un 3 son puntos que se les quitaron a los demás.'],
   ['¿Por qué Mantenibilidad tiene 1 si la regulación cambia tanto?','El ritmo de cambio lo marca el laboratorio: cada cambio crítico se valida de 2 a 4 semanas y hay recertificación anual. Un código más fácil de cambiar no acelera ese cuello de botella. Es un riesgo asumido: nos apoyamos en una seguridad fuerte para seguir cumpliendo cuando cambian las reglas.'],
-  ['¿Por qué cuatro ADR y no cinco?','El material pide un ADR por escenario crítico. ESC-04 es importante, pero su costo cae en la corrección del premio (Adecuación funcional, 1), que además calcula el proveedor. Escribir un ADR para todos los escenarios es el nivel Inicial de la rúbrica.'],
+  ['¿Por qué cuatro ADR y no cinco?','El material pide un ADR por escenario crítico. ESC-04 es importante, pero su costo cae en la corrección del premio (Adecuación funcional, 2), que no está entre los altos y que además calcula el proveedor. Escribir un ADR para todos los escenarios es el nivel Inicial de la rúbrica.'],
   ['¿Por qué Seguridad × Compatibilidad no era tensión fuerte desde el comienzo?','Al principio la vimos como “más integraciones, más superficie de ataque”. Al revisar nuestra primera presentación vimos que el conflicto es directo: la interfaz de saldo es la puerta por la que entra el dinero, y su protección depende de cómo autentica cada proveedor. Exigir un esquema único deja proveedores fuera; aceptar el de cada uno nos deja tan protegidos como el más débil.'],
   ['¿Por qué fallo cerrado en los retiros y no fallo abierto?','Si los controles antilavado no responden, pagar un retiro sin evaluarlo puede significar pagarle dinero de lavado a una persona incluida en una lista. Legalmente eso es más grave que demorar un retiro, que de todos modos tiene un plazo máximo de 72 horas. El juego y los depósitos no se detienen por esta causa.'],
   ['ESC-03 y ESC-05 tocan la misma interfaz. ¿No son el mismo escenario?','Comparten artefacto, pero no estímulo. ESC-03 trata peticiones legítimas que llegan repetidas porque se perdió una respuesta: el reto es entender el protocolo del proveedor (Compatibilidad). ESC-05 trata peticiones que ningún proveedor emitió: el reto es la autenticidad (Seguridad).'],
@@ -680,7 +682,7 @@ const RUB = [
   ['Estímulo y entorno','Estímulos que el operador observa; entornos con franja horaria, carga y modo de operación.','Bajo. ESC-04 se corrigió para que fuente y estímulo sean lo que el operador ve.'],
   ['Respuesta','Cada respuesta distingue de dos a cuatro casos.','Bajo.'],
   ['Medida de la respuesta','Cifras con unidad y percentil, y la forma de verificarlas (conciliación, cruce por marca de tiempo, prueba de carga).','Bajo. Cada cifra tiene origen en la ficha.'],
-  ['Coherencia con la priorización','Cada escenario dice su atributo dominante con su puntaje y el atributo que paga.','Medio: ESC-03 tiene dominante en 3. Defensa: un 3 concentra puntos libres, y lo que paga es Fiabilidad, en 4.'],
+  ['Coherencia con la priorización','Cada escenario dice su atributo dominante con su puntaje y el atributo que paga.','Medio: ESC-02 y ESC-03 tienen dominante en 3. Defensa: el corte de atributo alto es 3, que concentra puntos libres, y en ambos el atributo que paga también es alto.'],
   ['Selección de escenarios críticos','Prueba de criticidad a 10 candidatos y justificación en una línea; ESC-04 sin ADR por criterio.','Bajo: 4 ADR, uno por cada tensión fuerte entre atributos altos.'],
   ['ADR: contexto y estado','Context idéntico al escenario (verificado con script), título que nombra la decisión, estado Propuesto y pendientes.','Bajo.'],
   ['ADR: opciones y trade-offs','Tres opciones por ADR, descritas como mecanismos, con lo que gana, lo que paga, el atributo sacrificado y si cumple la medida.','Bajo. En cada ADR al menos una opción no cumple la medida.']
