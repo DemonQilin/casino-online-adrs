@@ -1,7 +1,5 @@
 # Fase 1 — Investigación del dominio
 
-> [← Anterior](./00-plan-de-trabajo.md) · [Índice](./README.md) · [Siguiente →](./02-ficha-contexto.md)
-
 **Proyecto:** casino online de juegos de azar regulado en Colombia (sin apuestas deportivas)
 **Fecha de corte de la investigación:** 25 de octubre de 2026
 **Propósito:** reunir hechos verificables para que la ficha de contexto (fase 2) no invente nada.
@@ -116,6 +114,7 @@ La última columna anticipa qué característica de ISO 25010 toca cada obligaci
 | E8 | Pruebas de penetración de caja blanca y caja negra a cargo del laboratorio certificador. | [F1] | Seguridad |
 | E9 | Todo acceso desde Colombia se redirige al dominio ".co" del operador, y se identifica el tráfico por IP cuando sea técnicamente viable. | [F1] | Compatibilidad, Seguridad |
 | E10 | Las diferencias de funcionalidad en dispositivos móviles se documentan y se informan al jugador, que debe aceptarlas. | [F1] | Portabilidad × Usabilidad |
+| E11 | El sistema debe **autenticar todos los accesos**, también los de otros sistemas y componentes (el reglamento pone como ejemplo la pasarela de pagos). | [F1] | Seguridad × Compatibilidad |
 
 ### 1.3 Prevención de lavado de activos (SIPLAFT)
 
@@ -260,6 +259,7 @@ Esto es un adelanto para la fase 3, sin soluciones.
 | Bloqueo a los 5 intentos y cierre a los 20 minutos (C3, C12) | **Seguridad** frente a **Usabilidad**. Es el mismo ejemplo del widget de tensiones del curso. |
 | Detección de suplantación por comportamiento (C4) y SARLAFT: perfil de riesgo en cada depósito y retiro y reconsulta masiva de listas (sección 1.3) | **Seguridad** frente a **Desempeño**, porque se evalúa en el camino de cada depósito o retiro. Y **Seguridad** frente a **Usabilidad**, por la diligencia reforzada, que retiene retiros. |
 | Inspección en Colombia, con formato fijado por Coljuegos (A2, A3) | **Compatibilidad** obligatoria y **Portabilidad** restringida. |
+| Cada proveedor llega con su propio esquema de autenticación, y el reglamento exige autenticar todo acceso (E11) | **Seguridad** frente a **Compatibilidad**. (Agregada el 1 de noviembre de 2026.) |
 | Ventana de apuestas en vivo y juegos *crash* (sección 2.2) | **Desempeño** frente a equidad del juego (Adecuación funcional y Fiabilidad). |
 | Reglas fiscales y técnicas que cambian por decreto (secciones 1.1 y 1.6) | **Mantenibilidad** (capacidad de modificación). |
 
@@ -321,7 +321,3 @@ Esto es un adelanto para la fase 3, sin soluciones.
 - **[F31]** Blask, "Colombia: deposit tax returns, opening doors for offshore" (2026). https://blask.com/newsroom/colombia-deposit-tax-returns-opening-doors-for-offshore/
 - **[F32]** MercoPress, "How Live Dealer Casino Games Actually Work" (sept. 2026). https://en.mercopress.com/2026/09/01/how-live-dealer-casino-games-actually-work-at-olimp
 - **[F33]** Focus Gaming News, "Coljuegos y la Superintendencia Financiera de Colombia buscan facilitar el acceso de operadores de juego al sistema bancario". https://focusgn.com/latinoamerica/coljuegos-y-la-superintendencia-financiera-de-colombia-buscan-facilitar-el-acceso-de-operadores-de-juego-al-sistema-bancario
-
----
-
-> [← Anterior](./00-plan-de-trabajo.md) · [Índice](./README.md) · [Siguiente →](./02-ficha-contexto.md)

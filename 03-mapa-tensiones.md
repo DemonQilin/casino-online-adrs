@@ -1,11 +1,9 @@
 # Fase 3 — Mapa de tensiones
 
-> [← Anterior](./02-ficha-contexto.md) · [Índice](./README.md) · [Siguiente →](./04-priorizacion.md)
-
 **Proyecto:** Casino Andino, casino online regulado en Colombia
 **Insumos:**
-- [`02-ficha-contexto.md`](./02-ficha-contexto.md): las cifras citadas salen de ahí; [S#] son sus supuestos.
-- [`01-investigacion-dominio.md`](./01-investigacion-dominio.md): las referencias [F#] y los códigos de obligación (A1, B3, C6…) remiten a su sección 1.2.
+- `02-ficha-contexto.md`: las cifras citadas salen de ahí; [S#] son sus supuestos.
+- `01-investigacion-dominio.md`: las referencias [F#] y los códigos de obligación (A1, B3, C6…) remiten a su sección 1.2.
 - La pestaña **Tensiones** del widget de ISO 25010 del curso, como punto de partida.
 
 **Método:**
@@ -29,10 +27,10 @@ Como en la fase anterior, aquí se describen necesidades en conflicto, no soluci
 |---|:---:|:---:|:---:|:---:|:---:|:---:|:---:|:---:|
 | **Adecuación funcional** | — | **F** (T6) | S | L | S | L | L | · |
 | **Eficiencia de desempeño** | **F** (T6) | — | L | L | **F** (T2) | **F** (T1) | L | L |
-| **Compatibilidad** | S | L | — | S | **F** (T3) | L | L | S |
+| **Compatibilidad** | S | L | — | S | **F** (T3) | **F** (T7) | L | S |
 | **Usabilidad** | L | L | S | — | S | **F** (T5) | · | L |
 | **Fiabilidad** | S | **F** (T2) | **F** (T3) | S | — | L | L | S |
-| **Seguridad** | L | **F** (T1) | L | **F** (T5) | L | — | **F** (T4) | L |
+| **Seguridad** | L | **F** (T1) | **F** (T7) | **F** (T5) | L | — | **F** (T4) | L |
 | **Mantenibilidad** | L | L | L | · | L | **F** (T4) | — | S |
 | **Portabilidad** | · | L | S | L | S | L | S | — |
 
@@ -40,8 +38,8 @@ Como en la fase anterior, aquí se describen necesidades en conflicto, no soluci
 
 | Tipo | Cantidad |
 |------|---------:|
-| Tensión fuerte | 6 |
-| Tensión leve | 13 |
+| Tensión fuerte | 7 |
+| Tensión leve | 12 |
 | Sinergia | 7 |
 | Sin relación relevante | 2 |
 
@@ -138,6 +136,18 @@ El usuario es mayoritariamente móvil, con gama media y 4G variable, y compite c
 
 **Evidencia:** ficha §2.2, §3, §4.2, S5, S6, S15; F1 (D5); F13; F32.
 
+### T7 · Seguridad × Compatibilidad
+
+**Situación en Casino Andino.** La interfaz de operaciones de saldo recibe ~3.000 peticiones por segundo de 5 proveedores, y cada petición puede **abonar dinero** a una cuenta. Quien logre hacerse pasar por un proveedor puede crear saldo de la nada. El reglamento exige autenticar todos los accesos, también los de otros sistemas (E11), y autenticación en ambos sentidos (E7). Pero cada proveedor llega con **su propio esquema de autenticación** y no acepta cambiarlo (S29), y se suman 1 o 2 proveedores al año (S11).
+
+**Si se prioriza Seguridad**, pierde Compatibilidad. Exigir a todos un esquema único y estricto deja fuera a los proveedores que no lo soportan o retrasa su integración, y cada integración nueva se vuelve una negociación.
+
+**Si se prioriza Compatibilidad**, pierde Seguridad. Aceptar el esquema de cada proveedor tal como viene obliga a convivir con esquemas débiles (una clave fija, por ejemplo), y la interfaz queda tan protegida como el proveedor menos exigente.
+
+**Por qué se promovió de leve a fuerte (1 de noviembre de 2026).** En la versión inicial del mapa se trató como leve (L4), con la idea general de "más integraciones, más superficie de ataque". Al revisar la primera presentación del equipo se vio que el conflicto es directo: la interfaz de saldo es la puerta por la que entra el dinero, y su protección depende de cómo autentica cada proveedor.
+
+**Evidencia:** ficha §3, §4.4, S11, S29; F1 (A6, E7, E11); F25.
+
 ---
 
 ## 3. Tensiones leves
@@ -147,7 +157,6 @@ El usuario es mayoritariamente móvil, con gama media y 4G variable, y compite c
 | L1 | Fiabilidad × Seguridad | **¿Fallar abierto o cerrado?** Si el proveedor de listas o la evaluación de riesgo no responden, ¿se pagan los retiros para cumplir la meta de 24 h, o se detienen? El reglamento ya inclina la balanza en las fallas graves: suspender todo (E3). | Seguridad: pagar sin evaluar abre una ventana a pagos indebidos | Fiabilidad: retiros detenidos mientras dura la falla externa |
 | L2 | Fiabilidad × Mantenibilidad | **Contraria a la sinergia típica del widget.** El sistema alterno con la misma certificación exige replicar **de inmediato** cada cambio (E1), así que todo cambio cuesta el doble. | Mantenibilidad: cada entrega se hace y verifica en dos entornos | Fiabilidad: un alterno desfasado no sirve en la contingencia |
 | L3 | Compatibilidad × Mantenibilidad | **Contraria a la sinergia típica del widget.** No hay un estándar común entre proveedores de juego: cada uno trae su protocolo. Un juego sobre otra plataforma o versión obliga a **recertificar la integración** (B4). | Mantenibilidad: más variantes que mantener y recertificar | Compatibilidad: menos proveedores y juegos, catálogo más lento |
-| L4 | Compatibilidad × Seguridad | Hay 5 proveedores de juego, 5 medios de pago, listas, identidad y el acceso remoto de Coljuegos (A5). Cada integración es una superficie de ataque. | Seguridad: más puntos de entrada que proteger | Compatibilidad: integraciones más lentas y restringidas |
 | L5 | Desempeño × Compatibilidad | Cada una de las ~24 M de operaciones diarias debe traducirse al formato XML de Coljuegos (A3), y cada protocolo de proveedor debe traducirse al modelo del operador. | Compatibilidad: presión para simplificar o diferir la captura regulatoria | Desempeño: la traducción consume recursos en el pico |
 | L6 | Usabilidad × Desempeño | El multiplicador del *crash*, el video del blackjack y el *jackpot* deben verse actualizados en **todos** los dispositivos (D4), en celulares de gama media y 4G variable, con carga de pantalla p95 ≤ 3 s. | Desempeño: más actualizaciones visuales en tiempo real para miles de dispositivos | Usabilidad: información desactualizada o pantallas más pobres |
 | L7 | Adecuación funcional × Usabilidad | El registro obligatorio tiene muchos campos (documento, fecha y lugar de expedición, municipio DIVIPOLA…). Además, la pantalla debe mostrar siempre el tiempo de sesión, el aviso de juego responsable, el saldo y el sello (C13). Todo en pantallas móviles pequeñas. | Usabilidad: interfaz cargada y registro largo | Adecuación funcional: no es opcional, es exigencia regulatoria |
@@ -157,6 +166,8 @@ El usuario es mayoritariamente móvil, con gama media y 4G variable, y compite c
 | L11 | Desempeño × Portabilidad | Ajustar el sistema al entorno donde corre lo ata a ese entorno. A la vez, el sistema alterno exige poder correr igual en otro sitio (E1). | Portabilidad: más difícil llevarlo al alterno o a otro centro de datos | Desempeño: menos margen para aprovechar el entorno |
 | L12 | Seguridad × Portabilidad | La certificación es del entorno concreto. Mover el sistema (otro centro de datos, otro proveedor de infraestructura) reabre pruebas de seguridad y certificación (B1, B3). El sistema de inspección debe estar en Colombia (A2). | Portabilidad: cambiar de entorno es caro y lento | Seguridad: se exponen controles no validados en el entorno nuevo |
 | L13 | Usabilidad × Portabilidad | Web de escritorio, web móvil y app Android, con gama media. Las diferencias de funcionalidad entre dispositivos deben documentarse y aceptarse (E10). | Portabilidad: adaptar la experiencia a cada canal impide reutilizar lo mismo en todos | Usabilidad: una experiencia única se siente mal en algún canal |
+
+> **L4 (Compatibilidad × Seguridad) se promovió a tensión fuerte T7** el 1 de noviembre de 2026. Se conserva la numeración de las demás tensiones leves.
 
 ---
 
@@ -186,10 +197,10 @@ Esta tabla responde a la puerta de revisión 2.
 
 | Atributo | Tensiones fuertes | Leves | Sinergias |
 |----------|-------------------|------:|----------:|
-| Seguridad | T1, T4, T5 | 4 | 0 |
+| Seguridad | T1, T4, T5, T7 | 3 | 0 |
 | Eficiencia de desempeño | T1, T2, T6 | 4 | 0 |
 | Fiabilidad | T2, T3 | 2 | 3 |
-| Compatibilidad | T3 | 3 | 3 |
+| Compatibilidad | T3, T7 | 2 | 3 |
 | Mantenibilidad | T4 | 4 | 1 |
 | Usabilidad | T5 | 3 | 2 |
 | Adecuación funcional | T6 | 3 | 2 |
@@ -199,7 +210,7 @@ Esta tabla responde a la puerta de revisión 2.
 
 ### 5.2 Hallazgos para presentar
 
-1. **Seguridad y Desempeño son el centro del mapa.** Cada uno está en tres tensiones fuertes. Casi toda decisión del casino pasa por uno de ellos.
+1. **Seguridad y Desempeño son el centro del mapa.** Seguridad está en cuatro tensiones fuertes y Desempeño en tres. Casi toda decisión del casino pasa por uno de ellos.
 2. **La Mantenibilidad la limita el regulador** (T4), no solo el código. Eso la vuelve costosa de subir en la priorización, pero también peligrosa de bajar demasiado, por la volatilidad regulatoria.
 3. **La Portabilidad no tiene tensiones fuertes.** Además está acotada por restricciones fijas (inspección en Colombia, entorno certificado). Es la candidata natural a puntaje bajo.
 4. **El *crash* aporta la única tensión fuerte que involucra a la Adecuación funcional** (T6). Justifica haberlo incluido en el alcance.
@@ -214,8 +225,8 @@ La priorización con 18 puntos deberá decidir cuáles de **Seguridad, Desempeñ
 
 | Criterio | Estado |
 |----------|--------|
-| Se recorrieron los 28 pares | ✔ 6 fuertes, 13 leves, 7 sinergias y 2 sin relación |
-| Puerta 2: al menos tres atributos en tensión y cada par nombrado | ✔ Siete atributos en tensiones fuertes, pares nombrados T1–T6 |
+| Se recorrieron los 28 pares | ✔ 7 fuertes, 12 leves, 7 sinergias y 2 sin relación |
+| Puerta 2: al menos tres atributos en tensión y cada par nombrado | ✔ Siete atributos en tensiones fuertes, pares nombrados T1–T7 |
 | Puerta 3: cada par dice quién pierde | ✔ Cada tensión fuerte y leve indica qué se pierde en ambas direcciones |
 | Cada tensión anclada en cifras de la ficha o en obligaciones | ✔ Con referencias a §, S# y F# |
 | Sin soluciones | ✔ Se describen necesidades en conflicto, no mecanismos |
@@ -229,7 +240,4 @@ La priorización con 18 puntos deberá decidir cuáles de **Seguridad, Desempeñ
    - Razón: legalmente es más grave pagar dinero proveniente de lavado de activos que demorar un retiro.
    - El criterio quedó registrado en la ficha (§4.4 y restricción 9).
 2. **La presentación se enfocará en las tensiones fuertes.** La inversión de sinergias (L2, L3) queda solo como dato del mapa y no se presenta como hallazgo.
-
----
-
-> [← Anterior](./02-ficha-contexto.md) · [Índice](./README.md) · [Siguiente →](./04-priorizacion.md)
+3. **1 de noviembre de 2026: L4 sube a tensión fuerte (T7, Seguridad × Compatibilidad).** Decisión del equipo tras revisar su primera presentación, que ya trataba la suplantación de proveedores como un conflicto central.

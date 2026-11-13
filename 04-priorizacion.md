@@ -1,12 +1,10 @@
 # Fase 4 — Priorización con presupuesto de 18 puntos
 
-> [← Anterior](./03-mapa-tensiones.md) · [Índice](./README.md) · [Siguiente →](./05-seleccion-escenarios.md)
-
 **Proyecto:** Casino Andino, casino online regulado en Colombia
 **Insumos:**
-- [`02-ficha-contexto.md`](./02-ficha-contexto.md): cifras y supuestos [S#].
-- [`03-mapa-tensiones.md`](./03-mapa-tensiones.md): tensiones T1–T6 y L1–L13.
-- [`01-investigacion-dominio.md`](./01-investigacion-dominio.md): obligaciones [F#] y códigos A1, B3, C6…
+- `02-ficha-contexto.md`: cifras y supuestos [S#].
+- `03-mapa-tensiones.md`: tensiones T1–T6 y L1–L13.
+- `01-investigacion-dominio.md`: obligaciones [F#] y códigos A1, B3, C6…
 
 **Reglas del presupuesto (del material del curso):**
 - Cada uno de los 8 atributos de ISO 25010 recibe de 1 a 5 puntos.
@@ -45,7 +43,7 @@
 - El operador custodia el dinero de los jugadores, y cada depósito y retiro pasa por SARLAFT. Eso implica perfil de riesgo, listas restrictivas, reconsulta de 350.000 cuentas en ≤ 6 h y diligencia reforzada (ficha §4.4).
 - El equipo ya tomó una postura explícita: **fallo cerrado** en los retiros, porque legalmente es más grave pagar dinero de lavado que demorar un retiro (ficha, restricción 9).
 - El reglamento exige bloqueo a los 5 intentos, detección de suplantación, cifrado de ≥ 2048 bits, ISO 27001 como guía y pruebas de penetración (C3, C4, E6–E8).
-- Está en tres tensiones fuertes: T1, T4 y T5.
+- Está en cuatro tensiones fuertes: T1, T4, T5 y T7.
 
 **Fiabilidad (4).**
 - **Ninguna transacción de saldo confirmada puede perderse.** El saldo nunca puede ser negativo (C6), y toda pérdida de datos se reporta de inmediato a Coljuegos (E5).
@@ -69,7 +67,7 @@
 - A eso se suman 5 medios de pago, la verificación de identidad y las listas restrictivas.
 - El **sistema de inspección** es interoperabilidad obligatoria: formato XML fijado por Coljuegos, sin huecos (A2, A3).
 - Es el reto de interoperabilidad que motivó la elección del tema.
-- Está en una tensión fuerte, T3, contra un atributo alto (Fiabilidad).
+- Está en dos tensiones fuertes contra atributos altos: T3 (contra Fiabilidad) y T7 (contra Seguridad).
 
 *¿Por qué no 4?* Los protocolos los definen los proveedores y el regulador; el operador se adapta a ellos. Sus fallas se pagan en Fiabilidad, que ya está en 4.
 
@@ -120,12 +118,13 @@ Un escenario es crítico si su atributo dominante está entre los más altos **y
 | T1 | Seguridad (4) × Desempeño (3) | ✔ | **Sí** |
 | T2 | Fiabilidad (4) × Desempeño (3) | ✔ | **Sí** |
 | T3 | Compatibilidad (3) × Fiabilidad (4) | ✔ | **Sí** |
+| T7 | Seguridad (4) × Compatibilidad (3) | ✔ | **Sí** (promovida a fuerte el 1 de noviembre de 2026) |
 | L1 | Seguridad (4) × Fiabilidad (4) | ✔ | Posible: es leve, pero está entre dos altos y tiene la regla de fallo cerrado |
 | T4 | Seguridad (4) × Mantenibilidad (1) | ✘ | No: el costo cae en un atributo bajo |
 | T5 | Seguridad (4) × Usabilidad (1) | ✘ | No |
 | T6 | Desempeño (3) × Adecuación funcional (1) | ✘ | No |
 
-**Lectura para la fase 5:** tres tensiones fuertes quedan entre atributos altos. Eso apunta a **3 o 4 escenarios críticos**, y por lo tanto a 3 o 4 ADRs. T4, T5 o T6 pueden aportar un escenario **no crítico** que muestre el criterio de selección.
+**Lectura para la fase 5:** cuatro tensiones fuertes quedan entre atributos altos (T1, T2, T3 y T7). Eso apunta a **4 escenarios críticos**, y por lo tanto a 4 ADRs. T4, T5 o T6 pueden aportar un escenario **no crítico** que muestre el criterio de selección.
 
 ---
 
@@ -144,11 +143,11 @@ Las dos variantes también suman 18. Cambian qué tensiones quedan críticas.
 | Usabilidad | 1 | 1 | 1 |
 | Portabilidad | 1 | 1 | 1 |
 | **Total** | **18** | **18** | **18** |
-| Tensiones críticas | T1, T2, T3 | T1, T2 | T1, T2, T4 |
-| Qué se pierde frente a la recomendada | — | T3 sale del foco: la interoperabilidad con proveedores, el tema que motivó el proyecto, deja de tener ADR | T3 sale del foco y la Compatibilidad queda en el mínimo, aunque el sistema de inspección es obligatorio |
+| Tensiones críticas | T1, T2, T3, T7 | T1, T2 | T1, T2, T4 |
+| Qué se pierde frente a la recomendada | — | T3 y T7 salen del foco: la interoperabilidad con proveedores, el tema que motivó el proyecto, deja de tener ADR | T3 y T7 salen del foco y la Compatibilidad queda en el mínimo, aunque el sistema de inspección es obligatorio |
 | Qué se gana | — | La postura de fallo cerrado se refleja en el puntaje | La volatilidad regulatoria (impuestos, premio inmediato, revisión técnica) gana un ADR propio |
 
-**Por qué recomendamos la primera:** cubre los cuatro retos que motivaron el tema (tiempo real, seguridad, interoperabilidad y regulación). Además deja tres tensiones fuertes entre atributos altos, lo que da material para ADRs bien fundados, y conserva la decisión de fallo cerrado como regla explícita.
+**Por qué recomendamos la primera:** cubre los cuatro retos que motivaron el tema (tiempo real, seguridad, interoperabilidad y regulación). Además deja cuatro tensiones fuertes entre atributos altos, lo que da material para ADRs bien fundados, y conserva la decisión de fallo cerrado como regla explícita.
 
 ---
 
@@ -179,7 +178,4 @@ Las dos variantes también suman 18. Cambian qué tensiones quedan críticas.
 
 1. **El equipo adopta la propuesta recomendada:** Seguridad 4, Fiabilidad 4, Desempeño 3, Compatibilidad 3, Adecuación funcional 1, Usabilidad 1, Mantenibilidad 1, Portabilidad 1.
 2. **Mantenibilidad en 1 se mantiene, con el riesgo asumido explícitamente.** El equipo acepta el costo de la regulación cambiante y se apoya en una seguridad fuerte: un sistema con controles sólidos tiene más probabilidad de seguir cumpliendo cuando cambian las reglas, aunque cambiarlo cueste más.
-
----
-
-> [← Anterior](./03-mapa-tensiones.md) · [Índice](./README.md) · [Siguiente →](./05-seleccion-escenarios.md)
+3. **1 de noviembre de 2026:** con la promoción de T7 (Seguridad × Compatibilidad) a tensión fuerte, la misma priorización deja cuatro tensiones críticas. Los puntajes no cambian.

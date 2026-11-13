@@ -1,7 +1,5 @@
 # Fase 8 — Revisión integral
 
-> [← Anterior](./07-adrs.md) · [Índice](./README.md)
-
 **Proyecto:** Casino Andino, casino online regulado en Colombia
 **Documentos revisados:** `00` a `07`
 **Fecha:** 26 de octubre de 2026
@@ -37,7 +35,7 @@
 | 4 | Respuesta | Logrado | `06`: cada respuesta distingue 2 o 3 casos ("Casos que distingue la respuesta") | Bajo |
 | 5 | Medida de la respuesta | Logrado | `06`: cifras con unidad y percentil, y el método de verificación (conciliación, cruce por marca de tiempo) | Bajo, tras rastrear S23–S25 (H3) |
 | 6 | Coherencia con la priorización | Logrado | `06` "Resumen" y lista de chequeo: dominante con puntaje y atributo que paga | **Medio:** ESC-03 tiene dominante con puntaje 3 (ver riesgo R2) |
-| 7 | Selección de escenarios críticos | Logrado | `05` §2 (prueba de criticidad a 9 candidatos), §3 (justificación en una línea); `07` "Selección de los ADR" | **Medio:** 3 ADRs y no 4 (ver riesgo R4) |
+| 7 | Selección de escenarios críticos | Logrado | `05` §2 (prueba de criticidad a 10 candidatos), §3 (justificación en una línea); `07` "Selección de los ADR" | Bajo: 4 ADRs, uno por cada tensión fuerte entre atributos altos, y ESC-04 sin ADR por criterio (sección 7) |
 | 8 | ADR: contexto y estado | Logrado | `07`: Context idéntico al escenario (verificado con script), título numerado que nombra la decisión, estado Propuesto y "Pendiente para el Bloque 3" | Bajo |
 | 9 | ADR: opciones y trade-offs | Logrado | `07`: tres opciones por ADR, descritas como mecanismos, con lo que gana, lo que paga, el atributo sacrificado y si cumple la medida | Bajo |
 
@@ -94,7 +92,7 @@ No son errores, pero un evaluador podría leerlos distinto. Para cada uno dejamo
 | R1 | La fuente de ESC-02 es "una falla de hardware". Alguien podría decir que no es un actor. | En escenarios de fiabilidad, la fuente típica es una falla interna. No es una condición del entorno: la carga y la franja horaria sí están en el entorno. |
 | R2 | El dominante de ESC-03 (Compatibilidad) tiene 3, no 4. ¿Está "entre los más altos"? | Los 10 puntos libres se concentran solo en los cuatro altos; los demás quedaron en 1 (`04` §1, párrafo "Qué cuenta como alto"). Además, cumplirlo cuesta Fiabilidad, que tiene 4. |
 | R3 | Varias cifras clave son estimaciones (S10, S14, S15, S23–S25). | Están declaradas con su razón, como pide el plan. Las respuestas "Depende" de los ADR muestran que lo que falta se resuelve midiendo. |
-| R4 | Al comienzo se habló de 4 ADRs y la entrega trae 3. | El material pide un ADR por escenario crítico, y solo hay tres tensiones fuertes entre atributos altos. ESC-04 sin ADR demuestra el criterio; escribir un ADR para todos es el nivel Inicial de la rúbrica. |
+| R4 | *Resuelto el 1 de noviembre:* la entrega pasa a 4 ADRs (sección 7). El riesgo nuevo es que pregunten por qué T7 no era fuerte desde el comienzo. | `03`, T7, apartado "Por qué se promovió de leve a fuerte": al revisar la primera presentación se vio que la interfaz de saldo es la puerta por la que entra el dinero, y su protección depende de cómo autentica cada proveedor. |
 
 **Vigencia normativa.** Los requerimientos técnicos de Coljuegos están en revisión en 2026, y el Decreto 0240 de 2026 tiene un estado jurídico incierto. Si cambian antes de la entrega, hay que revisar la ficha §4 y las restricciones de los ADR.
 
@@ -120,4 +118,30 @@ El plan pide una lectura de alguien que no haya participado en la redacción. Pr
 
 ---
 
-> [← Anterior](./07-adrs.md) · [Índice](./README.md)
+## 7. Cambio posterior a la revisión (1 de noviembre de 2026)
+
+**Decisión del equipo:** subir L4 (Seguridad × Compatibilidad) a tensión fuerte **T7** y agregar su escenario y su ADR. La decisión salió de revisar la primera presentación del equipo, que ya trataba la suplantación de proveedores como un conflicto central.
+
+**Qué se agregó:**
+- **ESC-05 · Petición de abono falsificada a nombre de un proveedor.** Seguridad (4), con una restricción de compatibilidad (3). Tiene una sola fuente, un solo estímulo y una medida con las dos caras de la tensión: 100 % de lo falsificado rechazado y ≤ 0,001 % de lo legítimo rechazado.
+- **ADR-04 · Verificación del origen de las peticiones de saldo de los proveedores.** Tres opciones: clave fija con direcciones permitidas (no cumple), firma por petición con una pieza por proveedor (depende) y esquema único del operador (no cumple, porque deja fuera a proveedores).
+
+**Documentos actualizados:**
+
+| Archivo | Cambio |
+|---------|--------|
+| `01` | Obligación E11 (autenticar todos los accesos, también los de otros sistemas) y fila en las tensiones preliminares |
+| `02` | Requisitos de autenticación de proveedores en §1, §3, §4.2 y §4.4; supuestos S26–S29 |
+| `03` | T7 con su situación, quién pierde y por qué se promovió; matriz, conteo (7 fuertes, 12 leves), tabla de atributos y verificación |
+| `04` | T7 en la tabla de tensiones críticas, en la justificación de Seguridad y de Compatibilidad, y en las variantes. Los puntajes no cambian |
+| `05` | Candidato K10, prueba de criticidad, selección de 5 escenarios con 4 críticos y nueva justificación en una línea |
+| `06` | ESC-05, fila en el resumen, columna en la lista de chequeo y nota sobre su relación con ESC-03 |
+| `07` | ADR-04, selección y tabla de los ADR, relación ADR-03 ↔ ADR-04 y verificación |
+
+**Verificaciones repetidas:**
+- El Context de los **cuatro** ADR es idéntico a su escenario (script).
+- La matriz del mapa tiene 7 pares fuertes (14 celdas) y la tabla de leves tiene 12 filas.
+- Ninguna respuesta ni artefacto de los cinco escenarios nombra tácticas ni tecnologías.
+- Cada cifra de ESC-05 tiene origen en la ficha: S4, S6, S14 y S26–S29.
+
+**Pendiente:** la revisión en frío (sección 5) debe incluir ESC-05 y ADR-04.

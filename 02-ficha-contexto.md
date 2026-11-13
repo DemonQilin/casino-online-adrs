@@ -1,10 +1,8 @@
 # Fase 2 — Ficha de contexto
 
-> [← Anterior](./01-investigacion-dominio.md) · [Índice](./README.md) · [Siguiente →](./03-mapa-tensiones.md)
-
 **Proyecto:** casino online de juegos de azar regulado en Colombia
 **Nombre de trabajo:** *Casino Andino* (operador ficticio)
-**Insumo:** [`01-investigacion-dominio.md`](./01-investigacion-dominio.md) (las referencias [F#] remiten a sus fuentes)
+**Insumo:** `01-investigacion-dominio.md` (las referencias [F#] remiten a sus fuentes)
 **Horizonte de diseño:** año 3 de operación
 
 **Convenciones:**
@@ -28,7 +26,8 @@
 - **Seguridad:** bloqueo a los 5 intentos fallidos, cierre de sesión a los 20 minutos de inactividad y detección de suplantación por cambios bruscos de comportamiento. Además:
   - un **perfil de riesgo por jugador** que se actualiza en cada depósito y retiro;
   - consulta de **listas restrictivas** en el registro;
-  - **reconsulta de las 350.000 cuentas en ≤ 6 h** cada vez que cambian las listas.
+  - **reconsulta de las 350.000 cuentas en ≤ 6 h** cada vez que cambian las listas;
+  - **autenticación de cada petición de saldo** de los proveedores, respetando el esquema propio de cada uno.
 - **Diligencia reforzada:** ~2 % de los retiros (~60 al día), más todas las personas expuestas políticamente, se retienen para revisión y se resuelven en ≤ 48 h. Los demás retiros mantienen la meta de 24 h.
 - **Integraciones:** 5 proveedores de juego, 5 medios de pago (PSE, Nequi, Daviplata, tarjetas y efectivo), verificación de identidad, consulta de listas restrictivas, Coljuegos y UIAF.
 - **Cambio:** unos 20 juegos nuevos al mes y 3 o 4 cambios regulatorios al año. El equipo quiere entregar mejoras cada 2 semanas, pero cada cambio crítico pasa por el laboratorio, que tarda de 2 a 4 semanas.
@@ -67,7 +66,7 @@ Además incluye: registro y verificación, cuenta y saldo, depósitos y retiros,
 
 | Sistema externo | Qué se intercambia | Frecuencia en el pico de diseño | Restricción conocida |
 |----------------|-------------------|---------------------------------|---------------------|
-| 3 proveedores de tragamonedas y ruleta | Lanzamiento de juego; peticiones de descuento, abono y reversión del saldo | ~2.760 operaciones de saldo/s en conjunto | Cada operación trae un identificador (en algunos protocolos, único solo por jugador [F26]) y puede llegar repetida. Si el operador no responde a tiempo, el proveedor revierte la operación [F24][F26]. Tiempo de espera del proveedor: ~3 s **[S14]** |
+| 3 proveedores de tragamonedas y ruleta | Lanzamiento de juego; peticiones de descuento, abono y reversión del saldo | ~2.760 operaciones de saldo/s en conjunto | Cada operación trae un identificador (en algunos protocolos, único solo por jugador [F26]) y puede llegar repetida. Si el operador no responde a tiempo, el proveedor revierte la operación [F24][F26]. Tiempo de espera del proveedor: ~3 s **[S14]**. Cada proveedor usa su propio esquema de autenticación **[S29]** |
 | 1 proveedor de casino en vivo | Video, apuestas por ronda, resultados y liquidación | 80 apuestas/s en ráfagas de ventana | La ventana la cierra el servidor del proveedor [F32] |
 | 1 proveedor de *crash* | Apuestas al inicio de ronda, retiros durante la ronda y liquidación | 480 apuestas/s y hasta 720 retiros en un mismo segundo | El premio se calcula con el multiplicador vigente en el instante del retiro [F13] |
 | 5 medios de pago (PSE, Nequi, Daviplata, tarjetas, efectivo) | Depósitos, retiros y códigos de autorización | ~1.800 depósitos en la hora pico | PSE concentra ~60 % de las transacciones [F22]. El medio debe estar a nombre del jugador [F27] |
@@ -111,6 +110,7 @@ Además incluye: registro y verificación, cuenta y saldo, depósitos y retiros,
 | Aviso de pérdida de comunicación con el juego | Inmediato al detectarse | [F1] |
 | Saldo actualizado visible al jugador después de un abono | **p95 ≤ 2 s** | [S23] |
 | Alerta técnica por una petición de proveedor que repite proveedor, jugador e identificador con datos distintos | **≤ 5 min** | [S25] |
+| Tiempo que añade la verificación del origen de una petición de proveedor | **≤ 20 ms (p99)**, dentro del p99 ≤ 250 ms de la operación | [S26] |
 
 ### 4.3 Disponibilidad y recuperación
 
@@ -145,6 +145,7 @@ Restricciones fijas de esta área:
 | Diligencia reforzada | Obligatoria para personas expuestas políticamente y jugadores de riesgo alto (~2 % de los retiros, ~60 al día) | [S21] |
 | Falla de la evaluación de riesgo o del proveedor de listas | **Fallo cerrado:** los retiros se detienen hasta que la evaluación vuelva a estar disponible, siempre dentro de las 72 h regulatorias. El juego y los depósitos no se detienen por esta causa | Decisión del equipo (fase 3) [F1] |
 | Saldo | **Nunca negativo**; sin transferencias entre jugadores | [F1] |
+| Origen de las peticiones de saldo | Toda petición de un proveedor se autentica antes de afectar un saldo, respetando el esquema propio de cada proveedor. Peticiones legítimas rechazadas por la verificación: **≤ 0,001 %**. Alerta de seguridad ante una petición no emitida por un proveedor: **≤ 5 min** | [F1][S27][S28] |
 | Gestión de seguridad | Guiada por ISO 27001, 27002 y 27005; pruebas de penetración por el laboratorio | [F1] |
 | Datos personales | Ley 1581: consentimiento previo y expreso, evaluación de impacto permanente, privacidad por diseño | [F1] |
 | Datos de tarjeta | PCI DSS si se almacenan | [F1] |
@@ -240,6 +241,10 @@ Estas condiciones no son negociables y valen para cualquier diseño.
 | S23 | Después de un abono, el jugador ve su saldo actualizado en **p95 ≤ 2 s** | El jugador decide su siguiente apuesta con el saldo que ve en pantalla; 2 s cabe dentro del ritmo de juego más rápido (un giro cada 5 s, S6) **[Estimación]**. Agregado en la fase 8 para respaldar ESC-04. |
 | S24 | Tras restablecer el juego y el saldo, las operaciones vuelven a p99 ≤ 250 ms en **≤ 5 min** | Al volver coinciden las reconexiones y las jugadas incompletas por resolver; 5 min acota esa degradación dentro del pico **[Estimación]**. Agregado en la fase 8 para respaldar ESC-02. |
 | S25 | Una petición de proveedor que repite proveedor, jugador e identificador con datos distintos genera una alerta técnica en **≤ 5 min** | Es señal de un error de integración o de manipulación, y debe atenderse antes de que se acumulen diferencias en la conciliación diaria **[Estimación]**. Agregado en la fase 8 para respaldar ESC-03. |
+| S26 | La verificación del origen de una petición de proveedor añade **≤ 20 ms (p99)** a la operación de saldo | Deja más del 90 % del presupuesto de 250 ms (S14) para el resto de la operación **[Estimación]**. Agregado el 1 de noviembre de 2026 para respaldar ESC-05. |
+| S27 | **≤ 0,001 %** de las peticiones legítimas rechazadas por la verificación (≈ 240 al día con ~24 M de operaciones) | Cada rechazo indebido hace que el proveedor revierta la jugada y el jugador vea un error. Unos 240 al día, repartidos entre ~36.000 jugadores, es tolerable; más no **[Estimación]**. Agregado el 1 de noviembre de 2026. |
+| S28 | Alerta al equipo de seguridad ante una petición no emitida por un proveedor en **≤ 5 min** | Un intento de suplantación suele llegar en ráfaga; 5 min permite actuar antes de que se acumulen intentos, y es el mismo plazo de las alertas técnicas de integración (S25) **[Estimación]**. Agregado el 1 de noviembre de 2026. |
+| S29 | Cada uno de los 5 proveedores trae su propio esquema de autenticación y no acepta cambiarlo | Las integraciones con proveedores son específicas de cada uno [F25], y un operador mediano tiene poco poder para imponer condiciones a proveedores establecidos **[Estimación]**. Agregado el 1 de noviembre de 2026. |
 
 ---
 
@@ -264,7 +269,5 @@ Estas condiciones no son negociables y valen para cualquier diseño.
 5. **Métricas del SARLAFT (S18–S21).** Reconsulta de la base en ≤ 6 h, ~2 % de retiros con diligencia reforzada y resolución en ≤ 48 h.
 
 > **Estado:** el equipo validó todas las métricas, incluidas las del SARLAFT (punto 5), el 25 de octubre de 2026. **Fase cerrada.**
-
----
-
-> [← Anterior](./01-investigacion-dominio.md) · [Índice](./README.md) · [Siguiente →](./03-mapa-tensiones.md)
+>
+> **1 de noviembre de 2026:** se agregaron S26–S29 y los requisitos de autenticación de proveedores (§1, §3, §4.2, §4.4) para respaldar ESC-05.

@@ -1,12 +1,10 @@
 # Fase 7 — Registro de decisiones de arquitectura (ADRs)
 
-> [← Anterior](./06-escenarios.md) · [Índice](./README.md) · [Siguiente →](./08-revision.md)
-
 **Proyecto:** Casino Andino, casino online regulado en Colombia
 **Insumos:**
-- [`06-escenarios.md`](./06-escenarios.md): el Context de cada ADR es su escenario, copiado tal cual.
-- [`05-seleccion-escenarios.md`](./05-seleccion-escenarios.md): criterio de selección.
-- [`02-ficha-contexto.md`](./02-ficha-contexto.md): restricciones y cifras.
+- `06-escenarios.md`: el Context de cada ADR es su escenario, copiado tal cual.
+- `05-seleccion-escenarios.md`: criterio de selección.
+- `02-ficha-contexto.md`: restricciones y cifras.
 
 **Estado de todos los ADR: Propuesto.** Siguiendo el material del curso, cada ADR llega **hasta las opciones consideradas**. Decision y Consequences se escriben en el Bloque 3, cuando contemos con las tácticas para elegir con fundamento.
 
@@ -19,13 +17,14 @@
 
 ## Selección de los ADR
 
-> Hay un ADR por cada escenario crítico: ESC-01, ESC-02 y ESC-03. Son las únicas tensiones fuertes entre dos atributos priorizados altos (T1 Seguridad × Desempeño, T2 Fiabilidad × Desempeño y T3 Compatibilidad × Fiabilidad). ESC-04 no lleva ADR porque su costo cae en un atributo priorizado bajo (Adecuación funcional, 1).
+> Hay un ADR por cada escenario crítico: ESC-01, ESC-02, ESC-03 y ESC-05. Son las únicas tensiones fuertes entre dos atributos priorizados altos (T1 Seguridad × Desempeño, T2 Fiabilidad × Desempeño, T3 Compatibilidad × Fiabilidad y T7 Seguridad × Compatibilidad). ESC-04 no lleva ADR porque su costo cae en un atributo priorizado bajo (Adecuación funcional, 1).
 
 | ADR | Escenario | Atributo dominante | Atributo que paga |
 |-----|-----------|--------------------|-------------------|
 | ADR-01 | ESC-01 | Seguridad (4) | Desempeño (3) |
 | ADR-02 | ESC-02 | Fiabilidad (4) | Desempeño (3) |
 | ADR-03 | ESC-03 | Compatibilidad (3) | Fiabilidad (4) |
+| ADR-04 | ESC-05 | Seguridad (4) | Compatibilidad (3) |
 
 ---
 
@@ -181,7 +180,62 @@
   - evaluar si B y C se combinan: traducción por proveedor para el protocolo y registro junto al saldo para la garantía.
 - **Familias de tácticas por revisar:** *Gestionar interfaces* (Compatibilidad), *Prevenir fallas* (Fiabilidad) y *Reducir el acoplamiento* (Mantenibilidad).
 - **Relación con ADR-02:** las dos decisiones afectan el mismo paso de escritura del saldo, así que deben tomarse juntas en el Bloque 3.
+- **Relación con ADR-04:** ADR-04 decide quién puede pedir un cambio de saldo; ADR-03, que cada petición legítima se aplique una sola vez. Las dos viven en la misma interfaz.
 - **Consequences:** se escriben al decidir.
+
+---
+
+# ADR-04: Verificación del origen de las peticiones de saldo de los proveedores
+
+### Estado
+
+**Propuesto.** Pasa a Aceptado en el Bloque 3, cuando se complete la Decision.
+
+### Context
+
+*El escenario ESC-05, tal cual.*
+
+| Parte | Contenido |
+|-------|-----------|
+| **Atributo de calidad** | Seguridad (autenticidad e integridad), con una restricción de compatibilidad |
+| **Fuente del estímulo** | Un actor externo no autorizado que se hace pasar por uno de los proveedores de tragamonedas |
+| **Estímulo** | Envía a la interfaz de saldo una petición de abono de COP 2.000.000 a una cuenta de jugador, con el formato de ese proveedor, pero que no fue emitida por él |
+| **Artefacto** | La interfaz de operaciones de saldo que el operador ofrece a los proveedores de juego |
+| **Entorno** | Viernes de quincena a las 21:00, en el pico de diseño: 12.000 jugadores simultáneos y ~3.000 operaciones de saldo legítimas por segundo de 5 proveedores, cada uno con su propio esquema de autenticación |
+| **Respuesta** | Rechaza la petición sin modificar ningún saldo, la registra con su origen y alerta al equipo de seguridad. Si llegan más peticiones no emitidas por proveedores desde el mismo origen, las sigue rechazando y las agrupa en el mismo incidente. Las peticiones legítimas de los 5 proveedores se siguen aceptando, cada una con el esquema de autenticación propio de su proveedor |
+| **Medida de la respuesta** | **100 %** de las peticiones de una batería de falsificación rechazadas (sin credencial, con la credencial de otro proveedor y copia de una petición legítima con el monto modificado), con **0 saldos modificados**, verificado en la prueba de carga y en las pruebas de penetración del laboratorio. **≤ 0,001 %** de las peticiones legítimas rechazadas por la verificación. La verificación añade **≤ 20 ms (p99)** a cada operación, y las operaciones de saldo siguen en **p99 ≤ 250 ms**. Alerta al equipo de seguridad en **≤ 5 min** |
+
+**Restricciones del proyecto que también fuerzan esta decisión:**
+- El reglamento exige autenticar todos los accesos, también los de otros sistemas (E11), autenticación en ambos sentidos y cifrado con clave de ≥ 2048 bits (E7) [F1].
+- Pruebas de penetración de caja blanca y caja negra a cargo del laboratorio (E8), y validación previa de todo cambio en la seguridad de las comunicaciones (B3) [F1].
+- Cada proveedor trae su propio esquema de autenticación y no acepta cambiarlo (S29); se suman 1 o 2 proveedores al año (S11).
+- Todo incidente de seguridad se registra y se gestiona con un procedimiento documentado (E6) [F1].
+
+### Opciones consideradas
+
+**A · Clave fija y lista de direcciones de red permitidas por proveedor.** La interfaz solo acepta peticiones que llegan desde las direcciones de red registradas para cada proveedor y que traen la clave fija asignada a ese proveedor.
+
+**B · Firma de cada petición con un secreto por proveedor, verificada por una pieza de traducción por proveedor.** Cada petición llega con una firma calculada sobre su contenido y su hora, con el esquema propio del proveedor. Una pieza por proveedor verifica esa firma con el secreto de ese proveedor y entrega un resultado común antes de que la petición llegue al saldo.
+
+**C · Un esquema único, definido por el operador, para todos los proveedores.** Todo proveedor debe conectarse presentando un certificado propio en una entrada exclusiva del operador y, además, firmar cada petición con el formato común que fija el operador.
+
+| Opción | Gana | Paga | Atributo sacrificado | ¿Cumple la medida? |
+|--------|------|------|----------------------|--------------------|
+| A · Clave fija y direcciones permitidas | Es simple, todos los proveedores lo soportan y casi no añade tiempo | La clave viaja igual en cada petición: quien la obtenga puede abonar desde una dirección permitida, y una copia con el monto cambiado pasa. Si el proveedor cambia sus direcciones de red, su integración se cae | Seguridad (autenticidad e integridad); de paso, Fiabilidad | **No**: la copia con el monto modificado de la batería pasa la verificación |
+| B · Firma por petición, con una pieza por proveedor | Detecta peticiones alteradas o no emitidas por el proveedor y respeta el esquema de cada uno. Un proveedor nuevo es una pieza nueva, sin tocar el saldo | Un cálculo más en cada una de las ~3.000 operaciones por segundo (Desempeño). Un reloj desfasado puede rechazar peticiones legítimas (Fiabilidad). Cinco piezas y cinco secretos que mantener, rotar y recertificar (Mantenibilidad) | Mantenibilidad; algo de Desempeño | **Depende**: sí, si los 5 proveedores firman el contenido de sus peticiones. Hay que medir que la verificación quepa en ≤ 20 ms |
+| C · Esquema único del operador | La identidad del proveedor se comprueba al conectarse, el tráfico no autorizado no llega a la aplicación y hay un solo esquema que mantener | Los proveedores que no soportan ese esquema quedan fuera o retrasan su integración (Compatibilidad). Certificados que emitir, rotar y vigilar: uno vencido corta a un proveedor completo (Fiabilidad) | Compatibilidad | **No**: cumple el rechazo, pero incumple la aceptación de las peticiones legítimas de los 5 proveedores con su esquema propio |
+
+### Pendiente para el Bloque 3
+
+- **Decision:** abierta. No elegimos todavía.
+- **Para decidir con fundamento hace falta:**
+  - la documentación del esquema de autenticación de cada uno de los 5 proveedores: ¿firman el contenido y la hora de cada petición?;
+  - medir el costo de la verificación en el pico de ~3.000 operaciones por segundo;
+  - definir qué se hace con un proveedor cuyo esquema sea solo una clave fija;
+  - evaluar si B y C se combinan: B como base y C para los proveedores que la soporten.
+- **Familias de tácticas por revisar:** *Resistir ataques* (identificar y autenticar actores, limitar acceso y exposición), *Detectar ataques* (verificar la integridad de los mensajes), *Reaccionar a ataques* (bloquear, notificar) y *Gestionar interfaces* (adaptar la interfaz o el formato).
+- **Relación con ADR-03:** ADR-04 decide quién puede pedir un cambio de saldo; ADR-03, que cada petición legítima se aplique una sola vez. Las dos viven en la misma interfaz y conviene decidirlas coordinadas.
+- **Consequences:** se escriben al decidir. Por ejemplo, lo que quede sin resolver, como la filtración del secreto de un proveedor.
 
 ---
 
@@ -196,7 +250,7 @@
 **Otros chequeos:**
 - **Ninguna opción usa nombres de tácticas ni marcas.** Por ejemplo, se escribe "una libreta de solo agregar confirmada por mayoría", no el nombre técnico del patrón.
 - **Ningún ADR elige.** La sección Decision queda abierta en los tres.
-- **Las opciones no son relleno.** En cada ADR hay al menos una opción que no cumple la medida (A en ADR-01, B en ADR-02, A en ADR-03). Así se ve que la medida sirve para descartar.
+- **Las opciones no son relleno.** En cada ADR hay al menos una opción que no cumple la medida (A en ADR-01, B en ADR-02, A en ADR-03, A y C en ADR-04). Así se ve que la medida sirve para descartar.
 
 ---
 
@@ -205,8 +259,6 @@
 1. **Opciones aprobadas.** El equipo no discutió alternativas adicionales.
 2. **Las respuestas "Depende" se mantienen:** se resuelven midiendo en el Bloque 3.
 
-> **Fase 8:** el Context de ADR-03 se actualizó junto con ESC-03 (regla de identificadores repetidos). Ver [`08-revision.md`](./08-revision.md), hallazgo H1.
-
----
-
-> [← Anterior](./06-escenarios.md) · [Índice](./README.md) · [Siguiente →](./08-revision.md)
+> **Fase 8:** el Context de ADR-03 se actualizó junto con ESC-03 (regla de identificadores repetidos). Ver `08-revision.md`, hallazgo H1.
+>
+> **1 de noviembre de 2026:** se agrega ADR-04 (escenario ESC-05, tensión T7), a pedido del equipo. Ver `08-revision.md`, sección 7.

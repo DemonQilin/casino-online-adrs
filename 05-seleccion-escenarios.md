@@ -1,12 +1,10 @@
 # Fase 5 — Selección de escenarios
 
-> [← Anterior](./04-priorizacion.md) · [Índice](./README.md) · [Siguiente →](./06-escenarios.md)
-
 **Proyecto:** Casino Andino, casino online regulado en Colombia
 **Insumos:**
-- [`04-priorizacion.md`](./04-priorizacion.md): priorización adoptada.
-- [`03-mapa-tensiones.md`](./03-mapa-tensiones.md): tensiones T1–T6 y L1.
-- [`02-ficha-contexto.md`](./02-ficha-contexto.md): cifras y restricciones.
+- `04-priorizacion.md`: priorización adoptada.
+- `03-mapa-tensiones.md`: tensiones T1–T6 y L1.
+- `02-ficha-contexto.md`: cifras y restricciones.
 
 **Priorización adoptada:**
 
@@ -37,6 +35,7 @@
 | K7 | T6 · Desempeño × Adecuación funcional | 720 jugadores del *crash* | Se retiran en el mismo segundo, cuando el multiplicador llega a 2,00x | Pico de diseño, ronda con 2.400 jugadores |
 | K8 | T4 · Mantenibilidad × Seguridad | Gobierno nacional | Expide un decreto que cambia la base de cálculo de un impuesto sobre el GGR bimestral | Sistema en producción; equipo de 14 personas; validación del laboratorio en 2–4 semanas |
 | K9 | T5 · Seguridad × Usabilidad | Jugador legítimo que olvidó su contraseña | Falla 5 intentos seguidos de inicio de sesión | Sábado a las 22:00, desde el celular, con un saldo de COP 80.000 |
+| K10 | T7 · Seguridad × Compatibilidad | Actor externo que se hace pasar por un proveedor de tragamonedas | Envía una petición de abono de COP 2.000.000 que ese proveedor no emitió | Pico de diseño: ~3.000 operaciones de saldo por segundo de 5 proveedores, cada uno con su propio esquema de autenticación |
 
 ---
 
@@ -53,12 +52,13 @@
 | K7 | Desempeño (3) | ✔ | Adecuación funcional (1): la corrección del premio, que además calcula el proveedor | ✘ | **No crítico.** Es importante, pero cumplirlo no sacrifica un atributo alto |
 | K8 | Mantenibilidad (1) | ✘ | Seguridad (4) | ✔ | No crítico. El dominante no está entre los altos (riesgo asumido en la fase 4) |
 | K9 | Seguridad (4) | ✔ | Usabilidad (1) | ✘ | No crítico. Además, el bloqueo a los 5 intentos es piso regulatorio fijo |
+| K10 | Seguridad (4) | ✔ | Compatibilidad (3): exigir un esquema estricto a todos choca con el esquema propio de cada proveedor | ✔ | **Crítico** |
 
 ---
 
 ## 3. Selección propuesta
 
-**4 escenarios: 3 críticos y 1 no crítico.** Eso da **3 ADRs**.
+**5 escenarios: 4 críticos y 1 no crítico.** Eso da **4 ADRs**.
 
 | Escenario | Candidato | Tensión | Atributo dominante | ¿Crítico? | ¿Lleva ADR? |
 |-----------|-----------|---------|--------------------|:---------:|:-----------:|
@@ -66,10 +66,11 @@
 | **ESC-02** | K3 · Falla del servidor de saldo en pleno pico | T2 | Fiabilidad | ✔ | **ADR-02** |
 | **ESC-03** | K5 · Abono repetido del proveedor del *crash* | T3 | Compatibilidad | ✔ | **ADR-03** |
 | **ESC-04** | K7 · Ráfaga de retiros del *crash* | T6 | Desempeño | ✘ | No |
+| **ESC-05** | K10 · Petición de abono falsificada a nombre de un proveedor | T7 | Seguridad | ✔ | **ADR-04** |
 
 ### Justificación de la selección (en una línea)
 
-> Elegimos ESC-01, ESC-02 y ESC-03 como críticos porque son las únicas tensiones fuertes entre dos atributos altos (T1, T2 y T3), con un escenario por tensión. ESC-04 se escribe sin ADR porque su costo cae en un atributo que priorizamos bajo.
+> Elegimos ESC-01, ESC-02, ESC-03 y ESC-05 como críticos porque son las únicas tensiones fuertes entre dos atributos altos (T1, T2, T3 y T7), con un escenario por tensión. ESC-04 se escribe sin ADR porque su costo cae en un atributo que priorizamos bajo.
 
 ### Por qué quedan fuera los demás
 
@@ -79,19 +80,20 @@
 
 ### Cobertura que logra la selección
 
-- **Los cuatro atributos altos son dominantes** en algún escenario: Seguridad (ESC-01), Fiabilidad (ESC-02), Compatibilidad (ESC-03) y Desempeño (ESC-04).
+- **Los cuatro atributos altos son dominantes** en algún escenario: Seguridad (ESC-01 y ESC-05), Fiabilidad (ESC-02), Compatibilidad (ESC-03) y Desempeño (ESC-04).
 - **Los retos del tema quedan cubiertos:**
   - antilavado y regulación (ESC-01);
   - continuidad del dinero (ESC-02);
   - interoperabilidad con proveedores (ESC-03);
+  - autenticidad de los proveedores (ESC-05);
   - tiempo real (ESC-04).
 - **ESC-04 demuestra el criterio de selección:** muestra un escenario importante que, a propósito, no lleva ADR. La rúbrica premia eso, y pone en nivel Inicial escribir ADRs para todos.
 
 ---
 
-## 4. Variante: 5 escenarios
+## 4. Límite de escenarios
 
-Si el equipo quiere mostrar un segundo ejemplo de escenario no crítico, se puede agregar **K9** (bloqueo a los 5 intentos) como **ESC-05**. La razón para no hacerlo es que la mayor parte de K9 la fija la regulación y aporta poco análisis nuevo. En cualquier caso, la cantidad de ADRs sigue siendo 3.
+Con ESC-05 se alcanza el máximo de 5 escenarios que permite el material. K9 (bloqueo a los 5 intentos) queda fuera: la mayor parte la fija la regulación y aportaría poco análisis nuevo.
 
 ---
 
@@ -99,9 +101,9 @@ Si el equipo quiere mostrar un segundo ejemplo de escenario no crítico, se pued
 
 | Criterio | Estado |
 |----------|--------|
-| Al menos 6 candidatos derivados de tensiones | ✔ 9 candidatos: el plan pedía de 6 a 8; se agregó uno más para descartar con criterio los no críticos |
+| Al menos 6 candidatos derivados de tensiones | ✔ 10 candidatos: el plan pedía de 6 a 8; se agregaron los no críticos para descartarlos con criterio, y K10 al promover T7 |
 | Prueba de criticidad aplicada con las dos preguntas | ✔ Sección 2 |
-| Entre 3 y 5 escenarios elegidos, críticos marcados | ✔ 4 escenarios, 3 críticos |
+| Entre 3 y 5 escenarios elegidos, críticos marcados | ✔ 5 escenarios, 4 críticos |
 | Selección justificada en una línea | ✔ Sección 3 |
 | Rúbrica, criterio *Selección de escenarios críticos*, nivel "Logrado" | Cada ADR responde a un escenario con dominante alto que cuesta otro alto; la selección está justificada |
 
@@ -109,9 +111,6 @@ Si el equipo quiere mostrar un segundo ejemplo de escenario no crítico, se pued
 
 ## 6. Punto de control (cerrado el 25 de octubre de 2026)
 
-1. **Aprobado:** 4 escenarios, 3 de ellos críticos (3 ADRs). Se descarta la variante de 5.
+1. **Aprobado (25 de octubre):** 4 escenarios, 3 de ellos críticos (3 ADRs). *Actualizado por el punto 3.*
 2. **Aprobado:** el fallo cerrado entra como restricción en el Context de ADR-01 y no tiene ADR propio.
-
----
-
-> [← Anterior](./04-priorizacion.md) · [Índice](./README.md) · [Siguiente →](./06-escenarios.md)
+3. **1 de noviembre de 2026:** al subir L4 a tensión fuerte (T7), el equipo agrega ESC-05 con ADR-04. La selección pasa a 5 escenarios, 4 de ellos críticos (4 ADRs).
