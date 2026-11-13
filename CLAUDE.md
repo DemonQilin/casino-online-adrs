@@ -13,7 +13,7 @@ No hay código de producto, ni build, ni lint, ni pruebas. Los entregables son d
 | Bloque | Tema | Estado | Efecto sobre los ADR |
 |--------|------|--------|----------------------|
 | 2 | Atributos de calidad, escenarios y ADR | Entregado (`bloque-2/`) | Context y opciones consideradas. Estado: Propuesto |
-| 3 | Tácticas | Pendiente | Se completan Decision y Consequences. Estado: Aceptado |
+| 3 | Tácticas y sizing | En curso (`bloque-3/`) | Se completan Decision y Consequences. Estado: Aceptado |
 | 4 | Estilos arquitectónicos | Pendiente | Un estilo puede condicionar o reemplazar decisiones; los ADR se enlazan |
 
 ## Fuente de autoridad
@@ -53,13 +53,13 @@ Estas reglas cruzan varios archivos. Romper una rompe la cadena completa.
 
 | Regla | Detalle |
 |-------|---------|
-| Toda cifra tiene origen | Cada número se marca **[Fuente]** (`F#`, definidas en `01`) o **[Supuesto]** (`S#`, definidos en `02` con su razón). Una cifra nueva en un escenario o ADR exige agregar su supuesto a la ficha |
+| Toda cifra tiene origen | Cada número se marca **[Fuente]** (`F#`, definidas en `01`) o **[Supuesto]** (`S#`, definidos en `02` con su razón). Una cifra nueva de requisito en un escenario o ADR exige agregar su supuesto a la ficha. Las cifras sobre la solución (límites de la línea base, efecto y costo de las tácticas) continúan la numeración `S#` y `F#` y se registran en la fase del Bloque 3 donde nacen |
 | Mecanismos, no marcas | Fichas, escenarios y opciones de ADR describen lo que el sistema hace, sin nombres de tecnologías ni productos. Los nombres de tácticas entran solo cuando el Bloque 3 las introduce |
 | El escenario es el Context | El Context de cada ADR es su escenario copiado tal cual. Si cambia el escenario, cambia el Context y la presentación |
 | Los ADR no se reescriben | Un ADR cambia de estado (Propuesto, Aceptado, reemplazado por otro) y se enlaza; no se borra ni se edita para cambiar la historia |
 | Un ADR por escenario crítico | Es crítico si su atributo dominante es alto y cumplirlo le cuesta a otro atributo alto. Un escenario por tensión, no por atributo |
 | Presupuesto de 18 puntos | Ocho atributos ISO 25010, de 1 a 5, suma exacta 18, máximo tres atributos en 4 o más. Reparto adoptado: Seguridad 4, Fiabilidad 3, Compatibilidad 3, Desempeño 3, Adecuación funcional 2 y el resto en 1. Es alto un atributo con 3 o más |
-| Identificadores estables | `ESC-NN`, `ADR-NN`, `T#` (tensiones fuertes), `L#` (leves), `S#`, `F#`, `H#` (hallazgos). No se renumeran: un elemento que cambia de categoría recibe un identificador nuevo y los demás conservan el suyo |
+| Identificadores estables | `ESC-NN`, `ADR-NN`, `T#` (tensiones fuertes), `L#` (leves), `S#`, `F#`, `H#` (hallazgos), `TAC-NN` (tácticas del Bloque 3). No se renumeran: un elemento que cambia de categoría recibe un identificador nuevo y los demás conservan el suyo |
 | Vocabulario ISO 25010 | Se usan las ocho características del widget del curso. La tabla de equivalencias con los términos del taller GPSMetro está en `bloque-2/00-plan-de-trabajo.md` §5 |
 | Alcance | Solo juegos de casino de proveedores externos. Fuera: apuestas deportivas, juegos propios, póker entre jugadores y bingo |
 
