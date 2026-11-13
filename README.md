@@ -4,23 +4,23 @@ Trabajo de Arquitectura de Software (Bloque 2: atributos de calidad, escenarios 
 
 ## Empieza por aquí
 
-- **Lo esencial:** [ADRs](./07-adrs.md), las decisiones, y [Escenarios](./06-escenarios.md), de dónde salen.
+- **Lo esencial:** [ADRs](./bloque-2/07-adrs.md), las decisiones, y [Escenarios](./bloque-2/06-escenarios.md), de dónde salen.
 - **Cómo se llegó:** lee las fases en orden, de la 1 a la 8.
-- **Estado de la revisión:** [Revisión integral](./08-revision.md).
+- **Estado de la revisión:** [Revisión integral](./bloque-2/08-revision.md).
 
 ## Índice
 
 | Fase | Documento | Qué responde |
 |:-:|---|---|
-| 0 | [Plan de trabajo](./00-plan-de-trabajo.md) | Qué hay que entregar y cómo se organiza el trabajo |
-| 1 | [Investigación del dominio](./01-investigacion-dominio.md) | Qué exige la regulación y cómo opera un casino online |
-| 2 | [Ficha de contexto](./02-ficha-contexto.md) | Requisitos no funcionales con cifras, restricciones y supuestos |
-| 3 | [Mapa de tensiones](./03-mapa-tensiones.md) | Qué atributos de calidad chocan entre sí |
-| 4 | [Priorización](./04-priorizacion.md) | Cómo se reparten los 18 puntos entre los 8 atributos |
-| 5 | [Selección de escenarios](./05-seleccion-escenarios.md) | Qué escenarios son críticos y por qué |
-| 6 | [Escenarios de calidad](./06-escenarios.md) | Los escenarios redactados (fuente, estímulo… medida) |
-| 7 | [ADRs](./07-adrs.md) | Opciones consideradas para cada decisión |
-| 8 | [Revisión integral](./08-revision.md) | Autoevaluación, coherencia y riesgos pendientes |
+| 0 | [Plan de trabajo](./bloque-2/00-plan-de-trabajo.md) | Qué hay que entregar y cómo se organiza el trabajo |
+| 1 | [Investigación del dominio](./bloque-2/01-investigacion-dominio.md) | Qué exige la regulación y cómo opera un casino online |
+| 2 | [Ficha de contexto](./bloque-2/02-ficha-contexto.md) | Requisitos no funcionales con cifras, restricciones y supuestos |
+| 3 | [Mapa de tensiones](./bloque-2/03-mapa-tensiones.md) | Qué atributos de calidad chocan entre sí |
+| 4 | [Priorización](./bloque-2/04-priorizacion.md) | Cómo se reparten los 18 puntos entre los 8 atributos |
+| 5 | [Selección de escenarios](./bloque-2/05-seleccion-escenarios.md) | Qué escenarios son críticos y por qué |
+| 6 | [Escenarios de calidad](./bloque-2/06-escenarios.md) | Los escenarios redactados (fuente, estímulo… medida) |
+| 7 | [ADRs](./bloque-2/07-adrs.md) | Opciones consideradas para cada decisión |
+| 8 | [Revisión integral](./bloque-2/08-revision.md) | Autoevaluación, coherencia y riesgos pendientes |
 
 ## Cómo está armado
 
