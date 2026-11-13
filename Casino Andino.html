@@ -1,0 +1,917 @@
+<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#000}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>
+<title>Casino Andino</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,800&family=IBM+Plex+Mono:wght@500&family=IBM+Plex+Sans:wght@400;500;600&display=swap">
+<style>
+/* Concepto: una mesa de paño verde. Marfil sobre verde profundo en oscuro, papel verdoso en claro; el latón marca lo que cuesta. Pestañas que siguen la cadena ficha → puntos → tensiones → escenarios → ADR. */
+:root{
+  --bg:#F1F5F2; --surface:#FFFFFF; --surface2:#E6EDE8; --ink:#12261D; --muted:#4D6257; --line:#CFDBD3;
+  --accent:#0F6B47; --accent-ink:#FFFFFF; --accent-soft:#DAEEE3; --fill:#9DB3A5;
+  --brass:#8A5E0F; --brass-soft:#F7EAC9; --bad:#A3281E; --bad-soft:#F8DEDA;
+  --display:"Bricolage Grotesque","Trebuchet MS",system-ui,sans-serif;
+  --body:"IBM Plex Sans","Segoe UI",system-ui,-apple-system,sans-serif;
+  --mono:"IBM Plex Mono",ui-monospace,Menlo,Consolas,monospace;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --bg:#0B1713; --surface:#12241D; --surface2:#1A332B; --ink:#E9F1EC; --muted:#9DB2A7; --line:#27433B;
+    --accent:#44C48F; --accent-ink:#04241A; --accent-soft:#123C2D; --fill:#3C5A4E;
+    --brass:#E3B64F; --brass-soft:#3A2F12; --bad:#FF8F80; --bad-soft:#3E1D19;
+    color-scheme:dark;
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#0B1713; --surface:#12241D; --surface2:#1A332B; --ink:#E9F1EC; --muted:#9DB2A7; --line:#27433B;
+  --accent:#44C48F; --accent-ink:#04241A; --accent-soft:#123C2D; --fill:#3C5A4E;
+  --brass:#E3B64F; --brass-soft:#3A2F12; --bad:#FF8F80; --bad-soft:#3E1D19;
+  color-scheme:dark;
+}
+*,*::before,*::after{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font:400 16px/1.55 var(--body);
+  padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+.wrap{max-width:1060px;margin:0 auto;padding-block:32px 72px}
+button{font:inherit;color:inherit}
+a{color:var(--accent)}
+:focus-visible{outline:3px solid var(--accent);outline-offset:2px}
+h1,h2,h3,h4{font-family:var(--display);text-wrap:balance;margin:0}
+h1{font-weight:800;font-size:clamp(40px,8vw,72px);line-height:.95;letter-spacing:-.03em}
+h2{font-weight:800;font-size:clamp(24px,3.4vw,32px);line-height:1.1;letter-spacing:-.015em;margin-bottom:8px}
+h3{font-weight:600;font-size:19px;line-height:1.25}
+h4{font-weight:600;font-size:17px;line-height:1.25}
+p{margin:0 0 12px;max-width:68ch}
+ul{margin:0;padding-left:20px}
+li+li{margin-top:5px}
+.muted{color:var(--muted)}
+.kicker,.lbl{font:500 12px var(--mono);letter-spacing:.12em;text-transform:uppercase}
+.kicker{color:var(--brass);margin-bottom:12px}
+.lbl{color:var(--muted)}
+.lead{font-size:18px;color:var(--muted);max-width:62ch;margin-top:16px}
+.by{font:500 13px var(--mono);color:var(--muted);margin-top:14px}
+.by .todo{color:var(--brass)}
+
+nav.tabs{display:flex;flex-wrap:wrap;align-items:center;gap:6px;border-bottom:1px solid var(--line);margin:28px 0 30px;padding-bottom:16px}
+nav.tabs button{border:0;background:none;padding:8px 14px;cursor:pointer;font-weight:600;font-size:15px;color:var(--muted);border-radius:999px;white-space:nowrap;transition:background .15s,color .15s}
+nav.tabs button:hover{background:var(--surface2);color:var(--ink)}
+nav.tabs button[aria-selected="true"]{background:var(--accent);color:var(--accent-ink)}
+nav.tabs .sep{width:1px;height:22px;background:var(--line);margin:0 6px;flex:0 0 auto}
+@media (max-width:620px){nav.tabs .sep{display:none}}
+section.panel>*+*{margin-top:28px}
+.sub{color:var(--muted);max-width:66ch}
+
+.chips{display:flex;flex-wrap:wrap;gap:8px}
+.chip{border:1.5px solid var(--line);background:var(--surface);border-radius:999px;padding:6px 14px;cursor:pointer;font-weight:500;font-size:15px}
+.chip[aria-pressed="true"]{background:var(--accent);border-color:var(--accent);color:var(--accent-ink)}
+.chip.static{cursor:default}
+.tag{display:inline-block;font:500 12px var(--mono);padding:3px 10px;border-radius:999px;background:var(--surface2);color:var(--muted);white-space:nowrap}
+.tag.brass{background:var(--brass-soft);color:var(--brass)}
+.tag.green{background:var(--accent-soft);color:var(--accent)}
+.tag.red{background:var(--bad-soft);color:var(--bad)}
+
+.stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:1px;background:var(--line);border:1px solid var(--line);border-radius:12px;overflow:hidden}
+.stats>div{background:var(--surface);padding:14px 18px;min-width:0}
+.stats .n{font:500 30px/1.1 var(--mono);font-variant-numeric:tabular-nums}
+.stats .n small{font-size:15px;color:var(--muted)}
+.stats .d{font-size:14px;color:var(--muted);margin-top:4px}
+
+.three{display:grid;grid-template-columns:repeat(auto-fit,minmax(250px,1fr));gap:16px}
+.three>div{min-width:0;border-top:3px solid var(--accent);padding-top:12px}
+.three>div:nth-child(2){border-top-color:var(--fill)}
+.three>div:nth-child(3){border-top-color:var(--brass)}
+.three h3{margin-bottom:6px}
+.note{font-size:14px;color:var(--muted)}
+
+.ficha{border-top:1px solid var(--line);margin:0}
+.ficha>div{display:grid;grid-template-columns:170px 1fr;gap:6px 20px;padding:12px 0;border-bottom:1px solid var(--line)}
+.ficha dt{font:500 12px var(--mono);letter-spacing:.1em;text-transform:uppercase;color:var(--brass);padding-top:3px}
+.ficha dd{margin:0;min-width:0}
+@media (max-width:620px){.ficha>div{grid-template-columns:1fr}}
+.cols{display:grid;grid-template-columns:repeat(auto-fit,minmax(290px,1fr));gap:24px}
+.cols>div{min-width:0}
+.cols h3{margin-bottom:8px}
+
+.meter{display:flex;flex-wrap:wrap;gap:12px 24px;align-items:center;justify-content:space-between;background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:16px 20px}
+.big{font:500 40px/1 var(--mono);font-variant-numeric:tabular-nums}
+.big small{font-size:18px;color:var(--muted)}
+.msg{font-size:15px;color:var(--muted);flex:1;min-width:220px}
+.msg.warn{color:var(--brass)}
+.btn{border:1.5px solid var(--accent);background:transparent;color:var(--accent);padding:8px 16px;border-radius:999px;cursor:pointer;font-weight:600}
+.btn:hover{background:var(--accent-soft)}
+.callout{background:var(--accent-soft);border-radius:12px;padding:16px 20px}
+.callout h3{margin-bottom:6px}
+.callout p:last-child{margin-bottom:0}
+
+.pt{padding:20px 0;border-top:1px solid var(--line)}
+.pt-top{display:flex;justify-content:space-between;align-items:center;gap:12px 20px;flex-wrap:wrap}
+.pt-top h3{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+.ctl{display:flex;align-items:center;gap:12px}
+.ctl button{width:40px;height:40px;border-radius:50%;border:1.5px solid var(--line);background:var(--surface);cursor:pointer;font:500 22px/1 var(--mono)}
+.ctl button:hover:not(:disabled){border-color:var(--accent);color:var(--accent)}
+.ctl button:disabled{opacity:.3;cursor:not-allowed}
+.val{font:500 28px/1 var(--mono);min-width:1.3ch;text-align:center}
+.track{height:10px;border-radius:5px;background:var(--surface2);margin:14px 0 12px;overflow:hidden}
+.fill{height:100%;background:var(--fill);transition:width .2s}
+.pt.hi .fill{background:var(--accent)}
+.pt p{margin-bottom:8px}
+.pt .acc{font-size:15px;color:var(--muted)}
+.pt .acc b{color:var(--ink);font-weight:600}
+.critbox{display:flex;flex-wrap:wrap;gap:8px}
+.radar-grid{display:grid;grid-template-columns:minmax(0,1.25fr) minmax(0,1fr);gap:24px;align-items:center}
+@media (max-width:760px){.radar-grid{grid-template-columns:1fr}}
+.radar-side{display:flex;flex-direction:column;gap:20px;min-width:0}
+.radar{margin:0;background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:12px}
+.radar svg{display:block;width:100%;height:auto;max-width:560px;margin:0 auto}
+.radar figcaption{text-align:center;margin-top:4px}
+.r-grid{fill:none;stroke:var(--line);stroke-width:1}
+.r-axis{stroke:var(--line);stroke-width:1}
+.r-area{fill:var(--accent);fill-opacity:.2;stroke:var(--accent);stroke-width:2.5;stroke-linejoin:round}
+.r-dot{fill:var(--accent)}
+.r-dot.lo{fill:var(--muted)}
+.r-lbl{fill:var(--ink);font:600 14px var(--body)}
+.r-val{fill:var(--accent);font:500 14px var(--mono)}
+.r-tick{fill:var(--muted);font:500 10px var(--mono)}
+
+.tblwrap{overflow-x:auto;border:1px solid var(--line);border-radius:12px;background:var(--surface)}
+table{border-collapse:collapse;width:100%;font-size:15px}
+th,td{text-align:left;vertical-align:top;padding:10px 14px;border-bottom:1px solid var(--line)}
+tr:last-child td{border-bottom:0}
+th{font:500 12px var(--mono);letter-spacing:.08em;text-transform:uppercase;color:var(--muted);background:var(--surface2)}
+td.nowrap{white-space:nowrap}
+
+.matrix{border-collapse:separate;border-spacing:3px;font-size:13px;width:auto;min-width:560px}
+.matrix th,.matrix td{border:0;padding:0;text-align:center;background:none}
+.matrix th{font:500 11px var(--mono);letter-spacing:.04em;text-transform:none;color:var(--muted);padding:4px 6px;white-space:nowrap}
+.matrix th.row{text-align:right}
+.matrix td span{display:grid;place-items:center;width:52px;height:34px;border-radius:6px;font:500 12px var(--mono)}
+.m-F{background:var(--bad-soft);color:var(--bad);font-weight:700}
+.m-L{background:var(--brass-soft);color:var(--brass)}
+.m-S{background:var(--accent-soft);color:var(--accent)}
+.m-0{background:var(--surface2);color:var(--muted)}
+.m-x{background:transparent}
+.legend{display:flex;flex-wrap:wrap;gap:8px 16px;font-size:14px;color:var(--muted);align-items:center}
+.legend i{display:inline-block;width:14px;height:14px;border-radius:4px;vertical-align:-2px;margin-right:6px}
+
+.tgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:14px}
+.tc{background:var(--surface);border:1.5px solid var(--line);border-radius:12px;padding:16px 18px;display:flex;flex-direction:column;gap:8px;transition:opacity .2s,border-color .2s;min-width:0}
+.tc.hit{border-color:var(--accent)}
+.tc.dim{opacity:.3}
+.tc .pair{display:flex;gap:6px;align-items:center;flex-wrap:wrap}
+.tc .arrow{color:var(--muted);font-family:var(--mono)}
+.tc p{margin:0;font-size:15px}
+.tc .loss{font-size:14px;color:var(--muted)}
+.tc .loss b{color:var(--ink);font-weight:600}
+.tc .out{margin-top:auto;padding-top:4px;display:flex;gap:6px;flex-wrap:wrap}
+
+details{border:1px solid var(--line);border-radius:12px;padding:14px 18px;background:var(--surface)}
+details+details{margin-top:10px}
+summary{cursor:pointer;font-weight:600;font-family:var(--display);font-size:17px}
+details[open]>summary{margin-bottom:12px}
+details p:last-child{margin-bottom:0}
+
+.pills{display:flex;flex-wrap:wrap;gap:8px}
+.head{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin:14px 0 4px}
+.parts{border-top:1px solid var(--line)}
+.part{display:grid;grid-template-columns:170px 1fr;gap:6px 24px;padding:14px 0;border-bottom:1px solid var(--line)}
+.part .k{font:500 12px var(--mono);letter-spacing:.1em;text-transform:uppercase;color:var(--brass);padding-top:3px}
+.part .v{min-width:0}
+.part .s{margin:8px 0 0;font-size:14.5px;color:var(--accent);background:var(--accent-soft);border-radius:8px;padding:6px 10px;display:block}
+@media (max-width:620px){.part{grid-template-columns:1fr}}
+.toggle{display:inline-flex;align-items:center;gap:8px;font-size:14px;color:var(--muted);cursor:pointer;user-select:none}
+.toggle input{accent-color:var(--accent);width:16px;height:16px}
+
+.optgrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:14px}
+.opt{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:18px;display:flex;flex-direction:column;gap:10px;min-width:0}
+.opt header{display:flex;gap:10px;align-items:center}
+.letter{flex:0 0 30px;height:30px;border-radius:50%;background:var(--accent);color:var(--accent-ink);display:grid;place-items:center;font:500 15px var(--mono)}
+.opt p{margin:0;font-size:15px}
+.opt dl{margin:0;display:grid;gap:4px}
+.opt dt{font:500 12px var(--mono);letter-spacing:.1em;text-transform:uppercase;color:var(--muted);margin-top:6px}
+.opt dd{margin:0;font-size:15px}
+.verd{padding:8px 10px;border-radius:8px;margin-top:auto !important;font-size:15px}
+.verd.no{background:var(--bad-soft);color:var(--bad)}
+.verd.yes{background:var(--accent-soft);color:var(--accent)}
+.verd.maybe{background:var(--brass-soft);color:var(--brass)}
+.state{display:flex;flex-wrap:wrap;gap:8px 12px;align-items:center}
+.lvl{font:500 12px var(--mono);padding:3px 10px;border-radius:999px;background:var(--accent-soft);color:var(--accent);white-space:nowrap}
+.src{font-size:14px}
+.src li{word-break:break-word}
+footer{margin-top:48px;padding-top:16px;border-top:1px solid var(--line);font-size:14px;color:var(--muted)}
+@media (prefers-reduced-motion:reduce){*{transition:none!important}}
+</style>
+
+<div class="wrap">
+  <header>
+    <div class="kicker">Arquitectura de software · ITM · Bloque 2</div>
+    <h1>Casino Andino</h1>
+    <p class="lead">Un nuevo concesionario mediano de Coljuegos que ofrece solo juegos de casino. Los juegos los ponen cinco proveedores externos certificados; Casino Andino responde por las cuentas, el dinero de los jugadores, los pagos y el cumplimiento regulatorio. Aquí se planea su arquitectura antes de escribir código: de la ficha de contexto a cuatro decisiones de arquitectura.</p>
+    <p class="by">Equipo 8 · Fabio Guillermo Rodriguez Díaz · Sara Isabel Torres Isaza · Yeison Andres Sanchez Rodas · Juan Esteban Velez Loaiza</p>
+  </header>
+
+  <nav class="tabs" role="tablist" aria-label="Secciones">
+    <button role="tab" data-tab="proyecto">1 · El proyecto</button>
+    <button role="tab" data-tab="puntos">2 · Los 18 puntos</button>
+    <button role="tab" data-tab="tensiones">3 · Tensiones</button>
+    <button role="tab" data-tab="escenarios">4 · Escenarios</button>
+    <button role="tab" data-tab="adr">5 · ADR</button>
+    <span class="sep" aria-hidden="true"></span>
+    <button role="tab" data-tab="sustentar">Para sustentar</button>
+    <button role="tab" data-tab="rubrica">Autoevaluación</button>
+    <button role="tab" data-tab="anexo">Supuestos y fuentes</button>
+  </nav>
+
+  <!-- 1 PROYECTO -->
+  <section class="panel" id="p-proyecto" role="tabpanel">
+    <div>
+      <h2>Qué es y qué no es nuestro</h2>
+      <p class="sub">El jugador se registra, deposita y abre un juego. El juego corre en el sistema del proveedor, y cada vez que el jugador apuesta o gana, el proveedor le pide a Casino Andino que descuente, abone o revierta saldo. Año de diseño: el tercero de operación.</p>
+    </div>
+    <div>
+      <div class="lbl" style="margin-bottom:8px">Los cuatro juegos</div>
+      <div class="chips">
+        <span class="chip static">Tragamonedas · ~450 títulos</span>
+        <span class="chip static">Ruleta con generador aleatorio · ~10 variantes</span>
+        <span class="chip static">Blackjack en vivo · 10 mesas</span>
+        <span class="chip static">Crash de multiplicador · 1 título</span>
+      </div>
+      <p class="note" style="margin-top:10px">Fuera del alcance: apuestas deportivas, juegos propios, póker entre jugadores y bingo.</p>
+    </div>
+    <div class="three">
+      <div>
+        <h3>Nuestro</h3>
+        <ul>
+          <li>Cuenta y verificación del jugador</li>
+          <li>Cartera: saldo, depósitos y retiros</li>
+          <li>Antilavado con SARLAFT</li>
+          <li>Sistema de inspección y reportes a Coljuegos y la UIAF</li>
+        </ul>
+      </div>
+      <div>
+        <h3>Del proveedor</h3>
+        <ul>
+          <li>El juego, su azar certificado y su video</li>
+          <li>El cálculo del premio</li>
+          <li>Su protocolo, su autenticación y sus reintentos</li>
+        </ul>
+      </div>
+      <div>
+        <h3>De terceros</h3>
+        <ul>
+          <li>Medios de pago: PSE, Nequi, Daviplata, tarjetas y efectivo</li>
+          <li>Verificación de identidad y listas restrictivas</li>
+          <li>Laboratorio certificador</li>
+        </ul>
+      </div>
+    </div>
+    <p class="note">Delegar el juego no delega el dinero: el saldo, su integridad y los reportes siguen siendo nuestros. Ahí se concentran las tensiones.</p>
+
+    <div>
+      <h2>Ficha de contexto</h2>
+      <p class="sub">Las cifras que permiten puntuar sin inventar. Las que no tienen fuente pública son supuestos declarados (anexo).</p>
+    </div>
+    <div class="stats">
+      <div><div class="n">12.000</div><div class="d">jugadores simultáneos en el pico de diseño</div></div>
+      <div><div class="n">~3.000<small>/s</small></div><div class="d">operaciones de saldo en el pico, ráfagas de 4.000</div></div>
+      <div><div class="n">≤ 250<small> ms</small></div><div class="d">respuesta de saldo (p99); el proveedor corta a los ~3 s</div></div>
+      <div><div class="n">2–4<small> sem</small></div><div class="d">de laboratorio por cambio crítico, contra entregas cada 2</div></div>
+    </div>
+    <dl class="ficha">
+      <div><dt>Carga</dt><dd>120.000 jugadores activos al mes y 350.000 cuentas. Pico normal de 5.000 simultáneos; pico de diseño de 12.000, un viernes o sábado de quincena con promoción.</dd></div>
+      <div><dt>Dinero</dt><dd>Cada jugada descuenta y abona saldo a pedido del proveedor. Unos 12.000 depósitos y 3.000 retiros al día, con un depósito promedio de COP 25.000.</dd></div>
+      <div><dt>Tiempo real</dt><dd>En el crash, el premio depende del instante del retiro y hasta 720 jugadores se retiran en el mismo segundo. En el blackjack en vivo, la ventana de apuesta dura de 10 a 20 s y la cierra el servidor.</dd></div>
+      <div><dt>Disponibilidad</dt><dd>Juego y saldo al 99,9 % mensual (≤ 43 min de caída), recuperación en ≤ 15 min y ninguna transacción confirmada perdida. Sistema alterno certificado obligatorio.</dd></div>
+      <div><dt>Antilavado</dt><dd>SARLAFT: perfil de riesgo de cada jugador evaluado en p95 ≤ 1 s, listas restrictivas en el registro y reconsulta de las 350.000 cuentas en ≤ 6 h cuando cambian. Fallo cerrado: si los controles no responden, los retiros se detienen.</dd></div>
+      <div><dt>Seguridad</dt><dd>Bloqueo a los 5 intentos, cierre de sesión a los 20 minutos, detección de suplantación y autenticación de cada petición de saldo de los proveedores, respetando el esquema de cada uno.</dd></div>
+      <div><dt>Cambio</dt><dd>~20 juegos nuevos al mes y 3 o 4 cambios regulatorios al año. El equipo quiere entregar cada 2 semanas; el laboratorio tarda de 2 a 4 por cada cambio crítico.</dd></div>
+      <div><dt>Presupuesto</dt><dd>14 personas de ingeniería. Tecnología con un tope de ~15 % del ingreso bruto del juego (≈ COP 7.300 millones al año). Las cargas al Estado suman ~31 % de ese ingreso.</dd></div>
+      <div><dt>Usuarios</dt><dd>80 % juega desde el celular, con equipos de gama media y 4G variable.</dd></div>
+    </dl>
+    <div class="cols">
+      <div>
+        <h3>Lo que exige la regulación</h3>
+        <ul>
+          <li>Centro de datos Tier III y sistema de inspección en Colombia, con el formato de datos de Coljuegos.</li>
+          <li>Validación del laboratorio antes de producción para todo cambio crítico, y recertificación integral cada 12 meses.</li>
+          <li>Sistema alterno con la misma certificación, al que se replica de inmediato cada cambio.</li>
+          <li>Saldo nunca negativo y toda jugada reconstruible.</li>
+          <li>Autenticar todos los accesos, también los de otros sistemas.</li>
+          <li>Prevención de lavado con reportes a la UIAF, y retorno al jugador de al menos 83 %.</li>
+        </ul>
+        <p class="note" style="margin-top:10px">Fuente principal: Requerimientos Técnicos de Juegos Operados por Internet (Res. 20224000026034 de 2022), hoy en revisión por Coljuegos.</p>
+      </div>
+      <div>
+        <h3>Decisiones de contexto</h3>
+        <ul>
+          <li>Todos los juegos vienen de proveedores externos certificados.</li>
+          <li>SARLAFT en lugar de un SIPLAFT básico, cumpliendo sus mínimos.</li>
+          <li>Fallo cerrado en los retiros: legalmente es más grave pagar dinero de lavado que demorar un retiro.</li>
+          <li>Cada proveedor conserva su propio protocolo y su propio esquema de autenticación.</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <!-- 2 PUNTOS -->
+  <section class="panel" id="p-puntos" role="tabpanel" hidden>
+    <div>
+      <h2>Los 18 puntos</h2>
+      <p class="sub">Cada atributo de ISO 25010 vale de 1 a 5, y entre los ocho suman 18. El mínimo de 1 ya gasta 8 puntos, así que solo quedan 10 libres: para subir un atributo hubo que bajar otro.</p>
+    </div>
+    <div class="radar-grid">
+      <figure class="radar">
+        <svg id="radar" viewBox="0 0 560 400" role="img" aria-label="Distribución de los 18 puntos: Seguridad 4, Fiabilidad 4, Desempeño 3, Compatibilidad 3, y Funcional, Usabilidad, Mantenibilidad y Portabilidad en 1"></svg>
+        <figcaption class="note">Reparto adoptado: 4 + 4 + 3 + 3 + 1 + 1 + 1 + 1 = 18</figcaption>
+      </figure>
+      <div class="radar-side">
+        <div class="callout">
+          <h3>Qué cuenta como alto</h3>
+          <p>Los 10 puntos libres van todos a cuatro atributos (3 + 3 + 2 + 2); los otros cuatro se quedan en el mínimo. Por eso un 3 cuenta como alto: son puntos que se les quitaron a los demás. Un escenario es crítico cuando su atributo dominante es alto y cumplirlo le cuesta a otro atributo alto.</p>
+        </div>
+        <div>
+          <div class="lbl" style="margin-bottom:8px">Escenarios críticos con este reparto</div>
+          <div class="critbox" id="critBox"></div>
+        </div>
+      </div>
+    </div>
+    <div id="ptList"></div>
+    <div>
+      <h3 style="margin-bottom:12px">Lo que nos costó</h3>
+      <div class="tblwrap"><table>
+        <thead><tr><th>Para subir…</th><th>…bajamos</th><th>Consecuencia que aceptamos</th></tr></thead>
+        <tbody>
+          <tr><td>Seguridad y Fiabilidad a 4</td><td>Usabilidad a 1</td><td>Más fricción que la competencia, incluidos los sitios ilegales. Retiros detenidos si fallan los controles antilavado.</td></tr>
+          <tr><td>Compatibilidad a 3</td><td>Mantenibilidad a 1</td><td>Cada cambio regulatorio y cada proveedor nuevo cuesta más.</td></tr>
+          <tr><td>Desempeño a 3</td><td>Adecuación funcional a 1</td><td>La corrección del premio del crash queda del lado del proveedor.</td></tr>
+          <tr><td>Que Desempeño y Compatibilidad sigan en 3</td><td>Que Seguridad no llegue a 5</td><td>La preferencia por la seguridad se expresa como regla (fallo cerrado), no como puntaje.</td></tr>
+          <tr><td>Todo lo anterior</td><td>Portabilidad a 1</td><td>Mudarse de centro de datos será caro y obligará a recertificar.</td></tr>
+        </tbody>
+      </table></div>
+    </div>
+  </section>
+
+  <!-- 3 TENSIONES -->
+  <section class="panel" id="p-tensiones" role="tabpanel" hidden>
+    <div>
+      <h2>Tensiones</h2>
+      <p class="sub">Recorrimos los 28 pares de atributos con las cifras del casino: 7 tensiones fuertes, 12 leves, 7 sinergias y 2 pares sin relación relevante. Las fuertes entre dos atributos altos se vuelven escenario crítico.</p>
+    </div>
+    <div>
+      <div class="tblwrap" style="padding:12px;display:inline-block;max-width:100%">
+        <table class="matrix" id="matrix"></table>
+      </div>
+      <div class="legend" style="margin-top:10px">
+        <span><i class="m-F"></i>Tensión fuerte</span><span><i class="m-L"></i>Tensión leve</span><span><i class="m-S"></i>Sinergia</span><span><i class="m-0"></i>Sin relación relevante</span>
+      </div>
+    </div>
+    <div>
+      <h3 style="margin-bottom:10px">Las siete tensiones fuertes</h3>
+      <div class="chips" id="tChips"></div>
+      <p class="note" id="tInfo" style="margin-top:10px"></p>
+      <div class="tgrid" id="tGrid"></div>
+    </div>
+    <div>
+      <details>
+        <summary>Tensiones leves (12)</summary>
+        <div class="tblwrap"><table id="leves"></table></div>
+        <p class="note" style="margin-top:10px">L4 (Compatibilidad × Seguridad) se promovió a tensión fuerte T7. Se conserva la numeración de las demás.</p>
+      </details>
+      <details>
+        <summary>Sinergias (7)</summary>
+        <div class="tblwrap"><table id="sinergias"></table></div>
+      </details>
+    </div>
+  </section>
+
+  <!-- 4 ESCENARIOS -->
+  <section class="panel" id="p-escenarios" role="tabpanel" hidden>
+    <div>
+      <h2>Cinco escenarios de calidad</h2>
+      <p class="sub">Uno por tensión, no uno por atributo. Cuatro son críticos y llevan ADR. ESC-04 se escribe sin ADR a propósito: es importante, pero su costo cae en un atributo que priorizamos bajo.</p>
+    </div>
+    <div class="pills" id="scPills"></div>
+    <label class="toggle"><input type="checkbox" id="simple" checked> Mostrar la versión en simple</label>
+    <div id="scBody"></div>
+  </section>
+
+  <!-- 5 ADR -->
+  <section class="panel" id="p-adr" role="tabpanel" hidden>
+    <div>
+      <h2>Un ADR por escenario crítico</h2>
+      <p class="sub">Cada ADR registra las opciones reales para cumplir su escenario, qué gana y qué paga cada una. Todavía no se elige: la Decision y las Consequences llegan en el Bloque 3, con las tácticas. Por eso los cuatro están en estado Propuesto.</p>
+    </div>
+    <div class="pills" id="adrPills"></div>
+    <div id="adrBody"></div>
+  </section>
+
+  <!-- SUSTENTAR -->
+  <section class="panel" id="p-sustentar" role="tabpanel" hidden>
+    <div>
+      <h2>Para sustentar</h2>
+      <p class="sub">Preguntas probables en el estilo del profesor: justificar una tensión, qué pasa si se agrega algo y qué duele si cambia una restricción. Las respuestas salen del contexto de este documento.</p>
+    </div>
+    <div id="qa"></div>
+  </section>
+
+  <!-- RUBRICA -->
+  <section class="panel" id="p-rubrica" role="tabpanel" hidden>
+    <div>
+      <h2>Autoevaluación</h2>
+      <p class="sub">Los nueve criterios de la rúbrica, el nivel que reclamamos y dónde está la evidencia. La última columna dice cómo defendemos los puntos que un evaluador podría leer distinto.</p>
+    </div>
+    <div class="tblwrap"><table id="rub"></table></div>
+    <div class="callout">
+      <h3>Cómo se verificó la cadena</h3>
+      <p>Se recalcularon con un script las 31 cifras derivadas de la ficha, se rastreó cada cifra de los escenarios hasta su origen y se comprobó que el Context de cada ADR es idéntico, carácter por carácter, a su escenario. La revisión encontró 9 hallazgos y todos se corrigieron.</p>
+    </div>
+  </section>
+
+  <!-- ANEXO -->
+  <section class="panel" id="p-anexo" role="tabpanel" hidden>
+    <div>
+      <h2>Supuestos y fuentes</h2>
+      <p class="sub">Toda cifra tiene origen: una fuente verificable o un supuesto declarado con su razón.</p>
+    </div>
+    <div>
+      <h3 style="margin-bottom:12px">Supuestos declarados (29)</h3>
+      <div class="tblwrap"><table id="sups"></table></div>
+    </div>
+    <div>
+      <h3 style="margin-bottom:12px">Fuentes principales</h3>
+      <ul class="src" id="srcs"></ul>
+      <p class="note" style="margin-top:12px">Vigencia: los requerimientos técnicos de Coljuegos están en revisión en 2026, y el Decreto 0240 de 2026 tiene un estado jurídico incierto. Si cambian, hay que revisar la ficha y las restricciones de los ADR.</p>
+    </div>
+  </section>
+
+  <footer>Bloque 2 · Los cuatro ADR están en estado Propuesto. La Decision y las Consequences se completan en el Bloque 3.</footer>
+</div>
+
+<script>
+const $ = s => document.querySelector(s);
+const $$ = s => Array.from(document.querySelectorAll(s));
+const esc = s => String(s);
+
+/* ---------- Atributos y puntos ---------- */
+const TOTAL = 18;
+const ATTRS = [
+  {id:'seg', name:'Seguridad', short:'Seguridad', pts:4,
+   why:'Casino Andino guarda dinero de otras personas, y la ley lo trata así: el reglamento de Coljuegos exige bloquear cuentas tras intentos fallidos, detectar suplantaciones, autenticar todo acceso y prevenir el lavado de activos, que en nuestro caso se hace con SARLAFT. Además, Seguridad aparece en cuatro de las siete tensiones fuertes del mapa: casi toda decisión pasa por ella. No le damos 5 porque eso obligaría a bajar Desempeño o Compatibilidad a 2, y cuando choca con Fiabilidad ya gana por una regla del equipo: fallo cerrado en los retiros.',
+   acc:'<b>Lo que aceptamos:</b> más controles significan más pasos para el jugador y más trabajo en cada operación.'},
+  {id:'fiab', name:'Fiabilidad', short:'Fiabilidad', pts:4,
+   why:'Cada jugada mueve dinero real, y el reglamento no deja margen: el saldo nunca puede quedar negativo, toda jugada debe poder reconstruirse y el operador debe tener un sistema alterno certificado, listo para seguir operando si el principal cae. Perder una transacción ya confirmada es perderle dinero a un jugador. Está en dos tensiones fuertes, y empata con Seguridad por la misma razón que ella no llega a 5.',
+   acc:'<b>Lo que aceptamos:</b> no buscamos más disponibilidad que la que pide el negocio, 99,9 % al mes; el esfuerzo va a que el saldo sea exacto.'},
+  {id:'perf', name:'Eficiencia de desempeño', short:'Desempeño', pts:3,
+   why:'Una noche de quincena puede haber hasta 12.000 personas jugando a la vez, y cada jugada hace que el proveedor nos pida descontar y abonar saldo. Si tardamos en responder, el proveedor da la jugada por fallida. Por eso es alto, y está en tres tensiones fuertes. No llega a 4 porque un problema de desempeño casi siempre se traduce en lentitud, no en dinero perdido, y porque el juego y su video los sirve el proveedor, no nosotros.',
+   acc:'<b>Lo que aceptamos:</b> no optimizamos más allá de lo que el proveedor necesita para no cortar la jugada.'},
+  {id:'compat', name:'Compatibilidad', short:'Compatibilidad', pts:3,
+   why:'Sin integraciones no hay casino: cinco proveedores ponen todos los juegos, cada uno con su propio protocolo y su propia forma de autenticarse, y el sistema de inspección de Coljuegos es obligatorio y tiene su propio formato. Por eso es alto: está en dos tensiones fuertes contra atributos altos. Tiene 3, el mínimo para seguir siendo alto, por dos razones. Subirla a 4 obligaría a bajar Desempeño a 2, y perderíamos dos tensiones críticas. Y cuando una integración falla, el daño cae en Fiabilidad y Seguridad, que ya están en 4. Como los protocolos los definen los proveedores y el regulador, nuestro trabajo es cumplir ese contrato con exactitud, y eso no mejora con más puntos.',
+   acc:'<b>Lo que aceptamos:</b> cada proveedor nuevo es trabajo de integración y, a veces, de recertificación.'},
+  {id:'func', name:'Adecuación funcional', short:'Funcional', pts:1,
+   why:'Lo que el sistema debe hacer ya viene escrito en los requerimientos técnicos de Coljuegos: los campos del registro, la autoexclusión, los límites, el historial. Ahí no hay mucho que decidir, solo cumplir. Y la lógica de los juegos, sus resultados y su retorno al jugador son del proveedor, certificados por un laboratorio.',
+   acc:'<b>Lo que aceptamos:</b> la exactitud de los premios queda del lado del proveedor.'},
+  {id:'usab', name:'Usabilidad', short:'Usabilidad', pts:1,
+   why:'Buena parte de la fricción no la decidimos nosotros: la impone la regulación, con el bloqueo tras intentos fallidos, el cierre de sesión por inactividad y un registro largo. Y la pantalla donde el jugador pasa su tiempo es la del juego, que hace el proveedor. Su única tensión fuerte es contra Seguridad, y ahí elegimos Seguridad.',
+   acc:'<b>Lo que aceptamos:</b> una experiencia con más pasos que la de los sitios ilegales, que no tienen estos controles.'},
+  {id:'mant', name:'Mantenibilidad', short:'Mantenibilidad', pts:1,
+   why:'Cambiar el sistema es caro aunque el código sea limpio: todo cambio en una parte crítica debe validarlo un laboratorio antes de salir, y cada año hay una recertificación completa. Poner puntos aquí no acelera ese paso. Es la baja más arriesgada, porque la regulación cambia seguido.',
+   acc:'<b>Riesgo asumido:</b> los cambios regulatorios costarán más. Confiamos en que una seguridad fuerte nos ayude a seguir cumpliendo cuando cambien las reglas.'},
+  {id:'port', name:'Portabilidad', short:'Portabilidad', pts:1,
+   why:'El sistema no se va a mudar: la regulación lo ata a un centro de datos Tier III, y el sistema de inspección debe estar en Colombia. Es el único atributo sin ninguna tensión fuerte en el mapa.',
+   acc:'<b>Lo que aceptamos:</b> cambiar de centro de datos sería caro y obligaría a recertificar.'}
+];
+const byId = id => ATTRS.find(a => a.id === id);
+
+/* ---------- Tensiones ---------- */
+const ORDER = ['func','perf','compat','usab','fiab','seg','mant','port'];
+const MAT = {
+  'func|perf':'F','func|compat':'S','func|usab':'L','func|fiab':'S','func|seg':'L','func|mant':'L','func|port':'0',
+  'perf|compat':'L','perf|usab':'L','perf|fiab':'F','perf|seg':'F','perf|mant':'L','perf|port':'L',
+  'compat|usab':'S','compat|fiab':'F','compat|seg':'F','compat|mant':'L','compat|port':'S',
+  'usab|fiab':'S','usab|seg':'F','usab|mant':'0','usab|port':'L',
+  'fiab|seg':'L','fiab|mant':'L','fiab|port':'S',
+  'seg|mant':'F','seg|port':'L','mant|port':'S'
+};
+const matGet = (a,b) => MAT[a+'|'+b] || MAT[b+'|'+a];
+
+const TENS = [
+  {id:'T1', a:'seg', b:'perf', t:'Controlar cada retiro sin frenar el juego',
+   x:'La evaluación de riesgo, las listas restrictivas y la detección de suplantación van en el camino de cada depósito y retiro, mientras la reconsulta de 350.000 cuentas convive con 3.000 operaciones por segundo.',
+   la:'cada control alarga depósitos y retiros, y la reconsulta compite con el juego.', lb:'controles livianos dejan ventanas para pagarle a quien no se debe.', o:'ESC-01'},
+  {id:'T2', a:'fiab', b:'perf', t:'Guardar seguro o responder rápido',
+   x:'Ninguna operación confirmada puede perderse y el sistema alterno debe quedar al día, pero cada operación debe responderse en p99 ≤ 250 ms con 3.000 por segundo.',
+   la:'asegurar cada operación antes de confirmarla alarga cada respuesta.', lb:'confirmar antes de asegurar abre la puerta a perder dinero ya confirmado.', o:'ESC-02'},
+  {id:'T3', a:'compat', b:'fiab', t:'Protocolos ajenos, saldo propio',
+   x:'Cinco proveedores con protocolos distintos piden descontar, abonar o revertir en cada jugada; repiten peticiones y revierten por su cuenta si no reciben respuesta en ~3 s.',
+   la:'cada variante de protocolo es una forma nueva de cobrar o abonar dos veces.', lb:'rechazar lo que el proveedor cree válido provoca reversiones y retrasa integraciones.', o:'ESC-03'},
+  {id:'T4', a:'seg', b:'mant', t:'El laboratorio marca el ritmo',
+   x:'Cada cambio crítico lo valida el laboratorio en 2 a 4 semanas, pero el negocio quiere entregar cada 2 semanas, sumar 20 juegos al mes y absorber 3 o 4 cambios regulatorios al año.',
+   la:'el ritmo real de entrega cae muy por debajo del deseado.', lb:'acelerar presiona para tocar elementos críticos sin validación.', o:'acc'},
+  {id:'T5', a:'seg', b:'usab', t:'Proteger molesta',
+   x:'Bloqueo a los 5 intentos, sesión de 20 minutos, verificación de identidad y diligencia reforzada que retiene retiros hasta 48 h, frente a sitios ilegales sin fricción.',
+   la:'jugadores legítimos bloqueados o esperando, y algunos se van a sitios ilegales.', lb:'puerta abierta a la suplantación, al lavado y al juego de menores.', o:'acc'},
+  {id:'T6', a:'func', b:'perf', t:'El instante exacto del crash',
+   x:'Hasta 720 jugadores se retiran en el mismo segundo, y cada premio debe liquidarse con el multiplicador que vio el jugador.',
+   la:'procesar la ráfaga con precisión limita el volumen justo en el pico.', lb:'los retiros demorados se liquidan con otro multiplicador.', o:'ESC-04'},
+  {id:'T7', a:'seg', b:'compat', t:'Quién puede pedir dinero',
+   x:'Cada petición de un proveedor puede abonar dinero: quien se haga pasar por uno crea saldo de la nada. El reglamento exige autenticar todo acceso, pero cada proveedor trae su propio esquema.',
+   la:'un esquema único y estricto deja fuera a proveedores o retrasa su integración.', lb:'la interfaz queda tan protegida como el proveedor menos exigente.', o:'ESC-05', promo:true}
+];
+const LEVES = [
+  ['L1','Fiabilidad × Seguridad','¿Fallar abierto o cerrado si no responden los controles antilavado? Resuelta con una regla del equipo: fallo cerrado.'],
+  ['L2','Fiabilidad × Mantenibilidad','El sistema alterno exige replicar de inmediato cada cambio: todo cambio cuesta el doble.'],
+  ['L3','Compatibilidad × Mantenibilidad','Un juego sobre otra plataforma obliga a recertificar la integración.'],
+  ['L5','Desempeño × Compatibilidad','Cada una de las ~24 millones de operaciones diarias se traduce al formato XML de Coljuegos.'],
+  ['L6','Usabilidad × Desempeño','Multiplicador, video y bote actualizados en todos los celulares de gama media, con 4G variable.'],
+  ['L7','Adecuación funcional × Usabilidad','Registro obligatorio largo e información fija en pantallas pequeñas.'],
+  ['L8','Adecuación funcional × Mantenibilidad','Reglas fiscales que cambian por decreto acumulan complejidad.'],
+  ['L9','Adecuación funcional × Seguridad','Historial de 30 días, repetición de jugadas y acceso de Coljuegos exponen datos sensibles.'],
+  ['L10','Desempeño × Mantenibilidad','Optimizar para 3.000 operaciones por segundo resta claridad, y cada optimización crítica pasa por el laboratorio.'],
+  ['L11','Desempeño × Portabilidad','Ajustarse al entorno ata al sistema, y el alterno exige correr igual en otro sitio.'],
+  ['L12','Seguridad × Portabilidad','La certificación es del entorno concreto: mudarse reabre pruebas.'],
+  ['L13','Usabilidad × Portabilidad','Web de escritorio, web móvil y app Android con diferencias documentadas.']
+];
+const SINERGIAS = [
+  ['S1','Adecuación funcional × Compatibilidad','La oferta de juegos y medios de pago llega por integración.'],
+  ['S2','Adecuación funcional × Fiabilidad','Saldo nunca negativo y jugadas reconstruibles son a la vez regla funcional y garantía de fiabilidad.'],
+  ['S3','Compatibilidad × Usabilidad','Más medios de pago locales facilitan depositar y retirar.'],
+  ['S4','Compatibilidad × Portabilidad','El formato de Coljuegos y los contratos con proveedores no dependen del entorno.'],
+  ['S5','Usabilidad × Fiabilidad','Ver el resultado de la jugada al reconectarse es fiabilidad que se percibe como buena experiencia.'],
+  ['S6','Fiabilidad × Portabilidad','El sistema alterno exige poder instalar el mismo sistema en dos entornos.'],
+  ['S7','Mantenibilidad × Portabilidad','Aislar lo que depende del entorno facilita cambiar y mudar.']
+];
+
+/* ---------- Escenarios ---------- */
+const PARTS = ['Atributo de calidad','Fuente del estímulo','Estímulo','Artefacto','Entorno','Respuesta','Medida de la respuesta'];
+const SC = [
+  {id:'ESC-01', name:'Retiro de un jugador incluido en una lista recién recibida', dom:'seg', cost:'perf', tens:'T1', adr:'ADR-01',
+   tension:'Seguridad exige evaluar contra la lista más reciente en el camino de cada retiro, mientras una reconsulta masiva consume recursos en pleno pico. Desempeño exige que la evaluación y el juego mantengan sus tiempos.',
+   p:[
+    ['Seguridad, con una restricción de desempeño','Que nunca se le pague a alguien de una lista, sin frenar el casino.'],
+    ['Un jugador cuyo documento aparece en una actualización de listas restrictivas que el operador recibió hace 30 minutos, y cuya cuenta todavía no ha sido reconsultada','Un jugador que acaba de aparecer en una lista y que todavía no hemos revisado.'],
+    ['Solicita un retiro de COP 3.000.000 hacia su billetera digital','Pide sacar tres millones.'],
+    ['El proceso de solicitud de retiros y su evaluación de riesgo de lavado de activos (SARLAFT)','El proceso de retiros y su control antilavado.'],
+    ['Viernes de quincena a las 21:00. 12.000 jugadores simultáneos, ~3.000 operaciones de saldo por segundo, ~1.800 depósitos en la hora. Reconsulta de las 350.000 cuentas contra la lista nueva en curso, iniciada hace 30 minutos','La noche más cargada, con la revisión masiva de cuentas corriendo.'],
+    ['Evalúa el retiro contra la versión de la lista recién recibida, aunque la cuenta no haya sido reconsultada todavía. Si el jugador está en la lista: no paga el retiro, suspende la cuenta por precaución, alerta al oficial de cumplimiento, deja el caso listo para el reporte a la UIAF y le muestra al jugador el retiro “en revisión”, sin revelarle el motivo. Si el jugador no está en la lista y su riesgo es normal: el retiro sigue su curso habitual. El juego y los depósitos de los demás jugadores siguen operando','No le paga, congela la cuenta y avisa a cumplimiento sin alertar al jugador. Los demás retiros y el juego siguen normal.'],
+    ['<b>0 retiros pagados</b> a personas incluidas en una lista ya recibida, verificado cruzando pagos y listas por marca de tiempo. Evaluación del retiro en <b>p95 ≤ 1 s</b>, también durante la reconsulta. Alerta al oficial de cumplimiento en <b>≤ 15 min</b>. Durante la reconsulta, las operaciones de saldo del juego se mantienen en <b>p99 ≤ 250 ms</b>. Reconsulta completa en <b>≤ 6 h</b>. Los retiros de riesgo normal mantienen la orden de transferencia en <b>≤ 24 h</b>','Cero pagos indebidos, decisión en un segundo y el juego sin perder velocidad.']
+   ],
+   casos:['Persona en la lista recibida → retiro retenido, cuenta suspendida y alerta.','Persona fuera de la lista y de riesgo normal → retiro normal.','Resto de jugadores → sin afectación.'],
+   checks:['Cruzar cada pago con las listas recibidas por marca de tiempo: ningún pago puede ser posterior a la llegada de una lista que incluya a su beneficiario.','Prueba de carga en el pico con una reconsulta en curso: medir el p95 de la evaluación y el p99 de las operaciones de saldo.','Medir en los registros el tiempo entre la retención del retiro y la alerta al oficial de cumplimiento.']},
+  {id:'ESC-02', name:'Caída del servidor de saldo en pleno pico', dom:'fiab', cost:'perf', tens:'T2', adr:'ADR-02',
+   tension:'Fiabilidad exige que ninguna de las ~3.000 operaciones por segundo que se confirmaron se pierda en la caída. Desempeño exige que esa garantía no lleve la confirmación por encima de p99 ≤ 250 ms.',
+   p:[
+    ['Fiabilidad, con una restricción de desempeño','Que no se pierda ni un peso confirmado aunque se caiga un servidor.'],
+    ['Una falla de hardware en el servidor que registra las operaciones de saldo de los jugadores','Un servidor que se daña.'],
+    ['El servidor deja de responder abruptamente, con operaciones de saldo en curso','Deja de responder de golpe, con operaciones a medio camino.'],
+    ['La cuenta de juego: el registro del saldo de cada jugador y de sus operaciones de descuento, abono y reversión','El registro del saldo de cada jugador.'],
+    ['Sábado de quincena a las 21:30, en el pico de diseño. 12.000 jugadores simultáneos, ~3.000 operaciones de saldo por segundo, confirmadas a los proveedores con p99 ≤ 250 ms. Una ronda de <i>crash</i> en curso con 2.400 apuestas registradas. Sistema técnico de juego alterno certificado, exigido por el regulador','El sábado más cargado, con una ronda del avión en curso.'],
+    ['Conserva todas las operaciones que ya había confirmado a los proveedores. Las operaciones que estaban en curso sin confirmar quedan sin efecto sobre el saldo, de forma que el proveedor y el operador terminen con el mismo saldo. Avisa a los jugadores afectados que el juego no está disponible. Restablece el juego y el saldo. Al reconectarse, cada jugador ve el resultado de la jugada que quedó incompleta. Registra el inicio, la duración y los servicios afectados, e informa a Coljuegos','Conserva lo confirmado, anula lo que iba a medias para que cuadre con el proveedor, avisa y vuelve en minutos mostrando el resultado de cada jugada.'],
+    ['<b>0 operaciones confirmadas perdidas</b>, verificado por la conciliación operador–proveedores posterior al evento. <b>0 saldos negativos.</b> Juego y saldo restablecidos en <b>≤ 15 min</b>. <b>100 %</b> de las jugadas incompletas con su resultado visible al reconectarse. Aviso a Coljuegos en <b>≤ 30 min</b>. A los <b>5 min</b> del restablecimiento, las operaciones de saldo vuelven a <b>p99 ≤ 250 ms</b>','Cero pérdidas, cero saldos negativos, de vuelta en 15 minutos y aviso a Coljuegos en 30.']
+   ],
+   casos:['Operación ya confirmada → se conserva.','Operación en curso sin confirmar → sin efecto, y ambos saldos coinciden.','Jugada incompleta → resultado visible al volver.'],
+   checks:['Apagar a la fuerza el servidor de saldo durante una prueba de carga de 3.000 operaciones por segundo.','Conciliar operador contra proveedores después del evento: ninguna operación confirmada puede faltar.','Medir el tiempo hasta restablecer y hasta volver a p99 ≤ 250 ms.']},
+  {id:'ESC-03', name:'El proveedor del crash envía tres veces el mismo abono', dom:'compat', cost:'fiab', tens:'T3', adr:'ADR-03',
+   tension:'Compatibilidad exige aceptar el protocolo de cada proveedor tal como viene, con sus repeticiones, reversiones y tiempos de espera. Cada variante es una forma de abonar dos veces, y eso presiona la Fiabilidad del saldo.',
+   p:[
+    ['Compatibilidad (interoperabilidad), con una restricción de fiabilidad','Entendernos con el proveedor tal como él trabaja, sin pagar dos veces.'],
+    ['El proveedor externo del juego <i>crash</i>','El proveedor del juego del avión.'],
+    ['Envía tres veces la misma petición de abono de COP 50.000, con el mismo identificador de transacción, porque no recibió respuesta a la primera dentro de su tiempo de espera de ~3 s','Manda tres veces el mismo pago de premio porque no le llegó nuestra respuesta.'],
+    ['La interfaz de operaciones de saldo que el operador ofrece a los proveedores de juego','La puerta por la que los proveedores mueven saldo.'],
+    ['Pico de diseño: ~3.000 operaciones de saldo por segundo. La red entre el proveedor y el operador está congestionada y pierde respuestas. Ronda de <i>crash</i> en curso con 2.400 jugadores. 5 proveedores conectados, cada uno con su propio protocolo','La noche más cargada, con la red perdiendo respuestas.'],
+    ['Abona los COP 50.000 una sola vez. A la segunda y a la tercera petición les responde con el mismo resultado y el mismo saldo que a la primera. Si llegara una petición del mismo proveedor, para el mismo jugador y con el mismo identificador, pero con datos distintos (otro monto u otro tipo de operación), la rechaza y genera una alerta. Registra cada petición recibida para la conciliación con el proveedor. Reporta la transacción una sola vez al sistema de inspección de Coljuegos','Paga una sola vez y responde igual a las tres. Si el mismo número llega con otro monto, lo rechaza y avisa.'],
+    ['<b>0 abonos duplicados.</b> <b>100 %</b> de las peticiones repetidas reciben una respuesta idéntica a la original, en <b>p99 ≤ 250 ms</b>. <b>0 diferencias</b> en la conciliación diaria de saldos operador–proveedor. <b>0 transacciones duplicadas</b> en el reporte a Coljuegos. <b>100 %</b> de las peticiones que repiten proveedor, jugador e identificador con datos distintos rechazadas, con alerta en <b>≤ 5 min</b>','Cero pagos dobles, y cuentas que cuadran con el proveedor y con Coljuegos.']
+   ],
+   casos:['Petición nueva → se aplica.','Petición repetida idéntica → misma respuesta, sin volver a aplicarse.','Mismo proveedor, jugador e identificador con datos distintos → se rechaza y genera alerta.','Mismo identificador para otro jugador → es una operación nueva: algunos proveedores solo garantizan identificadores únicos por jugador.'],
+   checks:['Reenviar cada petición entre 2 y 5 veces, a veces al mismo tiempo, durante una prueba de carga.','Conciliar a diario los saldos con cada proveedor y con el reporte a Coljuegos.','Enviar un identificador repetido con otro monto y medir el tiempo hasta la alerta.']},
+  {id:'ESC-04', name:'Ráfaga de retiros del crash', dom:'perf', cost:'func', tens:'T6', adr:null,
+   tension:'El dominante, Desempeño, es alto. Pero su costo cae en la corrección del premio (Adecuación funcional, 1), que calcula el proveedor y certifica el laboratorio. Cumplirlo no obliga a sacrificar un atributo que priorizamos alto.',
+   p:[
+    ['Eficiencia de desempeño','Aguantar la ráfaga de cobros del avión.'],
+    ['El proveedor externo del juego <i>crash</i>, después de que 720 jugadores de una misma ronda se retiran con el multiplicador en 2,00x','El proveedor del avión, justo cuando 720 jugadores se retiran a la vez.'],
+    ['Envía al operador, en el mismo segundo, 720 peticiones de abono de premios','Nos manda 720 pagos de premio en el mismo segundo.'],
+    ['El proceso de abono de premios del <i>crash</i> al saldo de los jugadores','El abono de premios del avión.'],
+    ['Pico de diseño: 2.400 jugadores en la ronda y ~3.000 operaciones de saldo por segundo de los demás juegos','La noche más cargada.'],
+    ['Abona cada premio por el monto que liquidó el proveedor. Cada jugador ve su saldo actualizado. Las operaciones de los demás juegos siguen atendiéndose','Abona cada premio tal como lo calculó el proveedor, y el resto de juegos sigue normal.'],
+    ['Los 720 abonos responden en <b>p99 ≤ 250 ms</b>. Saldo actualizado visible al jugador en <b>p95 ≤ 2 s</b>. <b>0 diferencias</b> entre el monto abonado y el liquidado por el proveedor. Durante la ráfaga, las operaciones de los demás juegos se mantienen en <b>p99 ≤ 250 ms</b>','Respuesta en 250 ms, saldo visible en 2 s y ni un peso de diferencia.']
+   ],
+   casos:['Cada abono → por el monto que liquidó el proveedor.','Demás juegos → siguen atendiéndose sin degradarse.'],
+   checks:['Simular en la prueba de carga una ronda con 720 retiros en el mismo segundo.','Comparar cada abono con la liquidación del proveedor.','Medir el p99 de los demás juegos durante la ráfaga.']},
+  {id:'ESC-05', name:'Petición de abono falsificada a nombre de un proveedor', dom:'seg', cost:'compat', tens:'T7', adr:'ADR-04',
+   tension:'Seguridad exige que nadie distinto de un proveedor pueda mover saldo. Compatibilidad exige que la verificación funcione con el esquema de autenticación de cada uno de los cinco proveedores, sin dejar a ninguno fuera.',
+   p:[
+    ['Seguridad (autenticidad e integridad), con una restricción de compatibilidad','Que nadie que no sea un proveedor pueda mover saldo, sin dejar por fuera a ningún proveedor real.'],
+    ['Un actor externo no autorizado que se hace pasar por uno de los proveedores de tragamonedas','Alguien que se hace pasar por un proveedor.'],
+    ['Envía a la interfaz de saldo una petición de abono de COP 2.000.000 a una cuenta de jugador, con el formato de ese proveedor, pero que no fue emitida por él','Pide abonar dos millones a una cuenta.'],
+    ['La interfaz de operaciones de saldo que el operador ofrece a los proveedores de juego','La puerta por la que los proveedores mueven saldo.'],
+    ['Viernes de quincena a las 21:00, en el pico de diseño: 12.000 jugadores simultáneos y ~3.000 operaciones de saldo legítimas por segundo de 5 proveedores, cada uno con su propio esquema de autenticación','La noche más cargada, con cinco proveedores que se autentican cada uno a su manera.'],
+    ['Rechaza la petición sin modificar ningún saldo, la registra con su origen y alerta al equipo de seguridad. Si llegan más peticiones no emitidas por proveedores desde el mismo origen, las sigue rechazando y las agrupa en el mismo incidente. Las peticiones legítimas de los 5 proveedores se siguen aceptando, cada una con el esquema de autenticación propio de su proveedor','La rechaza sin tocar saldos, la anota y avisa a seguridad. Los proveedores reales siguen jugando.'],
+    ['<b>100 %</b> de las peticiones de una batería de falsificación rechazadas (sin credencial, con la credencial de otro proveedor y copia de una petición legítima con el monto modificado), con <b>0 saldos modificados</b>, verificado en la prueba de carga y en las pruebas de penetración del laboratorio. <b>≤ 0,001 %</b> de las peticiones legítimas rechazadas por la verificación. La verificación añade <b>≤ 20 ms (p99)</b> a cada operación, y las operaciones de saldo siguen en <b>p99 ≤ 250 ms</b>. Alerta al equipo de seguridad en <b>≤ 5 min</b>','Ninguna falsa pasa, casi ninguna real se rechaza, y la verificación no frena el juego.']
+   ],
+   casos:['Petición no emitida por el proveedor → se rechaza sin tocar saldos y se alerta.','Más peticiones falsificadas desde el mismo origen → se rechazan y se agrupan en un incidente.','Petición legítima de cualquiera de los 5 proveedores → se acepta con su esquema propio.'],
+   checks:['Batería de falsificación (sin credencial, con la de otro proveedor, copia con el monto cambiado) en la prueba de carga y en la prueba de penetración del laboratorio.','Contar las peticiones legítimas rechazadas sobre el total del día: meta ≤ 0,001 %, unas 240 de ~24 millones.','Medir cuánto añade la verificación a cada operación y el tiempo hasta la alerta.']}
+];
+const scById = id => SC.find(s => s.id === id);
+
+/* ---------- ADR ---------- */
+const ADR = [
+  {id:'ADR-01', sc:'ESC-01', title:'Evaluación de los retiros contra listas restrictivas recién recibidas',
+   restr:['Fallo cerrado: si la evaluación de riesgo o la consulta de listas no están disponibles, los retiros se detienen. El plazo máximo sigue siendo de 72 h para la orden de transferencia.','SARLAFT, cumpliendo los mínimos del SIPLAFT; ~3.000 retiros al día; las listas cambian varias veces al mes.'],
+   opts:[
+    {k:'A', name:'Retener los retiros hasta que termine la reconsulta', how:'Mientras corre la reconsulta masiva, toda solicitud de retiro queda en espera. Al terminar, cada retiro se evalúa con todas las cuentas ya marcadas.',
+     gana:'Es la más simple: ningún retiro se evalúa con una lista incompleta.', paga:'Los retiros de riesgo normal esperan hasta 6 h para ser evaluados, sin culpa del jugador.', sac:'Desempeño; de paso, Usabilidad', v:'no', vt:'No: incumple la evaluación en p95 ≤ 1 s.', pol:'Favorece el cumplimiento a costa del jugador honesto: le traslada el costo de cada actualización de listas, porque su retiro espera hasta 6 h sin que haya nada en su contra.'},
+    {k:'B', name:'Consultar al proveedor de listas en cada retiro', how:'Cada solicitud de retiro dispara, en ese momento, una consulta individual al proveedor externo de listas por el documento del jugador. La reconsulta masiva sigue por su lado.',
+     gana:'Cada retiro ve la lista más reciente del proveedor, sin depender de la reconsulta.', paga:'Cada retiro depende de la latencia y la disponibilidad de un tercero. Con fallo cerrado, una caída del proveedor detiene todos los retiros.', sac:'Fiabilidad y Compatibilidad', v:'maybe', vt:'Depende: hay que medir la latencia del proveedor y su disponibilidad.', pol:'Traslada a un tercero, el proveedor de listas, la continuidad de los retiros: con fallo cerrado, si ese proveedor cae, todos los jugadores esperan. Se privilegia tener siempre la lista más reciente.'},
+    {k:'C', name:'Lista vigente propia, separada de la reconsulta', how:'Al recibir la actualización, el operador guarda la lista nueva en un registro propio de documentos listados, consultable por documento. Cada retiro se evalúa contra ese registro desde el primer minuto. La reconsulta avanza aparte, con un ritmo máximo para no competir con el juego (al menos ~16 cuentas por segundo).',
+     gana:'Evaluación en tiempo constante contra la lista más reciente desde el minuto 0. La reconsulta no compite con el juego.', paga:'Almacenamiento adicional y dos procesos que mantener coherentes. La reconsulta tarda más por su ritmo limitado.', sac:'Mantenibilidad; algo de Desempeño', v:'yes', vt:'Sí, si la lista nueva se carga en pocos minutos y la reconsulta cabe sin afectar el p99 del juego.', pol:'Favorece al jugador de riesgo normal, que cobra en el plazo habitual. El costo lo asume el operador: más almacenamiento y una reconsulta de cuentas más lenta.'}
+   ],
+   pend:['Medir cuánto tarda cargar una lista nueva en la opción C.','Conocer la latencia y la disponibilidad reales del proveedor de listas (opción B).','Verificar que las 6 h de la reconsulta caben en el ritmo máximo.','Familias de tácticas por revisar: Detectar ataques, Resistir ataques y Controlar la demanda de recursos.']},
+  {id:'ADR-02', sc:'ESC-02', title:'Permanencia de las operaciones de saldo confirmadas ante la caída de un servidor',
+   restr:['Sistema alterno con la misma certificación que el principal; todo cambio se replica de inmediato.','Centro Tier III como mínimo y copias en un sitio físicamente separado.','Saldo nunca negativo y toda jugada reconstruible.','Los proveedores dan por fallida una operación sin respuesta en ~3 s y la revierten por su cuenta.'],
+   opts:[
+    {k:'A', name:'Confirmar solo después de escribir en dos sitios físicos', how:'El operador responde al proveedor únicamente cuando la operación quedó grabada de forma permanente en el servidor principal y en una segunda ubicación física independiente, como el sistema alterno.',
+     gana:'Cero pérdida, incluso si se pierde todo el sitio principal.', paga:'Cada operación espera el viaje de red hasta el otro sitio. Si el segundo sitio no responde, el juego se detiene o hay que relajar la garantía.', sac:'Desempeño y Fiabilidad (disponibilidad)', v:'maybe', vt:'Depende: la pérdida cero se cumple, pero el p99 ≤ 250 ms depende de la distancia al segundo sitio.', pol:'Favorece al jugador y al regulador con pérdida cero, a costa de que todos los jugadores esperen más en cada jugada. Obliga a fijar una política de antemano: si el segundo sitio falla, ¿se detiene el juego o se relaja la garantía?'},
+    {k:'B', name:'Confirmar tras la grabación local y copiar después', how:'El operador responde en cuanto la operación queda grabada en el servidor principal. La copia a la segunda ubicación se hace segundos después.',
+     gana:'La respuesta más rápida: el viaje al segundo sitio no está en el camino de la jugada.', paga:'Si el servidor falla antes de copiar, se pierden las últimas operaciones ya confirmadas.', sac:'Fiabilidad', v:'no', vt:'No: deja una ventana de pérdida, y la medida exige cero.', pol:'Traslada al jugador el riesgo de perder una jugada ya confirmada a cambio de velocidad. El operador asume los reclamos y el reporte de la pérdida a Coljuegos.'},
+    {k:'C', name:'Libreta de operaciones de solo agregar, confirmada por mayoría', how:'Cada operación se anota primero, en orden, en una libreta a la que solo se le agregan entradas y que mantienen tres servidores del mismo centro de datos. El operador responde cuando al menos dos de los tres la tienen grabada. El saldo se calcula desde esa libreta, y el alterno la recibe aparte.',
+     gana:'Tolera la caída de un servidor completo sin perder lo confirmado y sin esperar al más lento. Permite reconstruir saldos y jugadas.', paga:'Tres servidores, más complejidad de operación y de recertificación, y un viaje de red interno en cada operación.', sac:'Mantenibilidad; algo de Desempeño', v:'yes', vt:'Sí, si la mayoría se obtiene dentro de p99 ≤ 250 ms. Hay que medirlo.', pol:'Frente al jugador, ninguna dentro de este escenario: lo confirmado no se pierde. El operador asume más costo de infraestructura y de recertificación, y queda abierta cuánta pérdida acepta si cae el centro de datos completo, porque el alterno recibe la libreta con atraso.'}
+   ],
+   pend:['Medir la latencia real entre sitios (A) y dentro del centro de datos (C) con 3.000 operaciones por segundo.','Costear la infraestructura adicional frente al ~15 % del GGR.','Resolver cómo se mantiene el alterno al día sin entrar al camino de cada jugada.','Familias de tácticas por revisar: Detectar, Recuperarse y Prevenir fallas, y Gestionar los recursos.']},
+  {id:'ADR-03', sc:'ESC-03', title:'Tratamiento de las peticiones de saldo repetidas de los proveedores de juego',
+   restr:['Los identificadores de transacción se conservan al menos 4 meses para conciliación.','El alcance de unicidad del identificador lo define cada proveedor: en algunos es único solo por jugador. Una petición repetida se reconoce por proveedor, jugador e identificador.','Un proveedor nuevo sobre otra plataforma obliga a recertificar la integración; se suman 1 o 2 al año.','Volumen: ~24 millones de operaciones de saldo al día.'],
+   opts:[
+    {k:'A', name:'Buscar el identificador en el historial de operaciones', how:'Ante cada petición se busca en el historial completo del jugador si ese identificador ya se aplicó. Si aparece, se reconstruye la respuesta; si no, se aplica.',
+     gana:'No añade estado nuevo: usa el historial que ya existe por obligación.', paga:'La búsqueda crece con el historial. Dos copias simultáneas pueden pasar ambas la búsqueda y aplicarse dos veces.', sac:'Desempeño y Fiabilidad', v:'no', vt:'No: no garantiza cero duplicados cuando las repeticiones llegan a la vez.', pol:'Traslada al operador el riesgo de pagar dos veces un premio cuando las repeticiones llegan a la vez. Corregirlo después significa cobrarle al jugador un abono que ya vio en su saldo.'},
+    {k:'B', name:'Registro de identificadores guardado junto con el cambio de saldo', how:'Al llegar una petición, el operador anota la combinación de proveedor, jugador e identificador, junto con la respuesta que dio, en el mismo paso indivisible en que modifica el saldo. Si ya estaba anotada, devuelve la respuesta guardada; si estaba con datos distintos, rechaza y alerta.',
+     gana:'Tiempo constante; cada operación se aplica exactamente una vez, incluso con copias simultáneas. Sirve igual para los 5 proveedores.', paga:'~24 millones de anotaciones al día durante 4 meses (~2.900 millones de registros) y una escritura más por operación.', sac:'Desempeño (recursos)', v:'yes', vt:'Sí, si la escritura adicional cabe en p99 ≤ 250 ms.', pol:'Ninguna: el saldo refleja exactamente lo que liquidó el proveedor. El costo de guardar las anotaciones lo asume el operador.'},
+    {k:'C', name:'Pieza de traducción por proveedor que descarta repetidos', how:'Cada proveedor tiene su propia pieza que lleva su protocolo al modelo del operador y descarta las repeticiones que recuerda de las últimas 24 horas.',
+     gana:'Aísla las particularidades de cada protocolo y facilita sumar proveedores. El saldo no conoce protocolos externos.', paga:'No detecta repeticiones tardías ni sobrevive a su propia caída. Cinco piezas que mantener y recertificar.', sac:'Fiabilidad y Mantenibilidad', v:'maybe', vt:'Parcial: no garantiza cero duplicados fuera de las 24 h ni tras una caída.', pol:'Favorece la rapidez para sumar proveedores. Traslada a la conciliación diaria, y a la relación con cada proveedor, los duplicados que se escapen: se corrigen después en lugar de impedirse.'}
+   ],
+   pend:['Medir el costo de la escritura adicional de B en el pico.','Definir el plan de almacenamiento de ~2.900 millones de anotaciones.','Evaluar si B y C se combinan: traducción por proveedor y garantía junto al saldo.','Decidir junto con ADR-02 (mismo paso de escritura) y coordinar con ADR-04 (misma interfaz).']},
+  {id:'ADR-04', sc:'ESC-05', title:'Verificación del origen de las peticiones de saldo de los proveedores',
+   restr:['El reglamento exige autenticar todos los accesos, también los de otros sistemas, autenticación en ambos sentidos y cifrado con clave de al menos 2048 bits.','Pruebas de penetración a cargo del laboratorio y validación previa de todo cambio en la seguridad de las comunicaciones.','Cada proveedor trae su propio esquema de autenticación y no acepta cambiarlo; se suman 1 o 2 proveedores al año.','Todo incidente de seguridad se registra y se gestiona con un procedimiento documentado.'],
+   opts:[
+    {k:'A', name:'Clave fija y lista de direcciones de red permitidas', how:'La interfaz solo acepta peticiones que llegan desde las direcciones registradas para cada proveedor y que traen la clave fija asignada a ese proveedor.',
+     gana:'Es simple, todos los proveedores lo soportan y casi no añade tiempo.', paga:'La clave viaja igual en cada petición: quien la obtenga puede abonar, y una copia con el monto cambiado pasa. Si el proveedor cambia sus direcciones, su integración se cae.', sac:'Seguridad; de paso, Fiabilidad', v:'no', vt:'No: la copia con el monto modificado de la batería pasa la verificación.', pol:'Favorece a los proveedores, a quienes no se les exige nada nuevo, y les traslada la seguridad del saldo: la interfaz queda tan protegida como cada proveedor cuide su clave.'},
+    {k:'B', name:'Firma por petición, verificada por una pieza por proveedor', how:'Cada petición llega con una firma calculada sobre su contenido y su hora, con el esquema propio del proveedor. Una pieza por proveedor la verifica con el secreto de ese proveedor y entrega un resultado común antes de llegar al saldo.',
+     gana:'Detecta peticiones alteradas o no emitidas por el proveedor y respeta el esquema de cada uno. Un proveedor nuevo es una pieza nueva.', paga:'Un cálculo más en cada operación; un reloj desfasado puede rechazar peticiones legítimas; cinco piezas y cinco secretos que mantener, rotar y recertificar.', sac:'Mantenibilidad; algo de Desempeño', v:'maybe', vt:'Depende: sí, si los 5 proveedores firman el contenido. Hay que medir que quepa en ≤ 20 ms.', pol:'Favorece a los proveedores, que conservan su propio esquema, y el operador asume el costo de mantener cinco piezas y cinco secretos. Obliga a decidir qué hacer con un proveedor que solo ofrece una clave fija: aceptarlo o excluirlo.'},
+    {k:'C', name:'Un esquema único, definido por el operador', how:'Todo proveedor debe conectarse presentando un certificado propio en una entrada exclusiva del operador y, además, firmar cada petición con el formato común que fija el operador.',
+     gana:'La identidad se comprueba al conectarse, el tráfico no autorizado no llega a la aplicación y hay un solo esquema que mantener.', paga:'Los proveedores que no soportan el esquema quedan fuera o retrasan su integración. Un certificado vencido corta a un proveedor completo.', sac:'Compatibilidad', v:'no', vt:'No: cumple el rechazo, pero deja fuera a proveedores legítimos.', pol:'Política comercial: Casino Andino solo trabaja con proveedores que acepten su esquema. Traslada a los proveedores el costo de adaptarse y sacrifica catálogo a cambio de seguridad.'}
+   ],
+   pend:['Revisar la documentación de autenticación de los 5 proveedores: ¿firman contenido y hora?','Medir el costo de la verificación en el pico.','Definir qué hacer con un proveedor cuyo esquema sea solo una clave fija.','Evaluar B como base y C para quienes la soporten. Coordinar con ADR-03, que vive en la misma interfaz.']}
+];
+
+/* ---------- Sustentación ---------- */
+const QA = [
+  ['¿Por qué Seguridad y Fiabilidad empatan en 4 y ninguna llega a 5?','Subir cualquiera a 5 obliga a bajar Desempeño o Compatibilidad a 2, y eso saca una tensión fuerte del foco. Cuando Seguridad y Fiabilidad chocan, el desempate ya existe como regla: fallo cerrado en los retiros. Gana Seguridad sin gastar un punto en decirlo.'],
+  ['¿Por qué un 3 cuenta como atributo alto?','Porque los 10 puntos libres van todos a Seguridad, Fiabilidad, Desempeño y Compatibilidad (3 + 3 + 2 + 2). Los otros cuatro se quedan en el mínimo. Un 3 son puntos que se les quitaron a los demás.'],
+  ['¿Por qué Mantenibilidad tiene 1 si la regulación cambia tanto?','El ritmo de cambio lo marca el laboratorio: cada cambio crítico se valida de 2 a 4 semanas y hay recertificación anual. Un código más fácil de cambiar no acelera ese cuello de botella. Es un riesgo asumido: nos apoyamos en una seguridad fuerte para seguir cumpliendo cuando cambian las reglas.'],
+  ['¿Por qué cuatro ADR y no cinco?','El material pide un ADR por escenario crítico. ESC-04 es importante, pero su costo cae en la corrección del premio (Adecuación funcional, 1), que además calcula el proveedor. Escribir un ADR para todos los escenarios es el nivel Inicial de la rúbrica.'],
+  ['¿Por qué Seguridad × Compatibilidad no era tensión fuerte desde el comienzo?','Al principio la vimos como “más integraciones, más superficie de ataque”. Al revisar nuestra primera presentación vimos que el conflicto es directo: la interfaz de saldo es la puerta por la que entra el dinero, y su protección depende de cómo autentica cada proveedor. Exigir un esquema único deja proveedores fuera; aceptar el de cada uno nos deja tan protegidos como el más débil.'],
+  ['¿Por qué fallo cerrado en los retiros y no fallo abierto?','Si los controles antilavado no responden, pagar un retiro sin evaluarlo puede significar pagarle dinero de lavado a una persona incluida en una lista. Legalmente eso es más grave que demorar un retiro, que de todos modos tiene un plazo máximo de 72 horas. El juego y los depósitos no se detienen por esta causa.'],
+  ['ESC-03 y ESC-05 tocan la misma interfaz. ¿No son el mismo escenario?','Comparten artefacto, pero no estímulo. ESC-03 trata peticiones legítimas que llegan repetidas porque se perdió una respuesta: el reto es entender el protocolo del proveedor (Compatibilidad). ESC-05 trata peticiones que ningún proveedor emitió: el reto es la autenticidad (Seguridad).'],
+  ['¿Por qué ESC-02 es de Fiabilidad y no solo de disponibilidad?','Porque no basta con volver a estar arriba: el sistema debe volver con los saldos correctos. Un sistema que está disponible pero muestra un saldo falso falla en Fiabilidad. Por eso la medida pide cero operaciones confirmadas perdidas y cero saldos negativos, además de los 15 minutos.'],
+  ['Si sumamos un sexto proveedor, ¿qué duele?','Compatibilidad × Mantenibilidad: si llega sobre otra plataforma, hay que recertificar la integración. Y Seguridad × Compatibilidad: trae otro esquema de autenticación, otra pieza que verificar (ADR-04) y otro protocolo de repeticiones que entender (ADR-03).'],
+  ['Si cae el Decreto 0240 o Coljuegos publica nuevos requerimientos técnicos, ¿qué cambia?','El decreto mueve las cargas al Estado (hoy ~31 % del GGR) y con ellas el presupuesto. Los requerimientos técnicos pueden mover restricciones de la ficha y de los ADR. Es justo el riesgo que asumimos al dejar Mantenibilidad en 1.'],
+  ['¿Por qué los ADR no tienen decisión?','Porque el material pide llegar hasta las opciones consideradas: la decisión se toma en el Bloque 3, con las tácticas como vocabulario. Cada ADR deja escrito qué hay que medir para decidir con fundamento.'],
+  ['¿De dónde salen las cifras?','De fuentes públicas (regulación de Coljuegos, cifras del mercado colombiano y documentación de integración de proveedores) y de 29 supuestos declarados, cada uno con su razón. Las 31 cifras derivadas se recalcularon con un script.'],
+  ['¿Por qué el casino no desarrolla sus propios juegos?','Un juego propio obliga a certificar su generador aleatorio, su matemática y su retorno al jugador. El blackjack en vivo exige un estudio con crupieres operando todo el día. Un concesionario mediano compra catálogos certificados y concentra su arquitectura en la cuenta, el dinero y el cumplimiento.']
+];
+
+/* ---------- Rúbrica ---------- */
+const RUB = [
+  ['Ficha de contexto','Ficha resumen con cifras de carga, disponibilidad, regulación, presupuesto y usuarios; 29 supuestos con razón.','Bajo. Lo que no tiene fuente pública está declarado como supuesto.'],
+  ['Priorización','Cada atributo alto y bajo justificado con el contexto, y la tabla “Lo que nos costó”.','Bajo.'],
+  ['Estímulo y entorno','Estímulos que el operador observa; entornos con franja horaria, carga y modo de operación.','Bajo. ESC-04 se corrigió para que fuente y estímulo sean lo que el operador ve.'],
+  ['Respuesta','Cada respuesta distingue de dos a cuatro casos.','Bajo.'],
+  ['Medida de la respuesta','Cifras con unidad y percentil, y la forma de verificarlas (conciliación, cruce por marca de tiempo, prueba de carga).','Bajo. Cada cifra tiene origen en la ficha.'],
+  ['Coherencia con la priorización','Cada escenario dice su atributo dominante con su puntaje y el atributo que paga.','Medio: ESC-03 tiene dominante en 3. Defensa: un 3 concentra puntos libres, y lo que paga es Fiabilidad, en 4.'],
+  ['Selección de escenarios críticos','Prueba de criticidad a 10 candidatos y justificación en una línea; ESC-04 sin ADR por criterio.','Bajo: 4 ADR, uno por cada tensión fuerte entre atributos altos.'],
+  ['ADR: contexto y estado','Context idéntico al escenario (verificado con script), título que nombra la decisión, estado Propuesto y pendientes.','Bajo.'],
+  ['ADR: opciones y trade-offs','Tres opciones por ADR, descritas como mecanismos, con lo que gana, lo que paga, el atributo sacrificado y si cumple la medida.','Bajo. En cada ADR al menos una opción no cumple la medida.']
+];
+
+/* ---------- Supuestos y fuentes ---------- */
+const SUPS = [
+  ['S1','~3 % del ingreso del segmento casino online en el año 3','Un concesionario nuevo compite por la porción que deja el top 5, que concentra ~88 %.'],
+  ['S2','120.000 jugadores activos al mes en el año 3 (40.000 en el año 1)','~6 % de los ~2 millones de jugadores reales proyectados.'],
+  ['S3','350.000 cuentas registradas (~1.000 registros al día)','~3 cuentas registradas por jugador activo, por abandono.'],
+  ['S4','36.000 jugadores al día, sesiones de 45 min; pico normal 5.000, pico de diseño 12.000','Sin datos públicos de concurrencia; ×2,4 cubre quincena, fin de semana y promoción.'],
+  ['S5','Mezcla en el pico: 55 % tragamonedas, 15 % ruleta, 20 % crash, 10 % blackjack','Tragamonedas y ruleta son las favoritas; el crash es muy popular en Colombia.'],
+  ['S6','Ritmos por juego que dan ~3.300 operaciones de saldo por segundo','Cada jugada es un descuento y un abono; ~24 millones de operaciones al día.'],
+  ['S7','3 depósitos al mes por jugador, de COP 25.000; 15 % en la hora pico','Coherente con un gasto típico de COP 20.000 a 50.000.'],
+  ['S8','1 retiro por cada 4 depósitos; orden de transferencia en 24 h','El mercado paga en 24 a 72 h; pagar rápido compite con los ilegales.'],
+  ['S9','GGR de ~COP 48.600 millones; tecnología al 15 %; 14 ingenieros','GGR = 45 % de los depósitos.'],
+  ['S10','El laboratorio tarda de 2 a 4 semanas por validación','No hay plazo público; estimación conservadora.'],
+  ['S11','~20 juegos nuevos al mes y 1 o 2 proveedores al año','Los catálogos se renuevan constantemente.'],
+  ['S12','80 % del tráfico es móvil, gama media y 4G','Patrón típico del juego online en Colombia.'],
+  ['S13','99,9 % para juego y saldo; 99,5 % para registro y depósitos','El reglamento obliga al operador a fijarlos y Coljuegos puede endurecerlos.'],
+  ['S14','Los proveedores cortan a los ~3 s; meta interna p99 ≤ 250 ms','Margen amplio frente al tiempo de espera.'],
+  ['S15','Tolerancia de 0,05x en el multiplicador del crash','Hace verificable la equidad; validar con el proveedor.'],
+  ['S16','Alerta antilavado en ≤ 15 min','Permite actuar antes de pagar un retiro.'],
+  ['S17','Concesión de 5 años','Plazo usual; por verificar.'],
+  ['S18','Consulta de listas en el registro en p95 ≤ 5 s','Breve para no frenar el registro.'],
+  ['S19','Reconsulta de toda la base en ≤ 6 h','Deja expuestos a lo sumo ~750 retiros; ritmo mínimo de ~16 cuentas por segundo.'],
+  ['S20','Evaluación de riesgo de un depósito o retiro en p95 ≤ 1 s','Cabe holgadamente en los 10 s de confirmación del depósito.'],
+  ['S21','~2 % de los retiros con diligencia reforzada, resueltos en ≤ 48 h','Deja 24 h de margen frente a las 72 h regulatorias.'],
+  ['S22','Aviso a Coljuegos ante una falla grave en ≤ 30 min','Vuelve medible el “de inmediato” del reglamento.'],
+  ['S23','Saldo visible al jugador en p95 ≤ 2 s después de un abono','Cabe dentro del ritmo de juego más rápido, un giro cada 5 s.'],
+  ['S24','Vuelta a p99 ≤ 250 ms en ≤ 5 min tras restablecer','Acota la degradación por reconexiones en el pico.'],
+  ['S25','Alerta técnica por identificador repetido con datos distintos en ≤ 5 min','Es señal de error de integración o de manipulación.'],
+  ['S26','La verificación del origen añade ≤ 20 ms (p99)','Deja más del 90 % del presupuesto de 250 ms.'],
+  ['S27','≤ 0,001 % de peticiones legítimas rechazadas (~240 al día)','Cada rechazo indebido revierte una jugada; más sería intolerable.'],
+  ['S28','Alerta de seguridad ante una petición falsificada en ≤ 5 min','La suplantación suele llegar en ráfaga.'],
+  ['S29','Cada proveedor conserva su propio esquema de autenticación','Un operador mediano tiene poco poder para imponer condiciones.']
+];
+const SRCS = [
+  ['Coljuegos, Requerimientos Técnicos de Juegos Operados por Internet (Res. 20224000026034 de 2022)','https://sidn.ramajudicial.gov.co/SIDN/NORMATIVA/TEXTOS_COMPLETOS/8_RESOLUCIONES/RESOLUCIONES%202022/AMRJSA%20Resoluciones%2020224000026034%20de%202022%20(Requerimientos%20T%C3%A9cnicos%20de%20Juegos%20Operados%20por%20Internet).pdf'],
+  ['Coljuegos, Acuerdo 8 de 2020 (reglamento compilado de juegos operados por internet)','https://normograma.supersalud.gov.co/compilacion/docs/acuerdo_coljuegos_0008_2020.htm'],
+  ['Coljuegos, Acuerdo 2 de 2019 (retorno al jugador mínimo del 83 %)','https://normograma.supersalud.gov.co/compilacion/docs/acuerdo_coljuegos_0002_2019.htm'],
+  ['Coljuegos, Acuerdo 5 de 2020 (casino en vivo)','https://normograma.supersalud.gov.co/compilacion/docs/acuerdo_coljuegos_0005_2020.htm'],
+  ['Coljuegos, Res. 20195100044514 de 2019 (SIPLAFT)','https://normograma.supersalud.gov.co/compilacion/docs/resolucion_coljuegos_44514_2019.htm'],
+  ['Focus Gaming News, Coljuegos y la Superfinanciera sobre el acceso bancario y el SARLAFT','https://focusgn.com/latinoamerica/coljuegos-y-la-superintendencia-financiera-de-colombia-buscan-facilitar-el-acceso-de-operadores-de-juego-al-sistema-bancario'],
+  ['Focus Gaming News, Acuerdo 01 de 2026 sobre juegos de premio inmediato','https://focusgn.com/latinoamerica/coljuegos-refuerza-el-marco-regulatorio-para-los-juegos-de-premio-inmediato-online'],
+  ['Yogonet, Decreto 0240 de 2026: impuesto del 16 % sobre el GGR','https://www.yogonet.com/latinoamerica/noticias/2026/03/16/108079-colombia-el-gobierno-de-petro-introduce-un-nuevo-impuesto-del-16-al-juego-online'],
+  ['Vixio, requerimientos técnicos de Colombia en revisión (2026)','https://www.vixio.com/articles/what-tool-can-help-a-casino-game-provider-understand-technical-approval-requirements-in-colombia'],
+  ['SiGMA, recaudo de Coljuegos enero–agosto de 2026','https://sigma.world/es/news/recaudo-coljuegos-2026-apuestas-mundial/'],
+  ['Vanguardia, mercado colombiano de casino online (2025)','https://www.vanguardia.com/mundo/2025/10/21/colombia-afianza-su-posicion-en-el-mercado-de-casinos-latinoamericano/'],
+  ['La República, participación de mercado de los operadores (2024)','https://www.larepublica.co/empresas/mercado-de-apuestas-online-en-colombia-4002300'],
+  ['Hub88, documentación de su API de billetera','https://docs.hub88.io/developer-docs/operator-api-reference/wallet-api'],
+  ['Blue Ocean Gaming, preguntas frecuentes de integración de billetera','https://blueoceangaming.atlassian.net/wiki/x/gIASS'],
+  ['Blask, migración de jugadores a sitios no autorizados (2026)','https://blask.com/newsroom/colombia-deposit-tax-returns-opening-doors-for-offshore/']
+];
+
+/* ---------- Pestañas (con hash) ---------- */
+const TABS = ['proyecto','puntos','tensiones','escenarios','adr','sustentar','rubrica','anexo'];
+function showTab(id, push){
+  if(!TABS.includes(id)) id = 'proyecto';
+  $$('nav.tabs button').forEach(b => b.setAttribute('aria-selected', String(b.dataset.tab === id)));
+  $$('section.panel').forEach(p => p.hidden = p.id !== 'p-' + id);
+  if(push){ try{ history.replaceState(null,'','#'+id); }catch(e){} }
+}
+$$('nav.tabs button').forEach(b => b.addEventListener('click', () => showTab(b.dataset.tab, true)));
+window.addEventListener('hashchange', () => { try{ showTab(location.hash.slice(1), false); }catch(e){} });
+
+/* ---------- Puntos (reparto adoptado) ---------- */
+const pts = {}; ATTRS.forEach(a => pts[a.id] = a.pts);
+const isCrit = sc => pts[sc.dom] >= 3 && pts[sc.cost] >= 3;
+
+$('#ptList').innerHTML = ATTRS.map(a => `
+  <div class="pt${a.pts >= 3 ? ' hi' : ''}">
+    <div class="pt-top">
+      <h3>${a.name}</h3>
+      <span class="val" aria-label="${a.pts} puntos">${a.pts}</span>
+    </div>
+    <div class="track"><div class="fill" style="width:${a.pts / 5 * 100}%"></div></div>
+    <p><b>¿Por qué ${a.pts}?</b> ${a.why}</p>
+    <p class="acc">${a.acc}</p>
+  </div>`).join('');
+
+function renderCrit(){
+  $('#critBox').innerHTML = SC.map(sc => isCrit(sc)
+    ? `<span class="tag green">${sc.id} · crítico → ${sc.adr}</span>`
+    : `<span class="tag">${sc.id} · no crítico</span>`).join('');
+}
+function renderRadar(){
+  const ord = ['func','perf','compat','usab','fiab','seg','mant','port'];
+  const cx = 280, cy = 200, R = 130, n = ord.length, f = v => v.toFixed(1);
+  const at = (i, r) => { const a = -Math.PI / 2 + i * 2 * Math.PI / n; return [cx + r * Math.cos(a), cy + r * Math.sin(a)]; };
+  const ring = r => ord.map((_, i) => at(i, r).map(f).join(',')).join(' ');
+  let s = '';
+  for(let k = 1; k <= 5; k++) s += `<polygon class="r-grid" points="${ring(R * k / 5)}"/>`;
+  ord.forEach((_, i) => { const [x, y] = at(i, R); s += `<line class="r-axis" x1="${cx}" y1="${cy}" x2="${f(x)}" y2="${f(y)}"/>`; });
+  for(let k = 1; k <= 5; k++) s += `<text class="r-tick" x="${cx + 5}" y="${f(cy - R * k / 5 + 11)}">${k}</text>`;
+  const vals = ord.map((id, i) => at(i, R * pts[id] / 5));
+  s += `<polygon class="r-area" points="${vals.map(p => p.map(f).join(',')).join(' ')}"/>`;
+  vals.forEach((p, i) => { s += `<circle class="r-dot${pts[ord[i]] >= 3 ? '' : ' lo'}" cx="${f(p[0])}" cy="${f(p[1])}" r="5"/>`; });
+  ord.forEach((id, i) => {
+    const [x, y] = at(i, R + 24);
+    const anchor = Math.abs(x - cx) < 4 ? 'middle' : (x > cx ? 'start' : 'end');
+    const dy = y < cy - R ? -2 : (y > cy + R ? 12 : 5);
+    s += `<text class="r-lbl" x="${f(x)}" y="${f(y + dy)}" text-anchor="${anchor}">${byId(id).short} <tspan class="r-val">${pts[id]}</tspan></text>`;
+  });
+  $('#radar').innerHTML = s;
+}
+function renderPoints(){ renderCrit(); renderRadar(); }
+
+/* ---------- Matriz y tensiones ---------- */
+(function renderMatrix(){
+  const lab = id => byId(id).short;
+  let h = '<thead><tr><th></th>' + ORDER.map(id => `<th scope="col">${lab(id)}</th>`).join('') + '</tr></thead><tbody>';
+  ORDER.forEach(r => {
+    h += `<tr><th scope="row" class="row">${lab(r)}</th>`;
+    ORDER.forEach(c => {
+      if(r === c){ h += '<td><span class="m-x"></span></td>'; return; }
+      const v = matGet(r,c);
+      const t = TENS.find(x => (x.a === r && x.b === c) || (x.a === c && x.b === r));
+      const txt = v === 'F' ? (t ? t.id : 'F') : (v === '0' ? '·' : v);
+      h += `<td><span class="m-${v}" title="${lab(r)} × ${lab(c)}">${txt}</span></td>`;
+    });
+    h += '</tr>';
+  });
+  $('#matrix').innerHTML = h + '</tbody>';
+})();
+$('#leves').innerHTML = '<thead><tr><th>ID</th><th>Par</th><th>Situación en Casino Andino</th></tr></thead><tbody>' +
+  LEVES.map(l => `<tr><td class="nowrap">${l[0]}</td><td class="nowrap">${l[1]}</td><td>${l[2]}</td></tr>`).join('') + '</tbody>';
+$('#sinergias').innerHTML = '<thead><tr><th>ID</th><th>Par</th><th>Por qué se refuerzan</th></tr></thead><tbody>' +
+  SINERGIAS.map(l => `<tr><td class="nowrap">${l[0]}</td><td class="nowrap">${l[1]}</td><td>${l[2]}</td></tr>`).join('') + '</tbody>';
+
+let tSel = null;
+const TCHIPS = ATTRS.map(a => ({id:a.id, label:a.short}));
+function outTag(t){
+  if(t.o === 'acc') return `<span class="tag brass">Aceptada: ${byId(t.b).short} tiene ${byId(t.b).pts} punto</span>`;
+  const sc = scById(t.o);
+  return sc.adr ? `<span class="tag green">${sc.id} → ${sc.adr}</span>` : `<span class="tag">${sc.id} · sin ADR</span>`;
+}
+function renderTensions(){
+  $('#tChips').innerHTML = TCHIPS.map(c => `<button type="button" class="chip" data-id="${c.id}" aria-pressed="${tSel === c.id}">${c.label}</button>`).join('');
+  const match = t => !tSel || t.a === tSel || t.b === tSel;
+  $('#tGrid').innerHTML = TENS.map(t => {
+    const cls = tSel ? (match(t) ? 'hit' : 'dim') : '';
+    const A = byId(t.a).short, B = byId(t.b).short;
+    return `<article class="tc ${cls}">
+      <div class="pair"><span class="tag">${t.id}</span><span class="tag">${A}</span><span class="arrow">↔</span><span class="tag">${B}</span></div>
+      <h4>${t.t}</h4><p>${t.x}</p>
+      <p class="loss"><b>Si gana ${A}:</b> ${t.la}</p>
+      <p class="loss"><b>Si gana ${B}:</b> ${t.lb}</p>
+      <div class="out">${outTag(t)}${t.promo ? '<span class="tag">Subió de leve a fuerte</span>' : ''}</div></article>`;
+  }).join('');
+  const n = TENS.filter(match).length, info = $('#tInfo');
+  if(!tSel) info.textContent = 'Elige un atributo para encender sus tensiones fuertes.';
+  else if(n === 0) info.textContent = byId(tSel).short + ' no tiene tensiones fuertes. Por eso lleva 1 punto.';
+  else info.textContent = n + (n === 1 ? ' tensión fuerte' : ' tensiones fuertes') + ' con ' + byId(tSel).short + '.';
+}
+$('#tChips').addEventListener('click', e => { const b = e.target.closest('.chip'); if(!b) return; tSel = tSel === b.dataset.id ? null : b.dataset.id; renderTensions(); });
+
+/* ---------- Escenarios ---------- */
+let curSc = 'ESC-01';
+function parts(sc, simple){
+  return '<div class="parts">' + PARTS.map((k,i) => `
+    <div class="part"><div class="k">${k}</div><div class="v">${sc.p[i][0]}${simple ? `<span class="s">En simple: ${sc.p[i][1]}</span>` : ''}</div></div>`).join('') + '</div>';
+}
+function renderScenario(id){
+  curSc = id;
+  const sc = scById(id), d = byId(sc.dom), c = byId(sc.cost);
+  const crit = isCrit(sc);
+  $('#scPills').innerHTML = SC.map(s => `<button type="button" class="chip" data-id="${s.id}" aria-pressed="${s.id === id}">${s.id} · ${s.name}</button>`).join('');
+  const status = crit ? `<span class="tag green">Crítico${sc.adr ? ' → ' + sc.adr : ''}</span>` : '<span class="tag">No crítico · sin ADR</span>';
+  $('#scBody').innerHTML = `
+    <h3 style="font-size:24px">${sc.id}: ${sc.name}</h3>
+    <div class="head">
+      <span class="tag green">Dominante: ${d.short} · ${pts[sc.dom]} pts</span>
+      <span class="tag">Le cuesta a: ${c.short} · ${pts[sc.cost]} pts</span>
+      <span class="tag">${sc.tens}</span>${status}
+    </div>
+    <p style="margin-top:10px"><b>La tensión.</b> ${sc.tension}</p>
+    ${parts(sc, $('#simple').checked)}
+    <div class="cols" style="margin-top:22px">
+      <div><h4>Casos que distingue la respuesta</h4><ul style="margin-top:8px">${sc.casos.map(x => `<li>${x}</li>`).join('')}</ul></div>
+      <div><h4>Cómo se comprueba</h4><ul style="margin-top:8px">${sc.checks.map(x => `<li>${x}</li>`).join('')}</ul></div>
+    </div>
+    ${sc.adr ? `<p style="margin-top:18px"><button type="button" class="btn" data-go="${sc.adr}">Ver ${sc.adr}</button></p>` : ''}`;
+}
+$('#scPills').addEventListener('click', e => { const b = e.target.closest('.chip'); if(b) renderScenario(b.dataset.id); });
+$('#simple').addEventListener('change', () => renderScenario(curSc));
+$('#scBody').addEventListener('click', e => { const b = e.target.closest('[data-go]'); if(b){ renderAdr(b.dataset.go); showTab('adr', true); } });
+
+/* ---------- ADR ---------- */
+let curAdr = 'ADR-01';
+function renderAdr(id){
+  curAdr = id;
+  const a = ADR.find(x => x.id === id), sc = scById(a.sc);
+  $('#adrPills').innerHTML = ADR.map(x => `<button type="button" class="chip" data-id="${x.id}" aria-pressed="${x.id === id}">${x.id}</button>`).join('');
+  $('#adrBody').innerHTML = `
+    <h3 style="font-size:24px">${a.id}: ${a.title}</h3>
+    <div class="state" style="margin:10px 0 18px"><span class="tag brass">Estado: Propuesto</span><span class="note">Pasa a Aceptado en el Bloque 3, cuando se completen la Decision y las Consequences.</span></div>
+    <details open><summary>Context: ${sc.id}, tal cual</summary>${parts(sc, false)}
+      <p style="margin-top:12px"><button type="button" class="btn" data-sc="${sc.id}">Ver ${sc.id}</button></p></details>
+    <details><summary>Restricciones del proyecto que también fuerzan esta decisión</summary><ul>${a.restr.map(x => `<li>${x}</li>`).join('')}</ul></details>
+    <h4 style="margin:26px 0 12px">Opciones consideradas</h4>
+    <div class="optgrid">${a.opts.map(o => `
+      <article class="opt">
+        <header><span class="letter">${o.k}</span><h4>${o.name}</h4></header>
+        <p>${o.how}</p>
+        <dl><dt>Gana</dt><dd>${o.gana}</dd><dt>Paga</dt><dd>${o.paga}</dd><dt>Decisión de política</dt><dd>${o.pol}</dd></dl>
+        <div><span class="tag">Sacrifica: ${o.sac}</span></div>
+        <p class="verd ${o.v}"><b>¿Cumple la medida?</b> ${o.vt}</p>
+      </article>`).join('')}</div>
+    <h4 style="margin:26px 0 8px">Pendiente para el Bloque 3</h4>
+    <ul>${a.pend.map(x => `<li>${x}</li>`).join('')}</ul>`;
+}
+$('#adrPills').addEventListener('click', e => { const b = e.target.closest('.chip'); if(b) renderAdr(b.dataset.id); });
+$('#adrBody').addEventListener('click', e => { const b = e.target.closest('[data-sc]'); if(b){ renderScenario(b.dataset.sc); showTab('escenarios', true); } });
+
+/* ---------- Sustentar, rúbrica y anexo ---------- */
+$('#qa').innerHTML = QA.map(q => `<details><summary>${q[0]}</summary><p>${q[1]}</p></details>`).join('');
+$('#rub').innerHTML = '<thead><tr><th>Criterio</th><th>Nivel</th><th>Evidencia</th><th>Riesgo y defensa</th></tr></thead><tbody>' +
+  RUB.map(r => `<tr><td>${r[0]}</td><td><span class="lvl">Logrado</span></td><td>${r[1]}</td><td>${r[2]}</td></tr>`).join('') + '</tbody>';
+$('#sups').innerHTML = '<thead><tr><th>ID</th><th>Supuesto</th><th>Razón</th></tr></thead><tbody>' +
+  SUPS.map(s => `<tr><td class="nowrap">${s[0]}</td><td>${s[1]}</td><td>${s[2]}</td></tr>`).join('') + '</tbody>';
+$('#srcs').innerHTML = SRCS.map(s => `<li><a href="${s[1]}" target="_blank" rel="noopener">${s[0]}</a></li>`).join('');
+
+/* ---------- Inicio ---------- */
+renderPoints();
+renderTensions();
+renderScenario('ESC-01');
+renderAdr('ADR-01');
+let startTab = 'proyecto';
+try{ const h = location.hash.slice(1); if(TABS.includes(h)) startTab = h; }catch(e){}
+showTab(startTab, false);
+</script>
+
+</body></html>
