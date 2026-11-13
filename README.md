@@ -1,6 +1,6 @@
 # Casino online regulado en Colombia — Investigación y ADRs
 
-Trabajo de Arquitectura de Software (Bloque 2: atributos de calidad, escenarios y ADR). Parte de un casino online hipotético, *Casino Andino* (tragamonedas, ruleta, blackjack en vivo y *crash*; sin apuestas deportivas), y llega hasta tres ADRs, pasando por la regulación, la priorización de atributos ISO 25010 y escenarios de calidad.
+Trabajo de Arquitectura de Software (Bloque 2: atributos de calidad, escenarios y ADR). Parte de un casino online hipotético, *Casino Andino* (tragamonedas, ruleta, blackjack en vivo y *crash*; sin apuestas deportivas), y llega hasta cuatro ADRs, pasando por la regulación, la priorización de atributos ISO 25010 y escenarios de calidad.
 
 ## Empieza por aquí
 
@@ -25,5 +25,4 @@ Trabajo de Arquitectura de Software (Bloque 2: atributos de calidad, escenarios 
 ## Cómo está armado
 
 - Cada fase usa como insumo a las anteriores y lo declara al inicio.
-- Cada documento tiene una barra de navegación (anterior · índice · siguiente) arriba y abajo.
 - Cada fase cierra con un **punto de control** donde el equipo valida lo decidido.
