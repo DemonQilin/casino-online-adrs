@@ -1,0 +1,607 @@
+<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#000}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>
+<title>Tácticas y sizing · Bloque 3</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<style>
+/* Layout: mismo sistema visual de los widgets del curso (teal/pizarra, títulos en serif); cabecera, pestañas, tarjetas en una columna de lectura */
+:root{
+  --ink:#1E293B; --slate:#475569; --muted:#94A3B8;
+  --teal-dark:#0F766E; --teal-mid:#0D9488; --teal-pale:#CCFBF1; --teal-faint:#F0FDFA;
+  --gold:#B45309; --gold-pale:#FEF3C7; --red:#B91C1C; --red-pale:#FEE2E2;
+  --bg:#F8FAFC; --card:#FFFFFF; --border:#E2E8F0; --soft:#F1F5F9; --on-teal:#FFFFFF;
+  --f-head:Georgia,"Iowan Old Style","Times New Roman",serif;
+  --f-body:-apple-system,BlinkMacSystemFont,"Segoe UI",Helvetica,Arial,sans-serif;
+  --f-mono:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --ink:#E2E8F0; --slate:#B6C2D1; --muted:#7C8BA0;
+  --teal-dark:#2DD4BF; --teal-mid:#14B8A6; --teal-pale:#134E4A; --teal-faint:#0F2A2A;
+  --gold:#F5B454; --gold-pale:#3A2A10; --red:#F87171; --red-pale:#3B1717;
+  --bg:#0E141B; --card:#151E28; --border:#283545; --soft:#1C2734; --on-teal:#04201D; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --ink:#E2E8F0; --slate:#B6C2D1; --muted:#7C8BA0;
+  --teal-dark:#2DD4BF; --teal-mid:#14B8A6; --teal-pale:#134E4A; --teal-faint:#0F2A2A;
+  --gold:#F5B454; --gold-pale:#3A2A10; --red:#F87171; --red-pale:#3B1717;
+  --bg:#0E141B; --card:#151E28; --border:#283545; --soft:#1C2734; --on-teal:#04201D; color-scheme:dark}
+
+*{box-sizing:border-box}
+body{background:var(--bg);color:var(--ink);font-family:var(--f-body);line-height:1.5}
+.wrap{max-width:1000px;margin:0 auto;padding-block:28px 56px;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+.kicker{font-size:12px;font-weight:700;letter-spacing:.08em;color:var(--teal-mid);text-transform:uppercase}
+h1{font-family:var(--f-head);font-size:30px;margin:4px 0 6px;font-weight:normal;text-wrap:balance}
+h2{font-size:17px;margin:0 0 6px;text-wrap:balance}
+h3{font-size:14.5px;margin:0 0 6px}
+p{margin:0 0 10px;font-size:14px;color:var(--slate);max-width:72ch}
+p:last-child{margin-bottom:0}
+.sub{font-size:14.5px;max-width:760px}
+b,strong{color:var(--ink)}
+nav.tabs{display:flex;gap:24px;border-bottom:1px solid var(--border);margin:22px 0 22px;overflow-x:auto}
+.tab{background:none;border:0;padding:10px 2px;cursor:pointer;font:inherit;font-size:15px;color:var(--slate);border-bottom:2px solid transparent;white-space:nowrap}
+.tab[aria-selected="true"]{color:var(--teal-dark);border-bottom-color:var(--teal-dark);font-weight:600}
+:focus-visible{outline:2px solid var(--teal-mid);outline-offset:2px}
+.panel{display:grid;gap:16px}
+.card{background:var(--card);border:1px solid var(--border);border-radius:10px;padding:18px 20px;min-width:0}
+.label-sm{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--muted);margin-bottom:6px}
+.quote{font-family:var(--f-head);font-size:19px;color:var(--ink);margin:6px 0 14px}
+.btn{background:var(--teal-dark);color:var(--on-teal);border:none;padding:9px 15px;border-radius:6px;font-size:13.5px;cursor:pointer;font-weight:600;font-family:inherit}
+.btn.ghost{background:none;color:var(--slate);border:1px solid var(--border);font-weight:500}
+.reveal{margin-top:14px;background:var(--teal-faint);border-left:3px solid var(--teal-mid);padding:12px 14px;border-radius:0 6px 6px 0;font-size:14px;color:var(--slate)}
+.badge{display:inline-block;font-size:10.5px;font-weight:700;padding:2px 8px;border-radius:10px;background:var(--gold-pale);color:var(--gold);letter-spacing:.02em;vertical-align:middle}
+.badge.teal{background:var(--teal-pale);color:var(--teal-dark)}
+.badge.red{background:var(--red-pale);color:var(--red)}
+
+/* cadena */
+.chain{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:8px;margin-top:12px}
+.link{border:1px solid var(--border);border-radius:8px;padding:10px 12px;background:var(--card);display:grid;gap:3px;align-content:start;position:relative}
+.link .n{font-family:var(--f-mono);font-size:11px;color:var(--teal-mid);font-weight:700}
+.link b{font-size:13.5px}
+.link span{font-size:12.5px;color:var(--slate)}
+.link.hot{border:2px solid var(--teal-mid);background:var(--teal-faint)}
+@media (max-width:760px){.chain{grid-template-columns:1fr}}
+
+/* tablas */
+.tbl{overflow-x:auto}
+table{width:100%;border-collapse:collapse;font-size:13px}
+th,td{padding:9px 11px;text-align:left;vertical-align:top;border-bottom:1px solid var(--border)}
+th{background:var(--teal-dark);color:var(--on-teal);font-size:12px;font-weight:600}
+td:first-child{font-weight:600;color:var(--ink)}
+.num{font-variant-numeric:tabular-nums;font-family:var(--f-mono);font-size:12.5px;white-space:nowrap}
+
+/* ejemplo */
+.calc{font-family:var(--f-mono);font-size:12.5px;background:var(--soft);border-radius:6px;padding:8px 10px;color:var(--ink);overflow-x:auto;white-space:pre-wrap}
+.ex-step{display:grid;grid-template-columns:28px minmax(0,1fr);gap:10px;padding:12px 0;border-top:1px solid var(--border)}
+.ex-step:first-of-type{border-top:0}
+.dot{width:26px;height:26px;border-radius:50%;background:var(--teal-pale);color:var(--teal-dark);font-weight:700;font-size:12.5px;display:grid;place-items:center}
+.ex-step .body{display:grid;gap:6px;min-width:0}
+.tagline{font-size:12px;color:var(--muted)}
+
+/* pasos */
+.step{display:grid;grid-template-columns:34px minmax(0,1fr);gap:12px}
+.step .dot{width:30px;height:30px;font-size:14px}
+.qa{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px;margin-top:8px}
+@media (max-width:760px){.qa{grid-template-columns:1fr}}
+.qa div{border:1px solid var(--border);border-radius:6px;padding:9px 11px;font-size:13px;color:var(--slate);display:grid;gap:3px;align-content:start}
+.qa .k{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.05em}
+.qa .what .k{color:var(--teal-dark)} .qa .good .k{color:var(--teal-mid)} .qa .err .k{color:var(--red)}
+.qa .err{border-color:var(--red-pale)}
+
+/* calculadora */
+.calcgrid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px;margin:12px 0}
+@media (max-width:760px){.calcgrid{grid-template-columns:repeat(2,minmax(0,1fr))}}
+.field{display:grid;gap:4px}
+.field label{font-size:12.5px;font-weight:600;color:var(--ink)}
+.field input{border:1px solid var(--border);background:var(--card);color:var(--ink);border-radius:6px;padding:8px 10px;font:inherit;font-size:14px;width:100%;min-width:0}
+.out{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px}
+@media (max-width:760px){.out{grid-template-columns:repeat(2,minmax(0,1fr))}}
+.out div{border-radius:8px;padding:10px 12px;background:var(--soft);display:grid;gap:2px}
+.out .v{font-family:var(--f-mono);font-size:18px;font-weight:700;color:var(--ink);font-variant-numeric:tabular-nums}
+.out .l{font-size:12px;color:var(--slate)}
+.out .warn .v{color:var(--red)} .out .ok .v{color:var(--teal-dark)}
+
+/* casos */
+.chips{display:flex;flex-wrap:wrap;gap:8px}
+.chip{border:1px solid var(--border);background:var(--card);color:var(--ink);border-radius:20px;padding:7px 14px;cursor:pointer;font:inherit;font-size:13.5px}
+.chip[aria-pressed="true"]{background:var(--teal-dark);color:var(--on-teal);border-color:var(--teal-dark);font-weight:600}
+.seedhead{display:flex;align-items:baseline;gap:10px;flex-wrap:wrap}
+.seedhead h2{font-family:var(--f-head);font-weight:normal;font-size:24px;margin:0}
+.list{margin:0;padding-left:20px;display:grid;gap:5px;font-size:14px;color:var(--slate)}
+.ext{border:2px solid var(--gold);background:var(--gold-pale);border-radius:10px;padding:14px 16px;display:grid;gap:10px}
+.ext .x{display:grid;gap:3px}
+.ext .x b{color:var(--gold)}
+.ext p{color:var(--ink)}
+.cols2{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px}
+@media (max-width:760px){.cols2{grid-template-columns:1fr}}
+
+/* rúbrica */
+.rub td.lv{cursor:pointer;color:var(--slate)}
+.rub td.lv:hover{background:var(--soft)}
+.rub td.lv.on{background:var(--teal-pale);color:var(--ink);box-shadow:inset 0 0 0 2px var(--teal-mid)}
+.rubsum{display:flex;gap:10px;flex-wrap:wrap;align-items:center;margin-top:12px;font-size:13.5px;color:var(--slate)}
+
+/* nivel */
+.levelbar{display:flex;flex-wrap:wrap;align-items:center;gap:10px;margin-top:14px}
+.seg{display:inline-flex;border:1px solid var(--border);border-radius:6px;overflow:hidden}
+.seg button{background:var(--card);color:var(--slate);border:0;padding:7px 14px;font:inherit;font-size:13.5px;cursor:pointer}
+.seg button[aria-pressed="true"]{background:var(--teal-pale);color:var(--teal-dark);font-weight:700}
+body[data-level="pre"] .pos-only{display:none!important}
+.lvtag{font-size:10.5px;font-weight:700;padding:2px 7px;border-radius:10px;background:var(--soft);color:var(--slate);margin-left:6px;vertical-align:middle;white-space:nowrap}
+/* plantilla */
+.tpl{width:100%;min-height:320px;font-family:var(--f-mono);font-size:12px;border:1px solid var(--border);border-radius:6px;padding:10px;background:var(--soft);color:var(--ink)}
+.row{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
+.note{font-size:13px;color:var(--slate)}
+.timeline{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px}
+@media (max-width:760px){.timeline{grid-template-columns:1fr}}
+.timeline div{border:1px solid var(--border);border-radius:8px;padding:12px;display:grid;gap:4px;align-content:start}
+.timeline .k{font-family:var(--f-mono);font-size:11.5px;color:var(--teal-mid);font-weight:700;text-transform:uppercase}
+.timeline span{font-size:13px;color:var(--slate)}
+</style>
+
+<div class="wrap">
+  <header>
+    <div class="kicker">Bloque 3 · Entrega del bloque</div>
+    <h1>Tácticas y sizing: hasta dónde llega su decisión</h1>
+    <p class="sub">En el Bloque 2 dejaron sus ADR con las opciones abiertas. Ahora eligen, con tácticas, y estiman con números qué cambia frente a la solución actual, cuánta carga aguanta el sistema después y dónde deja de alcanzar lo que decidieron. Aquí están el concepto, un ejemplo completo, los pasos, su caso con la extensión, la entrega y la rúbrica. Pueden trabajar sobre su propio proyecto o sobre una de las tres semillas.</p>
+    <div class="levelbar"><span class="note">Elijan su nivel para ver lo que les corresponde entregar:</span>
+      <div class="seg" id="levelSeg" role="group" aria-label="Nivel"><button data-lv="pre" aria-pressed="false">Pregrado</button><button data-lv="pos" aria-pressed="true">Posgrado</button></div></div>
+  </header>
+
+  <nav class="tabs" role="tablist" aria-label="Secciones">
+    <button class="tab" role="tab" data-tab="concept" aria-selected="true">Qué es el sizing</button>
+    <button class="tab" role="tab" data-tab="example" aria-selected="false">Ejemplo completo</button>
+    <button class="tab" role="tab" data-tab="steps" aria-selected="false">Paso a paso</button>
+    <button class="tab" role="tab" data-tab="case" aria-selected="false">Su caso y la extensión</button>
+    <button class="tab" role="tab" data-tab="deliver" aria-selected="false">La entrega</button>
+    <button class="tab" role="tab" data-tab="rubric" aria-selected="false">Rúbrica</button>
+  </nav>
+
+  <!-- ============ CONCEPTO ============ -->
+  <section class="panel" id="panel-concept">
+    <div class="card">
+      <div class="label-sm">Provocación de apertura</div>
+      <p class="quote">“Si elegimos bien la táctica, el escenario queda resuelto.”</p>
+      <button class="btn ghost" id="provBtn" aria-expanded="false">¿Verdadero o falso? Ver la respuesta</button>
+      <div class="reveal" id="provAnswer" hidden>
+        <p><strong>Falso.</strong> Una táctica resuelve el escenario hasta cierta carga, con ciertos supuestos y a cierto costo. Una caché que hoy salva el pico deja de alcanzar cuando la carga se triplica, y una cola que absorbe la carga cambia la consistencia que ve el usuario. Un ADR que no dice hasta dónde llega su decisión no le avisa a nadie cuándo hay que volver a decidir.</p>
+      </div>
+    </div>
+
+    <div class="card">
+      <h2>Qué es el sizing en este bloque</h2>
+      <p>Hacer sizing es estimar con números cuánta carga recibe el sistema, qué parte se satura primero y cuánto mueve ese límite cada táctica. No se busca el número exacto: nadie sabe cuántos usuarios tendrá su sistema. Se busca una <b>cadena de razonamiento que otra persona pueda seguir y discutir</b>: de dónde sale cada número, qué se asumió y qué pasaría si el supuesto fuera distinto.</p>
+      <div class="chain" aria-label="La cadena del sizing">
+        <div class="link"><span class="n">1</span><b>Línea base</b><span>Cómo funciona hoy la operación crítica.</span></div>
+        <div class="link"><span class="n">2</span><b>Perfil de carga</b><span>De usuarios a operaciones por segundo en el pico.</span></div>
+        <div class="link"><span class="n">3</span><b>Cuello de botella</b><span>Qué se satura primero y con cuánta carga.</span></div>
+        <div class="link hot"><span class="n">4</span><b>Tácticas</b><span>Qué métrica mueve cada una, de cuánto a cuánto y a qué costo.</span></div>
+        <div class="link"><span class="n">5</span><b>Hasta dónde</b><span>El nuevo límite y el siguiente cuello de botella.</span></div>
+      </div>
+    </div>
+
+    <div class="card">
+      <h2>Cómo cierra esto sus ADR</h2>
+      <div class="tbl"><table>
+        <thead><tr><th>Parte del ADR</th><th>En el Bloque 2</th><th>En esta entrega</th></tr></thead>
+        <tbody>
+          <tr><td>Estado</td><td>Propuesto</td><td>Aceptado</td></tr>
+          <tr><td>Opciones consideradas</td><td>Al menos tres, con lo que gana y paga cada una</td><td>No se reescriben: se resumen en una línea y se elige una</td></tr>
+          <tr><td>Decision</td><td>Abierta</td><td>En voz activa, con las tácticas del catálogo y por qué se descartan las demás opciones</td></tr>
+          <tr><td>Consequences</td><td>Abierta</td><td>Lo que se gana y se paga, <b>con números</b>, hasta dónde llega y la condición de revisión</td></tr>
+        </tbody>
+      </table></div>
+    </div>
+
+    <div class="card">
+      <h2>Tres ideas para no perderse</h2>
+      <ul class="list">
+        <li><b>Cada número dice de dónde sale.</b> Es un <i>dato</i> (lo dio el cliente o la semilla), un <i>supuesto</i> (lo decidieron ustedes, con una razón) o una <i>referencia</i> (sale de una fuente externa que pueden citar).</li>
+        <li><b>No todo es solicitudes por segundo.</b> A veces el límite es el ancho de banda, la memoria, la batería o el tiempo de ida y vuelta de la red. Busquen la dimensión que se agota primero en su sistema.</li>
+        <li><b>El límite es el resultado más importante.</b> Saber dónde deja de alcanzar una táctica es lo que les va a servir en el Bloque 4, cuando el estilo arquitectónico tenga que resolver lo que las tácticas ya no pueden.</li>
+      </ul>
+    </div>
+  </section>
+
+  <!-- ============ EJEMPLO ============ -->
+  <section class="panel" id="panel-example" hidden>
+    <div class="card">
+      <div class="label-sm">Lo que venía del Bloque 2 · ExamCore</div>
+      <h2>El escenario y las opciones consideradas</h2>
+      <p>Este es el ADR de ExamCore tal como quedó en el Bloque 2: el escenario completo como Context, estado Propuesto y tres opciones sin elegir. Es el punto de partida del ejemplo.</p>
+      <div class="label-sm" style="margin-top:14px">Escenario de calidad (Context del ADR)</div>
+      <div class="tbl"><table>
+        <tbody>
+          <tr><td>Atributo de calidad</td><td>Seguridad, con una restricción de desempeño</td></tr>
+          <tr><td>Fuente del estímulo</td><td>Una cuenta de estudiante que inicia sesión desde un dispositivo que ya tiene una sesión activa de otra cuenta</td></tr>
+          <tr><td>Estímulo</td><td>Un segundo inicio de sesión exitoso con el mismo identificador de dispositivo, dentro de una ventana de 60 s</td></tr>
+          <tr><td>Artefacto</td><td>El servicio de autenticación y sesiones de ExamCore</td></tr>
+          <tr><td>Entorno</td><td>Operación normal con concurrencia alta: examen masivo con miles de sesiones activas</td></tr>
+          <tr><td>Respuesta</td><td>Marca el par de cuentas para revisión humana. No marca sesiones secuenciales con cierre de sesión de por medio</td></tr>
+          <tr><td>Medida de la respuesta</td><td>Detección en menos de 50 ms por inicio de sesión, independiente del número de sesiones activas; falsos positivos menores al 1 %; alerta en menos de 5 s</td></tr>
+        </tbody>
+      </table></div>
+      <div class="label-sm" style="margin-top:14px">Opciones consideradas</div>
+      <div class="tbl"><table>
+        <thead><tr><th>Opción</th><th>Qué haría el sistema</th><th>Gana</th><th>Paga</th><th>¿Cumple la medida?</th></tr></thead>
+        <tbody>
+          <tr><td>A · Recorrer la lista de sesiones</td><td>Cada inicio de sesión se compara, una por una, contra las sesiones activas para ver si ese dispositivo ya aparece.</td><td>Simple y sin estado adicional</td><td>Desempeño: el tiempo crece con las sesiones activas</td><td>No</td></tr>
+          <tr><td>B · Consultar la base de datos</td><td>Cada inicio de sesión dispara una consulta a la base de datos para saber qué cuentas han usado ese dispositivo.</td><td>Persistente y sobrevive a reinicios</td><td>Desempeño: la latencia depende de la base de datos y añade carga bajo concurrencia alta</td><td>Depende: habría que medirlo</td></tr>
+          <tr><td>C · Índice en memoria por dispositivo</td><td>El sistema guarda en memoria, para cada dispositivo, qué cuentas tienen sesión activa; al iniciar sesión solo se consulta esa entrada.</td><td>Tiempo constante frente al número de sesiones</td><td>Memoria que crece con los dispositivos activos y pérdida del índice al reiniciar</td><td>Sí, con expiración de entradas</td></tr>
+        </tbody>
+      </table></div>
+      <p class="note" style="margin-top:10px">La opción B quedó en "depende" porque en el Bloque 2 no había números para decidir. El sizing es lo que permite cerrarla.</p>
+    </div>
+
+    <div class="card">
+      <div class="label-sm">Ejemplo completo · ExamCore</div>
+      <h2>El ADR de las sesiones concurrentes, con sizing</h2>
+      <p>Ahora se elige entre las tres opciones, con números. Así se justifica la decisión y se ve hasta dónde llega. Las cifras son del ejemplo, no de su caso.</p>
+
+      <div class="ex-step"><span class="dot">1</span><div class="body">
+        <h3>Línea base</h3>
+        <p>Hoy cada inicio de sesión consulta la base de datos para saber qué cuentas usaron ese dispositivo (la opción B). La base de datos es la misma que guarda las respuestas del examen.</p>
+      </div></div>
+
+      <div class="ex-step"><span class="dot">2</span><div class="body">
+        <h3>Perfil de carga</h3>
+        <ul class="list">
+          <li>Examen masivo de 6.000 estudiantes <span class="badge teal">dato</span></li>
+          <li>Inician sesión en los 5 minutos previos a la hora de inicio <span class="badge teal">dato</span></li>
+          <li>La mitad llega en el último minuto <span class="badge">supuesto: así se comportaron los registros del semestre pasado</span></li>
+        </ul>
+        <div class="calc">promedio: 6.000 inicios ÷ 300 s = 20 inicios/s
+pico:     3.000 inicios ÷ 60 s  = 50 inicios/s</div>
+      </div></div>
+
+      <div class="ex-step"><span class="dot">3</span><div class="body">
+        <h3>Cuello de botella</h3>
+        <p>La consulta a la base de datos tarda 18 ms con carga baja <span class="badge teal">dato: medido por el equipo</span>, pero en el minuto pico la base de datos también recibe el guardado automático de las respuestas de quienes ya empezaron. En la prueba de carga, la consulta sube a 120 ms con 40 inicios por segundo <span class="badge teal">dato: prueba de carga</span>.</p>
+        <div class="calc">medida exigida: < 50 ms   →   la línea base la cumple solo hasta unos 15 inicios/s (prueba de carga)
+pico estimado:  50 inicios/s  →   no se cumple</div>
+      </div></div>
+
+      <div class="ex-step"><span class="dot">4</span><div class="body">
+        <h3>Táctica, efecto y costo</h3>
+        <p><b>Múltiples copias de datos</b> (gestionar recursos): el servicio de sesiones mantiene en memoria, por dispositivo, las cuentas con sesión activa. La detección ya no consulta la base de datos.</p>
+        <div class="calc">métrica que mueve: tiempo de detección por inicio de sesión
+línea base:        120 ms en el pico      →   con la táctica: < 1 ms (búsqueda en memoria)
+costo en memoria:  6.000 entradas × 300 bytes ≈ 1,8 MB          [supuesto: tamaño de entrada]
+costo al reiniciar: reconstruir el índice leyendo 6.000 sesiones ≈ 2 s sin detección   [dato: medido]</div>
+      </div></div>
+
+      <div class="ex-step"><span class="dot">5</span><div class="body">
+        <h3>Hasta dónde</h3>
+        <p>La memoria no es el límite: 1,8 MB es despreciable. El límite está en un supuesto: el índice vive en <b>una sola instancia</b> del servicio de sesiones. Esa instancia atiende hasta 300 inicios por segundo <span class="badge teal">dato: prueba de carga</span>, seis veces el pico estimado.</p>
+        <div class="calc">margen sobre el pico: 300 ÷ 50 = 6
+siguiente cuello:     si hacen falta dos instancias, cada una tiene su propio índice y dos cuentas
+                      en el mismo dispositivo pueden caer en instancias distintas: la detección falla.</div>
+      </div></div>
+
+      <div class="ex-step"><span class="dot">6</span><div class="body">
+        <h3>Cómo queda el ADR</h3>
+        <p><b>Decision.</b> Usaremos un índice en memoria por dispositivo en el servicio de sesiones (táctica: múltiples copias de datos). Se descarta la consulta a la base de datos porque en el pico sube a 120 ms, y el recorrido de sesiones porque crece con el número de sesiones activas.</p>
+        <p><b>Consequences.</b> La detección baja de 120 ms a menos de 1 ms en el pico, con un margen de 6 veces sobre la carga estimada. Se pagan unos 2 s sin detección cada vez que el servicio se reinicia. No resuelve la suplantación del identificador del dispositivo.</p>
+        <p><b>Condición de revisión.</b> Revisar esta decisión si el pico supera 250 inicios por segundo o si el servicio de sesiones necesita una segunda instancia.</p>
+      </div></div>
+    </div>
+  </section>
+
+  <!-- ============ PASOS ============ -->
+  <section class="panel" id="panel-steps" hidden>
+    <div id="stepsList" class="panel"></div>
+    <div class="card">
+      <div class="label-sm">Herramienta</div>
+      <h2>Calculadora de la cadena de carga</h2>
+      <p>Les sirve para revisar sus cuentas, no para reemplazarlas: en la entrega deben escribir cada operación con sus unidades. Los valores iniciales son un ejemplo cualquiera.</p>
+      <div class="calcgrid">
+        <div class="field"><label for="c-n">Personas que llegan en la ventana del pico</label><input id="c-n" type="number" min="0" value="20000" inputmode="numeric"></div>
+        <div class="field"><label for="c-w">Duración de la ventana (minutos)</label><input id="c-w" type="number" min="0.1" step="0.1" value="15" inputmode="decimal"></div>
+        <div class="field"><label for="c-k">Operaciones por persona sobre el componente</label><input id="c-k" type="number" min="0" step="0.1" value="6" inputmode="decimal"></div>
+        <div class="field"><label for="c-l">Límite del componente (operaciones/s)</label><input id="c-l" type="number" min="0" value="500" inputmode="numeric"></div>
+      </div>
+      <div class="out" aria-live="polite">
+        <div><span class="v" id="o-a">–</span><span class="l">personas que llegan por segundo</span></div>
+        <div><span class="v" id="o-r">–</span><span class="l">operaciones por segundo sobre el componente</span></div>
+        <div id="o-ubox"><span class="v" id="o-u">–</span><span class="l">uso del componente (carga ÷ límite)</span></div>
+        <div><span class="v" id="o-m">–</span><span class="l">personas que aguanta en la ventana</span></div>
+      </div>
+      <div class="calc" id="o-f" style="margin-top:10px"></div>
+      <p class="note" style="margin-top:10px">Si conocen cuánto tiempo permanece cada persona en el sistema, la ley de Little da los concurrentes: <b>concurrentes = personas que llegan por segundo × segundos de permanencia</b>. Úsenla cuando su límite esté expresado en sesiones o conexiones simultáneas.</p>
+    </div>
+  </section>
+
+  <!-- ============ CASO ============ -->
+  <section class="panel" id="panel-case" hidden>
+    <div class="card">
+      <h2>Elijan su caso</h2>
+      <p>Trabajan sobre el mismo caso del Bloque 2. Las anclas de las semillas no cambian; a ellas se suma ahora la línea base y la extensión. Con proyecto propio, la línea base la describen ustedes y aplican la extensión general a sus propios números.</p>
+      <div class="chips" id="caseChips" role="group" aria-label="Caso"></div>
+    </div>
+    <div id="caseBody" class="panel"></div>
+  </section>
+
+  <!-- ============ ENTREGA ============ -->
+  <section class="panel" id="panel-deliver" hidden>
+    <div class="card">
+      <h2>Qué entregan</h2>
+      <p>Una entrega en el formato que prefieran (widget, diapositivas u hoja de cálculo) con los ADR del Bloque 2 completados y su sizing, y además <b>el resumen en texto plano con la plantilla</b>, igual que en el Bloque 2. El docente lee la plantilla para preparar las preguntas de sustentación.</p>
+      <div class="timeline">
+        <div><span class="k">Antes de la entrega</span><b>Preparen la extensión</b><span>La extensión ya está publicada en "Su caso y la extensión". Aplíquenla a sus números y lleven su respuesta escrita. Pregrado responde X1; posgrado, X1 y X2.</span></div>
+        <div><span class="k">La entrega</span><b>Entrega + plantilla</b><span>Su archivo o enlace, y la plantilla diligenciada con la ayuda de una IA, que transcribe y no mejora.</span></div>
+        <div><span class="k">Sustentación</span><b>Discusión de límites</b><span>Se discuten la extensión y el margen de sus tácticas. Los equipos con la misma semilla se comparan entre sí: supuestos, límites y lo que cada uno decidió sacrificar.</span></div>
+      </div>
+    </div>
+    <div class="card">
+      <h2>Qué cambia según el nivel</h2>
+      <p>El método es el mismo para todos, con semilla o con proyecto propio. Posgrado agrega profundidad en tres puntos.</p>
+      <div class="tbl"><table>
+        <thead><tr><th>Parte de la entrega</th><th>Pregrado</th><th>Posgrado</th></tr></thead>
+        <tbody>
+          <tr><td>Línea base, perfil de carga y cuello de botella</td><td>Sí</td><td>Sí</td></tr>
+          <tr><td>ADR completados</td><td>Uno por escenario crítico, eligiendo entre las opciones del Bloque 2 (al menos dos)</td><td>Uno por escenario crítico, eligiendo entre las opciones del Bloque 2 (al menos tres)</td></tr>
+          <tr><td>Por táctica: métrica, antes y después, costo</td><td>Sí</td><td>Sí</td></tr>
+          <tr><td>Hasta dónde llegan y condición de revisión</td><td>Sí</td><td>Sí</td></tr>
+          <tr><td>Qué medirían en producción para verificar la decisión</td><td>No</td><td>Sí</td></tr>
+          <tr><td>Interacción entre tácticas</td><td>Sí</td><td>Sí</td></tr>
+          <tr><td>Extensión X1 · crecimiento de la carga</td><td>Sí</td><td>Sí</td></tr>
+          <tr><td>Extensión X2 · degradación de una dependencia</td><td>No</td><td>Sí</td></tr>
+          <tr><td>Sensibilidad al supuesto que más pesa</td><td>No</td><td>Sí</td></tr>
+        </tbody>
+      </table></div>
+      <p class="note" style="margin-top:10px">En la plantilla, lo que no aplica a pregrado está marcado como "(solo posgrado)". La IA borra esas partes según el nivel que pongan en el encabezado.</p>
+    </div>
+    <div class="card">
+      <h2>Lo que se pregunta en la sustentación</h2>
+      <ul class="list">
+        <li>¿De dónde sale este número? ¿Es dato, supuesto o referencia?</li>
+        <li>¿Qué componente se satura primero hoy y con cuánta carga?</li>
+        <li>¿Cuánto mueve su táctica esa métrica y cómo lo estimaron?</li>
+        <li class="pos-only">¿Qué pasa si su supuesto más importante vale el doble?</li>
+        <li>Con la extensión, ¿qué táctica se rompe primero y qué ve el usuario?</li>
+        <li>¿Qué haría falta para pasar el siguiente cuello de botella?</li>
+      </ul>
+    </div>
+    <div class="card">
+      <h2>Detalles a tener en cuenta</h2>
+      <ul class="list">
+        <li><b>La IA transcribe, no calcula.</b> La plantilla le prohíbe hacer sus cuentas o completarlas. Si la cuenta no da, la IA lo anota al final; corríjanla ustedes antes de entregar.</li>
+        <li><b>Mecanismos, no marcas.</b> "Una caché en memoria del mapa de sillas, con expiración de 5 s" se puede discutir; el nombre de un producto no.</li>
+        <li><b>Un costo es un número.</b> "Más complejo" no es un costo. "Los datos llegan con hasta 5 s de retraso" o "un servidor más, unos 200 USD al mes" sí lo son.</li>
+        <li><b>Las tácticas se pisan.</b> Si una táctica de un ADR empeora la medida de otro escenario, díganlo y digan cuánto.</li>
+        <li><b>No inventen precisión.</b> Mejor "entre 400 y 600 solicitudes por segundo, según el supuesto S3" que "523,7".</li>
+      </ul>
+    </div>
+    <div class="card">
+      <h2>Plantilla del resumen</h2>
+      <p>Cópienla, péguenla en un archivo <span class="num">.md</span> y diligéncienla con la ayuda de una IA usando el prompt de la sección 0.</p>
+      <div class="row" style="margin-bottom:10px"><button class="btn" id="copyTpl">Copiar plantilla</button><span class="note" id="copyMsg" aria-live="polite"></span></div>
+      <textarea class="tpl" id="tpl" readonly aria-label="Plantilla de la entrega"></textarea>
+    </div>
+  </section>
+
+  <!-- ============ RÚBRICA ============ -->
+  <section class="panel" id="panel-rubric" hidden>
+    <div class="card">
+      <h2>Rúbrica</h2>
+      <p>Evalúa la calidad del razonamiento y no la exactitud de las cifras: dos equipos con números distintos pueden llegar al mismo nivel si sus cadenas se pueden seguir. Hagan clic en el nivel que creen haber alcanzado en cada criterio para autoevaluarse antes de entregar. La ponderación de cada criterio la define el docente.</p>
+      <div class="tbl rub"><table id="rubTable"></table></div>
+      <div class="rubsum" id="rubSum"></div>
+      <div class="row" style="margin-top:10px"><button class="btn ghost" id="rubReset">Limpiar autoevaluación</button></div>
+    </div>
+  </section>
+</div>
+
+<script>
+const TEMPLATE = "---\nequipo:\nintegrantes:\nnivel: pregrado | posgrado\ncaso: semilla TicketFlow | semilla HistoriaViva | semilla RiegoCampo | proyecto propio | proyecto final (pregrado)\nnombre_del_sistema:\nformato_de_entrega: widget | diapositivas | hoja de cálculo | otro\nenlace_o_archivo_de_la_entrega:\n---\n\n# Entrega Bloque 3: tácticas, ADR completos y sizing (texto plano)\n\n## 0. Instrucciones para la IA (borre esta sección del archivo final)\n\nUsted ayuda a un equipo de estudiantes a pasar su entrega, hecha en widget, diapositivas u hoja de cálculo, a este formato de texto plano. El docente leerá este archivo para entender rápido lo que el equipo decidió, cuánto estima que ganan sus tácticas y hasta dónde llegan, y para preparar preguntas de sustentación. Siga estas reglas sin excepción:\n\n1. **Transcriba, no mejore.** Use solo lo que el equipo planteó en su entrega o le dicta ahora. No agregue ideas, cifras, tácticas, supuestos ni justificaciones propias. Si el equipo no definió algo, escriba `[FALTA]` en ese campo.\n2. **No haga las cuentas por el equipo.** Copie los cálculos tal como el equipo los hizo, con sus operaciones y unidades. No complete un cálculo que el equipo dejó a medias, no redondee y no cambie unidades. Si una cuenta no da, no la corrija: regístrela en la sección 11.\n3. **Respete los números y las palabras del equipo.** Las cifras se copian literales, igual que la marca de cada número (dato, supuesto o referencia) y su fuente.\n4. **Mantenga la estructura.** No cambie los títulos, no agregue ni quite secciones, no convierta las listas en tablas ni en prosa. Duplique un bloque (C2, ADR-2, T2…) solo cuando el equipo tenga más elementos.\n5. **Tácticas sí, marcas no.** En este bloque las tácticas se nombran con el nombre del catálogo del curso. No sugiera tácticas que el equipo no eligió. Si el equipo nombró una herramienta o producto, déjelo y agregue `[MARCA: describa el mecanismo]` al lado.\n6. **No juzgue.** No corrija el razonamiento del equipo. Si ve incoherencias (una cuenta que no da, una táctica que no mueve la métrica que dice mover, un límite sin fuente), regístrelas solo en la sección 11, sin cambiar lo que escribió el equipo.\n7. **Texto plano.** Sin imágenes ni enlaces a diapositivas. Si algo está en un esquema, una imagen o una hoja de cálculo, descríbalo en una o dos frases y diga en qué diapositiva, pestaña o celda está.\n8. **Borre los comentarios `<!-- -->`** y las marcas `(solo posgrado)` que no apliquen al nivel del equipo. Deje todo lo demás.\n\nPrompt sugerido para el estudiante: “Diligencia esta plantilla con el contenido de mi entrega, que te pego a continuación. Sigue las instrucciones de la sección 0 al pie de la letra. No hagas ninguna cuenta por nosotros. Al final, dime qué campos quedaron en [FALTA].”\n\n---\n\n## 1. Punto de partida (lo que viene del Bloque 2)\n\n**Tensión dominante, en una línea (la del Bloque 2):**\nEn este sistema, ___ choca con ___ porque ___.\n\n**Escenarios críticos que llegan del Bloque 2:** (por ejemplo, E1 y E3)\n\n**Qué cambió desde el Bloque 2 y por qué:**\n<!-- Un supuesto corregido, un escenario reformulado, una medida ajustada tras la retroalimentación. Si no cambió nada, escriba \"Nada\". -->\n\n---\n\n## 2. Línea base: la solución actual\n\n<!-- La solución contra la que se mide todo lo demás. Con semilla, copie la línea base de la semilla sin cambios. Con proyecto propio, la que el equipo describió: lo que existe hoy o, si el sistema no existe, la versión más simple que funcionaría. -->\n\n**Cómo funciona hoy, en un párrafo:**\n\n**Componentes que intervienen en la operación crítica, en orden:**\n1.\n2.\n3.\n\n**Dónde está esto en la entrega:**\n\n---\n\n## 3. Perfil de carga\n\n<!-- Una cadena donde cada número sale del anterior. Cada número lleva su tipo: dato (lo dio el cliente o la semilla), supuesto (lo decidió el equipo; diga con qué razón) o referencia (sale de una fuente externa; diga cuál). -->\n\n**Cadena de carga:**\n- Usuarios registrados: ___ | tipo: dato / supuesto / referencia | razón o fuente:\n- Usuarios activos en el día pico: ___ | tipo: | razón o fuente:\n- Usuarios concurrentes en el pico: ___ | tipo: | razón o fuente:\n- Operaciones críticas por usuario durante el pico: ___ | tipo: | razón o fuente:\n- Tasa en el pico de la operación crítica (por segundo): ___ | tipo: | razón o fuente:\n\n**Cómo se calculó la tasa en el pico (operaciones, con unidades):**\n<!-- Por ejemplo: concurrentes = tasa de llegada × tiempo que permanece cada usuario (ley de Little). Copie el cálculo como el equipo lo hizo. -->\n\n**Otra dimensión que importa en este sistema (si la hay):**\n<!-- No todo es solicitudes por segundo: tamaño de lo que se transfiere, ancho de banda, memoria, mensajes acumulados, batería. Valor, tipo y razón o fuente. Si no aplica, escriba \"No aplica\" y por qué. -->\n\n**Proporción de lecturas y escrituras en la operación crítica:**\n\n**Dónde está esto en la entrega:**\n\n---\n\n## 4. Capacidad actual y cuello de botella\n\n<!-- Qué se satura primero en la línea base con la carga de la sección 3. -->\n\n**Componente que se satura primero:**\n\n**Su límite:** ___ | tipo: dato / supuesto / referencia | razón o fuente:\n\n**Uso con la carga del pico (carga / límite, con la cuenta):**\n\n**Hasta cuánta carga aguanta hoy la línea base (usuarios concurrentes o tasa por segundo):**\n\n**Qué le pasa al usuario cuando se supera ese límite:**\n\n**Dónde está esto en la entrega:**\n\n---\n\n## 5. ADR completados (uno por cada escenario crítico)\n\n<!-- Repita el bloque por cada ADR (ADR-1, ADR-2…). Las opciones consideradas vienen del Bloque 2: no se reescriben, solo se resumen en una línea cada una. Dentro de cada ADR, repita el bloque de táctica por cada una (T1, T2…). -->\n\n### ADR-1\n- Título:\n- Estado: Aceptado\n- Escenario que lo origina: (E1, E2…)\n- Medida de la respuesta del escenario (copiada literal):\n- Opciones del Bloque 2, una línea cada una:\n  - A:\n  - B:\n  - C: (solo posgrado)\n- Opción elegida: (A, B, C, una combinación o una nueva; si es nueva, diga por qué ninguna de las anteriores servía)\n\n**Decision, en voz activa:**\n<!-- \"Usaremos… para… \". -->\n\n**Por qué se descartan las demás opciones (frente a la medida de la respuesta):**\n\n**T1**\n- Táctica (nombre del catálogo):\n- Mecanismo concreto en este sistema (qué componente, qué dato, en qué paso de la operación crítica):\n- Responsabilidad: detecta | previene | resiste | recupera | reacciona | controla la demanda | gestiona recursos | desacopla | difiere decisiones | hace observable | otra\n- Métrica que mueve:\n- Valor en la línea base:\n- Valor estimado con la táctica:\n- Cómo se estimó (cálculo o razonamiento, con unidades):\n- Tipo de la estimación: dato / supuesto / referencia | razón o fuente:\n- Costo cuantificado (en dinero, latencia, frescura de datos, memoria, complejidad de operación u otra unidad):\n- Atributo que paga:\n\n**T2**\n- Táctica (nombre del catálogo):\n- Mecanismo concreto en este sistema (qué componente, qué dato, en qué paso de la operación crítica):\n- Responsabilidad:\n- Métrica que mueve:\n- Valor en la línea base:\n- Valor estimado con la táctica:\n- Cómo se estimó (cálculo o razonamiento, con unidades):\n- Tipo de la estimación: dato / supuesto / referencia | razón o fuente:\n- Costo cuantificado:\n- Atributo que paga:\n\n**Hasta dónde llegan estas tácticas:**\n- Nuevo límite del sistema con las tácticas de este ADR (usuarios concurrentes o tasa por segundo):\n- Cómo se calculó:\n- Siguiente componente que se satura:\n- ¿Se cumple la medida de la respuesta con la carga del pico? (sí | no | depende) y por qué:\n\n**Consequences:**\n- Gana:\n- Paga:\n- No resuelve:\n- Condición de revisión (umbral medible que obliga a revisar esta decisión):\n<!-- Por ejemplo: \"revisar si el pico supera 400 solicitudes por segundo\" o \"si la historia promedio supera 5 MB\". -->\n\n**Qué mediríamos en producción para saber si la decisión funcionó (solo posgrado):**\n\n**Dónde está este ADR en la entrega:**\n\n### ADR-2\n<!-- Copie la estructura de ADR-1. -->\n\n---\n\n## 6. Interacción entre las tácticas\n\n**¿Alguna táctica de un ADR empeora la medida de otro escenario?** (sí | no; si sí, cuál, cuál y cuánto)\n\n**Cómo lo resolvemos o por qué lo aceptamos:**\n\n---\n\n## 7. Resumen de límites\n\n- Carga del pico (sección 3):\n- Límite de la línea base (sección 4):\n- Límite con todas las tácticas aplicadas:\n- Margen sobre el pico (límite con tácticas / carga del pico):\n- Primer componente que se satura después:\n- Qué haría falta para pasar ese límite (una línea; no es una decisión, es una pista para el Bloque 4):\n\n---\n\n## 8. Extensión\n\n<!-- Con semilla, la extensión de la semilla. Con proyecto propio, la extensión general, aplicada a los números del equipo. Copie el texto de la extensión que recibió el equipo antes de responder. -->\n\n### X1 · Crecimiento de la carga\n- Extensión recibida:\n- Nueva carga del pico (con la cuenta):\n- Táctica que se sostiene y por qué:\n- Táctica que se rompe o deja de alcanzar, y en qué valor:\n- Qué cambiaríamos:\n- ¿Implica un ADR nuevo o reemplazar uno existente? (ninguno | nuevo | reemplaza ADR-…):\n\n### X2 · Falla o degradación de una dependencia (solo posgrado)\n- Extensión recibida:\n- Dependencia afectada y cómo se degrada (con cifras):\n- Qué ve el usuario durante la degradación:\n- Táctica que se sostiene y por qué:\n- Táctica que se rompe, y por qué:\n- Qué cambiaríamos:\n- ¿Implica un ADR nuevo o reemplazar uno existente? (ninguno | nuevo | reemplaza ADR-…):\n\n---\n\n## 9. Sensibilidad a los supuestos (solo posgrado)\n\n**El supuesto que más pesa en el sizing:**\n- Supuesto (con su número):\n- Si ese número fuera el doble, ¿qué cambia? (límite, táctica, decisión):\n- Si fuera la mitad, ¿qué cambia?:\n- Pregunta que le haríamos al cliente para confirmarlo:\n\n---\n\n## 10. Lo que el equipo reconoce\n\n**Números de los que menos estamos seguros, y por qué:**\n\n**Lo que más discutimos como equipo y no resolvimos:**\n\n**Autochequeo del equipo (marque lo que se cumple):**\n- [ ] Cada número del perfil de carga dice si es dato, supuesto o referencia, y tiene razón o fuente.\n- [ ] La tasa del pico sale de una cuenta que se puede seguir, con unidades.\n- [ ] Identificamos el componente que se satura primero en la línea base y con qué carga.\n- [ ] Cada ADR tiene Decision en voz activa y explica por qué descarta las demás opciones.\n- [ ] Cada táctica se nombra con el catálogo y se describe como un mecanismo concreto de nuestro sistema.\n- [ ] Cada táctica dice qué métrica mueve, de cuánto a cuánto y cómo lo estimamos.\n- [ ] Cada táctica tiene un costo cuantificado, no solo un adjetivo.\n- [ ] Cada ADR dice hasta dónde llegan sus tácticas y cuál es el siguiente cuello de botella.\n- [ ] Cada ADR tiene una condición de revisión medible.\n- [ ] Aplicamos la extensión a nuestros propios números.\n\n---\n\n## 11. Inconsistencias detectadas por la IA (solo la IA diligencia; no corrija lo anterior)\n\n<!-- Lista corta de cosas que no cuadran, sin corregirlas: una cuenta cuyo resultado no coincide con sus operaciones, unidades que cambian sin conversión (minutos y segundos, MB y Mb), un número sin tipo o sin fuente, una táctica cuya métrica no corresponde a su mecanismo, un límite con tácticas menor que el de la línea base sin explicación, un margen menor que 1 con la medida marcada como cumplida, una táctica sin costo, una herramienta en lugar de un mecanismo, una extensión aplicada a números distintos de los de la sección 3. Si no hay, escriba “Ninguna detectada”. -->\n\n-\n";
+const $ = s => document.querySelector(s);
+const $$ = s => Array.from(document.querySelectorAll(s));
+const esc = s => String(s).replace(/[&<>"]/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+
+/* Nivel */
+let level = "pos";
+try { const v = localStorage.getItem("b3:level"); if (v==="pre"||v==="pos") level = v; } catch(e){}
+document.body.dataset.level = level;
+
+/* Pestañas */
+const TABS = ["concept","example","steps","case","deliver","rubric"];
+function setTab(t){
+  $$(".tab").forEach(b => b.setAttribute("aria-selected", b.dataset.tab === t));
+  TABS.forEach(k => $("#panel-" + k).hidden = k !== t);
+}
+$$(".tab").forEach(b => b.addEventListener("click", () => setTab(b.dataset.tab)));
+setTab("concept");
+
+/* Provocación */
+$("#provBtn").addEventListener("click", () => {
+  const a = $("#provAnswer"); a.hidden = !a.hidden;
+  $("#provBtn").setAttribute("aria-expanded", !a.hidden);
+  $("#provBtn").textContent = a.hidden ? "¿Verdadero o falso? Ver la respuesta" : "Ocultar la respuesta";
+});
+
+/* Pasos */
+const STEPS = [
+  { t:"Punto de partida", s:"Sección 1 de la plantilla",
+    d:"Traigan la tensión dominante y los escenarios críticos del Bloque 2. Si la retroalimentación les hizo cambiar un supuesto o una medida, digan qué cambió y por qué.",
+    g:"Los ADR de esta entrega son los mismos del Bloque 2, ahora con Decision. Lo que cambió está declarado.",
+    e:"Cambiar de escenarios en silencio, o escribir ADR nuevos para escenarios que no eran críticos." },
+  { t:"Línea base", s:"Sección 2",
+    d:"Describan cómo funciona hoy la operación crítica y qué componentes intervienen, en orden. Con semilla, copien la línea base de la semilla. Con proyecto propio, la que existe hoy o, si no existe, la versión más simple que funcionaría.",
+    g:"Cualquiera puede seguir la operación crítica de punta a punta y ver dónde están las piezas que se pueden saturar.",
+    e:"Describir como línea base la solución que ya tiene las tácticas: así no hay contra qué comparar." },
+  { t:"Perfil de carga", s:"Sección 3",
+    d:"Una cadena: usuarios registrados → activos en el día pico → concurrentes en el pico → operaciones por usuario → operaciones por segundo sobre el componente crítico. Cada número marcado como dato, supuesto o referencia, con su razón o fuente. Agreguen la otra dimensión que importe (bytes, ancho de banda, memoria, batería).",
+    g:"La tasa del pico sale de una cuenta que se puede seguir con unidades. Se distingue el promedio del pico.",
+    e:"Diseñar para el promedio del día. 45.000 operaciones al día no son 0,5 por segundo si la mitad ocurre en una hora." },
+  { t:"Cuello de botella actual", s:"Sección 4",
+    d:"Identifiquen el componente que se satura primero en la línea base, su límite (con tipo y fuente), el uso con la carga del pico y hasta cuánta carga aguanta hoy el sistema. Digan qué ve el usuario cuando se supera.",
+    g:"Hay un número de uso (por ejemplo 3,4 veces el límite) y una consecuencia para el usuario.",
+    e:"Dar un límite sin fuente, o asumir que el cuello es el servidor sin revisar la base de datos, la red o la dependencia externa." },
+  { t:"ADR completados", s:"Sección 5",
+    d:"Para cada ADR: elijan la opción, escriban la Decision en voz activa y expliquen por qué descartan las demás. Para cada táctica: nombre del catálogo, mecanismo concreto, responsabilidad, métrica que mueve, valor antes y después, cómo lo estimaron, costo cuantificado y atributo que paga.",
+    g:"Cada táctica mueve una métrica con un número antes y otro después, y tiene un costo en la misma clase de unidad.",
+    e:"Listar tácticas sin efecto estimado, o un costo en adjetivos (\"más complejo\")." },
+  { t:"Hasta dónde llegan", s:"Sección 5, cierre de cada ADR, y sección 7",
+    d:"Calculen el nuevo límite con las tácticas, el margen sobre el pico (límite ÷ carga) y el siguiente componente que se satura. Escriban una condición de revisión medible en las Consequences.",
+    g:"\"Con las tácticas el sistema aguanta unas 230 compras por segundo, 1,2 veces el pico; el siguiente cuello son las escrituras en la base de datos única. Revisar si el pico supera 200 compras por segundo.\"",
+    e:"Decir que las tácticas \"escalan\" sin límite, o dar un margen menor que 1 y marcar la medida como cumplida." },
+  { t:"Interacción y extensión", s:"Secciones 6 y 8",
+    d:"Revisen si una táctica de un ADR empeora otro escenario. Después apliquen la extensión de su caso a sus números (pregrado: X1; posgrado: X1 y X2): qué táctica se sostiene, cuál se rompe, en qué valor y qué cambiarían.",
+    g:"La extensión se responde con los números de la sección 3, no con números nuevos, y dice si implica un ADR nuevo o reemplazar uno.",
+    e:"Responder la extensión con \"agregamos más servidores\" sin revisar si el cuello está en algo que no se escala." },
+  { t:"Sensibilidad a los supuestos", s:"Sección 9", pos:true,
+    d:"Elijan el supuesto que más pesa en su sizing y digan qué cambia si vale el doble o la mitad, y qué le preguntarían al cliente para confirmarlo.",
+    g:"Se ve que una de sus decisiones depende de un supuesto concreto.",
+    e:"Elegir un supuesto que no cambia nada." },
+  { t:"Lo que reconocen", s:"Sección 10",
+    d:"Digan de qué números están menos seguros y por qué, y qué discutieron sin resolver. Marquen el autochequeo antes de entregar.",
+    g:"Las dudas son concretas: un número, un supuesto, una táctica.",
+    e:"Reconocer debilidades genéricas (\"nos faltó tiempo\")." }
+];
+function renderSteps(){
+$("#stepsList").innerHTML = STEPS.filter(s => level==="pos" || !s.pos).map((s,i) => `
+  <div class="card step"><span class="dot">${i+1}</span><div>
+    <h2>${esc(s.t)} <span class="tagline">· ${esc(s.s)}</span>${s.pos?'<span class="lvtag">solo posgrado</span>':''}</h2>
+    <div class="qa">
+      <div class="what"><span class="k">Qué hacen</span>${esc(s.d)}</div>
+      <div class="good"><span class="k">Cómo se ve bien</span>${esc(s.g)}</div>
+      <div class="err"><span class="k">Error frecuente</span>${esc(s.e)}</div>
+    </div></div></div>`).join("");
+}
+
+/* Calculadora */
+const nf = (v, d=1) => isFinite(v) ? v.toLocaleString("es-CO",{maximumFractionDigits:d}) : "–";
+function calc(){
+  const n = +$("#c-n").value, w = +$("#c-w").value, k = +$("#c-k").value, l = +$("#c-l").value;
+  const secs = w*60, a = secs>0 ? n/secs : NaN, r = a*k, u = l>0 ? r/l : NaN, m = k>0 ? l/k*secs : NaN;
+  $("#o-a").textContent = nf(a);
+  $("#o-r").textContent = nf(r);
+  $("#o-u").textContent = isFinite(u) ? nf(u*100,0) + " %" : "–";
+  $("#o-ubox").className = isFinite(u) ? (u>1 ? "warn" : "ok") : "";
+  $("#o-m").textContent = nf(m,0);
+  $("#o-f").textContent =
+`llegadas:     ${nf(n,0)} personas ÷ (${nf(w)} min × 60 s) = ${nf(a)} personas/s
+operaciones:  ${nf(a)} personas/s × ${nf(k)} operaciones = ${nf(r)} operaciones/s
+uso:          ${nf(r)} ÷ ${nf(l,0)} = ${isFinite(u)?nf(u,2):"–"}${isFinite(u)&&u>1?"  → el componente se satura":""}
+aguanta:      ${nf(l,0)} ÷ ${nf(k)} × ${nf(secs,0)} s = ${nf(m,0)} personas en la ventana`;
+}
+["c-n","c-w","c-k","c-l"].forEach(id => $("#"+id).addEventListener("input", calc));
+calc();
+
+/* Casos */
+const GEN_EXT = [
+  { k:"X1 · Crecimiento de la carga", t:"Un evento, una campaña o una alianza multiplica por 5 la tasa del pico de su operación crítica durante 2 horas. El resto del perfil de carga se mantiene." },
+  { k:"X2 · Degradación de una dependencia", pos:true, t:"La dependencia más crítica de su operación crítica, externa o interna, responde 5 veces más lento que en la línea base durante 30 minutos y luego queda fuera de servicio 10 minutos más. Ustedes deciden cuál es esa dependencia y lo justifican." }
+];
+const CASES = [
+  { id:"ticketflow", name:"TicketFlow", dom:"Venta de entradas para eventos masivos",
+    anchors:["Un evento grande tiene 25.000 boletas y hasta 120.000 personas intentando comprar en los primeros 10 minutos de la venta.","Cada silla numerada se vende a una sola persona. No se tolera ninguna sobreventa.","Una boleta en proceso de pago se reserva 8 minutos; si no se paga, vuelve a estar disponible.","La pasarela de pagos es externa, tiene 99,5 % de disponibilidad y puede responder tarde o repetir una confirmación.","Presupuesto de infraestructura de 9.000 USD al mes en promedio; un día de gran venta puede costar hasta 3 veces el promedio diario. Equipo de 6 personas."],
+    base:"La plataforma actual tiene 2 servidores de aplicación detrás de un balanceador y una sola base de datos relacional. Al reservar, la aplicación bloquea la fila de la silla en la base de datos y la mantiene bloqueada hasta que la pasarela confirma el pago. El mapa de sillas disponibles se calcula con una consulta a la base de datos en cada visita y en cada refresco.",
+    data:["En la última venta grande (6.000 boletas, 30.000 personas en los primeros 10 minutos) el sitio dejó de responder en el minuto 4.","La prueba de carga posterior mostró que la base de datos se satura cerca de 700 consultas por segundo.","Cada comprador genera en promedio 12 consultas a la base de datos durante su compra: 9 son lecturas (mapa, refrescos, estado de la compra) y 3 son escrituras (reserva, pago, confirmación).","La pasarela de pagos confirma en 2 s en promedio."],
+    ext:[{k:"X1 · Crecimiento de la carga",t:"Un artista internacional confirma un estadio: 45.000 boletas y 300.000 personas intentando comprar en los primeros 10 minutos."},
+         {k:"X2 · Degradación de una dependencia",pos:true,t:"En plena venta, la pasarela tarda hasta 20 s en confirmar durante 15 minutos y repite el 3 % de las confirmaciones."}] },
+  { id:"historiaviva", name:"HistoriaViva", dom:"Historia clínica compartida para atención remota",
+    anchors:["14 sedes, 220 profesionales y 60.000 pacientes registrados; hasta 900 teleconsultas al día, concentradas entre las 8 a. m. y el mediodía.","Toda lectura o cambio de una historia queda registrado (quién, cuándo, para qué) y ese registro no se puede alterar.","Abrir la historia de un paciente durante la consulta toma menos de 2 s (percentil 95), aun en sedes rurales con conexiones de 3 Mbps.","Un paciente solo ve su historia; un profesional solo ve las de pacientes que atiende o que el paciente autorizó. En urgencias se permite un acceso de emergencia con justificación posterior.","Son datos sensibles bajo la Ley 1581 de 2012. Equipo de 5 personas y 6.000 USD al mes de infraestructura."],
+    base:"La consolidación está en curso: hay una aplicación central en la nube con una base de datos única. Al abrir la historia, la aplicación descarga al navegador del profesional la historia completa del paciente, con notas, resultados e imágenes adjuntas. El registro de auditoría se escribe en la misma base de datos, en la misma transacción de cada lectura. Las teleconsultas se agendan con al menos un día de anticipación.",
+    data:["Una historia pesa en promedio 1,5 MB y, en el percentil 95, 4 MB (pacientes con imágenes adjuntas).","Abrir la historia tarda 1,1 s (percentil 95) en sedes urbanas con 50 Mbps y 12 s (percentil 95) en sedes rurales con 3 Mbps.","6 de las 14 sedes son rurales.","Durante una teleconsulta, el profesional consulta la historia en promedio 8 veces (secciones, resultados, notas anteriores)."],
+    ext:[{k:"X1 · Crecimiento de la carga",t:"La red firma una alianza con 10 sedes más, 7 de ellas rurales. La demanda sube a 2.100 teleconsultas al día, en la misma franja, y una de las sedes nuevas tiene una conexión de 1 Mbps."},
+         {k:"X2 · Degradación de una dependencia",pos:true,t:"El 30 % de las historias todavía se completan consultando el sistema propio de la sede de origen. El sistema de la sede más grande, que atiende al 35 % de los pacientes, responde en 9 s durante toda una mañana de consultas."}] },
+  { id:"riegocampo", name:"RiegoCampo", dom:"Riego automático en fincas con conectividad intermitente",
+    anchors:["400 fincas con 6 sensores y 2 válvulas cada una; cada sensor reporta cada 15 minutos.","Sin conexión hasta por 72 horas, la finca sigue regando según su programación local, sin intervención.","Al volver la conexión, los datos acumulados se sincronizan en menos de 10 minutos por finca, sin perder lecturas ni duplicarlas.","Una orden de riego desde el celular se ejecuta en menos de 30 s con conexión; sin ella, queda pendiente y el agricultor lo ve.","Los dispositivos tienen batería para 12 meses y poca memoria. Presupuesto de 4.000 USD al mes de nube y un equipo de 4 personas."],
+    base:"Cada finca tiene una pasarela local que guarda las lecturas de sus sensores mientras no hay conexión. Al reconectarse, envía las lecturas una por una al servicio de ingesta en la nube y espera la confirmación de cada lectura antes de enviar la siguiente. El servicio de ingesta valida cada lectura y la inserta en la base de datos antes de confirmarla.",
+    data:["En la montaña, cada ida y vuelta entre la finca y la nube tarda en promedio 1,5 s.","El servicio de ingesta procesa como máximo 120 lecturas por segundo en total, sumando todas las fincas.","Tras una tormenta de 3 días, una finca tardó 43 minutos en sincronizar.","La pasarela de cada finca tiene memoria para 7 días de lecturas. Cada transmisión de radio consume batería; el fabricante garantiza los 12 meses de batería con un máximo de 200 transmisiones al día por pasarela."],
+    ext:[{k:"X1 · Crecimiento de la carga",t:"La cooperativa más grande se suma: el sistema pasa a 2.000 fincas. Una caída regional de 72 horas deja sin conexión a 1.200 de ellas, que se reconectan dentro de la misma hora."},
+         {k:"X2 · Degradación de una dependencia",pos:true,t:"El servicio de ingesta en la nube queda fuera de servicio 4 horas. Las fincas tienen conexión, pero no hay a quién enviar. Durante esas 4 horas, 60 agricultores ordenan regar desde el celular."}] }
+];
+let caseSel = 0;
+try { const v = localStorage.getItem("b3:case"); if (v !== null && +v >= 0 && +v <= CASES.length) caseSel = +v; } catch(e){}
+const extHTML = list => `<div class="ext"><div class="label-sm" style="color:var(--gold)">Extensión · publicada desde ya</div>
+  <p>Prepárenla antes de la entrega. Respóndanla con sus propios números en la sección 8 de la plantilla; en la sustentación la discutimos.</p>
+  ${list.filter(x => level==="pos" || !x.pos).map(x => `<div class="x"><b>${esc(x.k)}${x.pos?'<span class="lvtag">solo posgrado</span>':''}</b><p>${esc(x.t)}</p></div>`).join("")}
+  ${level==="pre" ? '<p class="note" style="color:var(--ink)">Pregrado responde solo X1. Posgrado responde además X2.</p>' : ''}
+  <p class="note" style="color:var(--ink)">Para cada una: qué táctica se sostiene, cuál se rompe y en qué valor, qué ve el usuario, qué cambiarían y si implica un ADR nuevo o reemplazar uno.</p></div>`;
+function renderCase(){
+  $("#caseChips").innerHTML = CASES.map((c,i) => `<button class="chip" aria-pressed="${i===caseSel}" data-i="${i}">${c.name}</button>`).join("")
+    + `<button class="chip" aria-pressed="${caseSel===CASES.length}" data-i="${CASES.length}">Proyecto propio o proyecto final</button>`;
+  $$("#caseChips .chip").forEach(b => b.addEventListener("click", () => { caseSel = +b.dataset.i; try{localStorage.setItem("b3:case", caseSel)}catch(e){} renderCase(); }));
+  const el = $("#caseBody");
+  if (caseSel === CASES.length){
+    el.innerHTML = `
+    <div class="card"><div class="seedhead"><h2>Proyecto propio o proyecto final</h2><span class="badge teal">misma exigencia que una semilla</span></div>
+      <p style="margin-top:8px">No conocemos su sistema, así que la línea base y los números los ponen ustedes. Lo que se controla es el método: cada número dice de dónde sale y la extensión es la misma para todos los proyectos propios, aplicada a sus cifras.</p></div>
+    <div class="cols2">
+      <div class="card"><h2>Su línea base</h2><ul class="list">
+        <li>Si el sistema existe: cómo funciona hoy la operación crítica.</li>
+        <li>Si todavía no existe: la versión más simple que funcionaría, sin ninguna de las tácticas que van a proponer.</li>
+        <li>Los componentes que intervienen en la operación crítica, en orden.</li>
+        <li>El límite del componente que se satura primero, con su fuente: una medición propia, la documentación del componente o un benchmark público que puedan citar.</li></ul></div>
+      <div class="card"><h2>Sus anclas del Bloque 2</h2>
+        <p>Las cinco anclas con cifras que definieron en el Bloque 2 son su piso. Si la retroalimentación les mostró que una era poco realista, ajústenla y declárenlo en la sección 1 de la plantilla.</p>
+        <p>Si su perfil de carga es tan pequeño que nada se satura, díganlo: el sizing también puede concluir que no hace falta ninguna táctica de rendimiento. Entonces busquen el límite en otra dimensión (disponibilidad, costo, una dependencia externa).</p></div>
+    </div>
+    ${extHTML(GEN_EXT)}`;
+    return;
+  }
+  const c = CASES[caseSel];
+  el.innerHTML = `
+    <div class="card"><div class="seedhead"><span class="badge">Semilla</span><h2>${c.name}</h2><span class="tagline">${esc(c.dom)}</span></div></div>
+    <div class="card"><h2>Línea base: la solución actual</h2><p>${esc(c.base)}</p>
+      <div class="label-sm" style="margin-top:12px">Datos medidos sobre la línea base</div>
+      <ul class="list">${c.data.map(d => `<li>${esc(d)}</li>`).join("")}</ul>
+      <p class="note" style="margin-top:10px">Estos datos se suman a las anclas y tampoco se cambian. Lo que no está aquí lo deciden ustedes como supuesto.</p></div>
+    <div class="card"><h2>Anclas del Bloque 2 (sin cambios)</h2><ul class="list">${c.anchors.map(a => `<li>${esc(a)}</li>`).join("")}</ul></div>
+    ${extHTML(c.ext)}`;
+}
+renderCase();
+
+/* Plantilla */
+$("#tpl").value = TEMPLATE;
+$("#copyTpl").addEventListener("click", () => {
+  const box = $("#tpl"), msg = $("#copyMsg");
+  const fail = () => { box.focus(); box.select(); msg.textContent = "Seleccionamos el texto: cópienlo con Ctrl+C."; };
+  try { navigator.clipboard.writeText(TEMPLATE).then(() => { msg.textContent = "Copiada."; }, fail); } catch(e){ fail(); }
+});
+
+/* Rúbrica */
+const RUB = [
+  { c:"Línea base y cuello de botella", l:["No hay línea base, o es la solución que ya tiene las tácticas.","Línea base descrita, pero sin identificar qué se satura primero ni con cuánta carga.","Línea base clara, componente que se satura primero, su límite con fuente y qué ve el usuario al superarlo."] },
+  { c:"Perfil de carga", l:["Números sueltos, sin relación entre sí ni origen.","Hay una cadena, pero faltan tipos o fuentes, o se diseña para el promedio y no para el pico.","Cadena completa de usuarios a operaciones por segundo en el pico, con cuentas y unidades, cada número marcado como dato, supuesto o referencia."] },
+  { c:"Decision", l:["No se elige una opción, o se elige sin justificar.","Se elige una opción, pero no se explica por qué se descartan las demás.","Decision en voz activa, justificada frente a la medida de la respuesta y frente a cada opción descartada."] },
+  { c:"Tácticas como mecanismos", l:["Nombres de táctica o de productos sin mecanismo.","Táctica nombrada con un mecanismo genérico (\"usar caché\").","Táctica del catálogo con un mecanismo concreto del sistema: qué componente, qué dato, en qué paso."] },
+  { c:"Efecto estimado", l:["No se estima el efecto de las tácticas.","Se dice qué métrica mueve, pero sin valores o sin forma de seguir la estimación.","Cada táctica mueve una métrica de un valor a otro, con la estimación explicada y su tipo declarado."] },
+  { c:"Costo cuantificado", l:["No se mencionan costos, o solo ventajas.","Costos en adjetivos (\"más complejo\", \"más caro\").","Costo de cada táctica en número (dinero, latencia, frescura, memoria, operación) y el atributo que lo paga."] },
+  { c:"Hasta dónde", l:["Se asume que las tácticas resuelven el problema sin límite.","Se da un nuevo límite, pero sin calcularlo o sin el siguiente cuello de botella.","Nuevo límite calculado, margen sobre el pico, siguiente componente que se satura y condición de revisión medible."] },
+  { c:"Interacción entre tácticas", l:["No se revisa.","Se menciona que hay conflictos, sin decir cuáles ni cuánto.","Se identifica qué táctica afecta qué escenario, en cuánto, y cómo se resuelve o por qué se acepta."] },
+  { c:"Extensión", l:["No se responde, o se responde con \"más servidores\".","Se responde, pero con números distintos de los propios o sin decir qué táctica se rompe.","La extensión de su nivel (pregrado: X1; posgrado: X1 y X2) aplicada a sus números: qué se sostiene, qué se rompe y en qué valor, qué ve el usuario y si implica un ADR nuevo."] },
+  { c:"Sensibilidad a los supuestos", pos:true, l:["No se analiza.","Se elige un supuesto que no cambia ninguna decisión.","El supuesto que más pesa, con qué cambia si vale el doble o la mitad y la pregunta para confirmarlo."] }
+];
+const rubSel = {};
+function renderRub(){
+  let h = "<thead><tr><th>Criterio</th><th>Inicial</th><th>En desarrollo</th><th>Logrado</th></tr></thead><tbody>";
+  RUB.forEach((r,i) => {
+    if (r.pos && level!=="pos") return;
+    h += `<tr><td>${esc(r.c)}${r.pos?'<span class="lvtag">solo posgrado</span>':''}</td>` + r.l.map((t,j) => `<td class="lv${rubSel[i]===j?" on":""}" data-i="${i}" data-j="${j}" tabindex="0" role="button" aria-pressed="${rubSel[i]===j}">${esc(t)}</td>`).join("") + "</tr>";
+  });
+  $("#rubTable").innerHTML = h + "</tbody>";
+  $$("#rubTable td.lv").forEach(td => {
+    const act = () => { const i=+td.dataset.i, j=+td.dataset.j; if (rubSel[i]===j) delete rubSel[i]; else rubSel[i]=j; renderRub(); };
+    td.addEventListener("click", act);
+    td.addEventListener("keydown", e => { if (e.key==="Enter"||e.key===" "){ e.preventDefault(); act(); } });
+  });
+  const active = RUB.map((r,i)=>i).filter(i => !RUB[i].pos || level==="pos");
+  const cnt=[0,0,0]; active.forEach(i => { if (rubSel[i]!==undefined) cnt[rubSel[i]]++; });
+  const done = active.filter(i => rubSel[i]!==undefined).length;
+  $("#rubSum").innerHTML = done===0 ? "Aún no han marcado ningún criterio."
+    : `<span class="badge teal">Logrado: ${cnt[2]}</span><span class="badge">En desarrollo: ${cnt[1]}</span><span class="badge red">Inicial: ${cnt[0]}</span><span>${done} de ${active.length} criterios marcados</span>`;
+}
+$("#rubReset").addEventListener("click", () => { Object.keys(rubSel).forEach(k => delete rubSel[k]); renderRub(); });
+renderRub();
+renderSteps();
+
+function setLevel(lv){
+  level = lv; document.body.dataset.level = lv;
+  try{ localStorage.setItem("b3:level", lv) }catch(e){}
+  $$("#levelSeg button").forEach(b => b.setAttribute("aria-pressed", b.dataset.lv===lv));
+  renderSteps(); renderCase(); renderRub();
+}
+$$("#levelSeg button").forEach(b => b.addEventListener("click", () => setLevel(b.dataset.lv)));
+setLevel(level);
+</script>
+
+</body></html>

@@ -1,0 +1,650 @@
+<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#000}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>
+<title>PedalVa Tácticas</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Barlow+Semi+Condensed:wght@500;600;700&family=Public+Sans:ital,wght@0,400;0,600;0,700;1,400&family=JetBrains+Mono:wght@400;600&display=swap">
+<style>
+/* Layout: señalética de ciclorruta — banda superior oscura con la ficha del sistema, selector de equipo tipo "anclajes", pestañas, una columna de lectura */
+:root{
+  --bg:#f3f5f2; --surface:#ffffff; --ink:#18231f; --muted:#5a6863; --line:#d6ddd8;
+  --route:#0f5c46; --route-ink:#ffffff; --route-soft:#e1efe9;
+  --seal:#b5651d; --seal-soft:#f8eadb; --seal-ink:#5b2f08;
+  --warn:#9b2c2c;
+  --band:#132a23; --band-ink:#e8f1ed; --band-muted:#9fb7ad;
+  --f-display:"Barlow Semi Condensed","Arial Narrow",Arial,sans-serif;
+  --f-body:"Public Sans",system-ui,-apple-system,"Segoe UI",sans-serif;
+  --f-mono:"JetBrains Mono",ui-monospace,Menlo,Consolas,monospace;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --bg:#0f1714; --surface:#16211d; --ink:#e4ece8; --muted:#97a8a1; --line:#2a3833;
+  --route:#3fb58d; --route-ink:#06130e; --route-soft:#183a2f;
+  --seal:#e09a52; --seal-soft:#33230f; --seal-ink:#f6d6b3;
+  --warn:#f08a8a;
+  --band:#0a120f; --band-ink:#e4ece8; --band-muted:#8aa398; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#0f1714; --surface:#16211d; --ink:#e4ece8; --muted:#97a8a1; --line:#2a3833;
+  --route:#3fb58d; --route-ink:#06130e; --route-soft:#183a2f;
+  --seal:#e09a52; --seal-soft:#33230f; --seal-ink:#f6d6b3;
+  --warn:#f08a8a;
+  --band:#0a120f; --band-ink:#e4ece8; --band-muted:#8aa398; color-scheme:dark}
+
+body{background:var(--bg);color:var(--ink);font-family:var(--f-body);font-size:15px;line-height:1.55}
+.wrap{max-width:860px;margin:0 auto;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+h1,h2,h3{font-family:var(--f-display);text-wrap:balance;line-height:1.1;margin:0}
+p{margin:0}
+button,input,select,textarea{font:inherit;color:inherit}
+:focus-visible{outline:2px solid var(--route);outline-offset:2px}
+
+/* banda */
+.band{background:var(--band);color:var(--band-ink)}
+.band .wrap{padding-block:22px 20px;display:grid;gap:14px}
+.eyebrow{font-family:var(--f-mono);font-size:11.5px;letter-spacing:.08em;text-transform:uppercase;color:var(--band-muted)}
+.band h1{font-size:clamp(30px,6vw,44px);font-weight:700;letter-spacing:.01em}
+.band h1 span{color:var(--route)}
+.facts{display:flex;flex-wrap:wrap;gap:8px 22px;font-family:var(--f-mono);font-size:12.5px;color:var(--band-muted)}
+.facts b{color:var(--band-ink);font-weight:600}
+.band .lede{max-width:65ch;color:var(--band-ink);opacity:.9}
+
+/* selector de equipo */
+.docks{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:6px;margin-top:4px}
+.dock{border:1px solid #2f4a40;background:transparent;color:var(--band-ink);border-radius:6px;padding:8px 4px;cursor:pointer;display:grid;gap:1px;text-align:center}
+.dock .code{font-family:var(--f-display);font-weight:700;font-size:20px;line-height:1}
+.dock .attr{font-size:10.5px;color:var(--band-muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.dock[aria-pressed="true"]{background:var(--route);border-color:var(--route);color:var(--route-ink)}
+.dock[aria-pressed="true"] .attr{color:var(--route-ink);opacity:.85}
+.docklabel{font-size:12.5px;color:var(--band-muted)}
+
+/* pestañas */
+.tabs{position:sticky;top:env(safe-area-inset-top,0px);z-index:5;background:var(--bg);border-bottom:1px solid var(--line)}
+body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset-top,0px);z-index:10;background:var(--bg)}
+.tabs .wrap{display:flex;gap:4px;overflow-x:auto}
+.tab{border:0;background:none;padding:12px 12px 10px;cursor:pointer;font-family:var(--f-display);font-weight:600;font-size:17px;color:var(--muted);border-bottom:3px solid transparent;white-space:nowrap}
+.tab[aria-selected="true"]{color:var(--ink);border-bottom-color:var(--route)}
+.tab .n{font-family:var(--f-mono);font-size:11px;background:var(--route-soft);color:var(--route);border-radius:10px;padding:1px 6px;margin-left:4px;vertical-align:2px}
+
+main .wrap{padding-block:22px 48px;display:grid;gap:18px}
+.panel{display:grid;gap:18px}
+
+/* caso */
+.attrline{display:flex;flex-wrap:wrap;align-items:baseline;gap:6px 12px}
+.attrline h2{font-size:30px}
+.pill{font-family:var(--f-mono);font-size:11.5px;letter-spacing:.04em;text-transform:uppercase;padding:3px 8px;border-radius:4px;background:var(--route-soft);color:var(--route)}
+.prose{max-width:65ch;display:grid;gap:10px}
+.measure{border:1px solid var(--line);background:var(--surface);border-radius:8px;padding:12px 14px;display:grid;gap:4px}
+.measure .k{font-family:var(--f-mono);font-size:11.5px;text-transform:uppercase;letter-spacing:.06em;color:var(--muted)}
+.tension{border-left:4px solid var(--warn);padding:2px 0 2px 14px;display:grid;gap:4px;max-width:65ch}
+.tension .k{font-family:var(--f-mono);font-size:11.5px;text-transform:uppercase;letter-spacing:.06em;color:var(--warn)}
+.pair{font-size:13.5px;color:var(--muted)}
+.pair button{background:none;border:0;padding:0;color:var(--route);text-decoration:underline;cursor:pointer;font-size:inherit}
+
+.flow{border:1px dashed var(--line);border-radius:8px;padding:12px 14px;display:grid;gap:8px}
+.flow ol{margin:0;padding-left:20px;display:grid;gap:2px;font-size:14px}
+.flow h3{font-size:16px;color:var(--muted);font-weight:600}
+
+/* giro sellado */
+.seal{border:2px solid var(--seal);background:var(--seal-soft);color:var(--seal-ink);border-radius:10px;padding:16px;display:grid;gap:10px}
+.seal h3{font-size:22px;color:var(--seal-ink)}
+.seal .row{display:flex;flex-wrap:wrap;gap:8px}
+.seal input{flex:1 1 180px;min-width:0;border:1px solid var(--seal);background:var(--surface);color:var(--ink);border-radius:6px;padding:9px 10px;font-family:var(--f-mono)}
+.btn{border:1px solid var(--route);background:var(--route);color:var(--route-ink);border-radius:6px;padding:9px 14px;cursor:pointer;font-weight:600}
+.btn.ghost{background:transparent;color:var(--route)}
+.btn.seal-btn{background:var(--seal);border-color:var(--seal);color:var(--surface)}
+.msg{font-size:13.5px}
+.giro-text{font-size:16px;line-height:1.55;color:var(--ink);background:var(--surface);border-radius:6px;padding:12px 14px;border:1px solid var(--seal)}
+.giro-from{font-family:var(--f-mono);font-size:11.5px;text-transform:uppercase;letter-spacing:.06em}
+
+.agenda{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:8px}
+.agenda div{border:1px solid var(--line);border-radius:8px;padding:10px 12px;background:var(--surface);display:grid;gap:2px;font-size:13.5px}
+.agenda b{font-family:var(--f-mono);font-size:12px;color:var(--route)}
+
+/* catálogo */
+.filters{display:grid;gap:10px}
+.search{width:100%;border:1px solid var(--line);background:var(--surface);border-radius:6px;padding:10px 12px}
+.chips{display:flex;flex-wrap:wrap;gap:6px}
+.chip{border:1px solid var(--line);background:var(--surface);border-radius:20px;padding:5px 11px;cursor:pointer;font-size:13.5px}
+.chip[aria-pressed="true"]{background:var(--ink);color:var(--bg);border-color:var(--ink)}
+.chip.mine{border-color:var(--route)}
+.cat-group{display:grid;gap:10px}
+.cat-group>h3{font-size:22px;padding-top:6px}
+.cat-sub{font-family:var(--f-mono);font-size:11.5px;text-transform:uppercase;letter-spacing:.06em;color:var(--muted);margin-top:4px}
+.tactic{border:1px solid var(--line);background:var(--surface);border-radius:8px;padding:12px 14px;display:grid;gap:6px}
+.tactic .top{display:flex;justify-content:space-between;align-items:flex-start;gap:10px}
+.tactic h4{margin:0;font-family:var(--f-display);font-size:19px;font-weight:600;line-height:1.15}
+.tactic .aka{font-size:12.5px;color:var(--muted);font-style:italic}
+.tactic .cost{font-size:13.5px;color:var(--muted)}
+.tactic .cost b{color:var(--warn);font-weight:600}
+.add{flex:none;border:1px solid var(--route);background:transparent;color:var(--route);border-radius:6px;padding:4px 9px;font-size:12.5px;cursor:pointer;white-space:nowrap}
+.add.on{background:var(--route);color:var(--route-ink)}
+.empty{color:var(--muted);font-style:italic}
+
+/* lámina */
+.form{display:grid;gap:14px}
+.field{display:grid;gap:4px}
+.field label{font-size:13px;font-weight:600}
+.field .hint{font-size:12.5px;color:var(--muted)}
+.field input,.field textarea,.field select{border:1px solid var(--line);background:var(--surface);border-radius:6px;padding:8px 10px;width:100%;min-width:0;box-sizing:border-box}
+.field textarea{min-height:64px;resize:vertical}
+.grid6{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
+@media (max-width:560px){.grid6{grid-template-columns:1fr}.docks{grid-template-columns:repeat(5,minmax(0,1fr))}.dock .attr{display:none}}
+.mech{border:1px solid var(--line);border-radius:8px;padding:12px;background:var(--surface);display:grid;gap:10px}
+.mech .head{display:flex;justify-content:space-between;align-items:center;gap:8px}
+.mech .head b{font-family:var(--f-display);font-size:18px}
+.x{border:0;background:none;color:var(--warn);cursor:pointer;font-size:13px}
+.section-title{font-size:22px;display:flex;align-items:baseline;gap:10px;flex-wrap:wrap}
+.section-title small{font-family:var(--f-body);font-size:13px;font-weight:400;color:var(--muted)}
+.actions{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+.copybox{width:100%;box-sizing:border-box;min-height:180px;font-family:var(--f-mono);font-size:12.5px;border:1px solid var(--line);border-radius:6px;padding:10px;background:var(--surface)}
+.note{font-size:13px;color:var(--muted)}
+/* contexto y guía */
+details>summary{cursor:pointer;list-style:none}
+details>summary::-webkit-details-marker{display:none}
+details>summary::after{content:"▾";margin-left:8px;color:var(--muted);display:inline-block;transition:transform .15s}
+details:not([open])>summary::after{transform:rotate(-90deg)}
+.ctx,.guide{border:1px solid var(--line);background:var(--surface);border-radius:10px;padding:14px 16px}
+.ctx>summary,.guide>summary{font-family:var(--f-display);font-weight:700;font-size:22px;display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+.guide{border-color:var(--route);border-width:2px}
+.ctx-body,.guide-body{display:grid;gap:14px;padding-top:12px}
+.parts{display:grid;grid-template-columns:minmax(0,1fr) auto minmax(0,1fr) auto minmax(0,1fr);gap:8px;align-items:stretch}
+.part{border:1px solid var(--line);border-radius:8px;padding:10px 12px;display:grid;gap:3px;align-content:start;background:var(--bg)}
+.part b{font-family:var(--f-display);font-size:17px}
+.part span{font-size:13px;color:var(--muted)}
+.part.ext{grid-column:3 / 4;border-style:dashed}
+.arrow{align-self:center;color:var(--route);font-size:20px}
+@media (max-width:640px){.parts{grid-template-columns:1fr}.arrow{display:none}.part.ext{grid-column:auto}}
+.steps{margin:0;padding-left:22px;display:grid;gap:8px;max-width:65ch}
+.cmp{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
+@media (max-width:560px){.cmp{grid-template-columns:1fr}}
+.cmp>div{border-radius:8px;padding:12px 14px;display:grid;gap:6px;align-content:start;border:1px solid var(--line)}
+.cmp .bad{border-left:4px solid var(--warn)}
+.cmp .good{border-left:4px solid var(--route)}
+.cmp .k{font-family:var(--f-mono);font-size:11.5px;text-transform:uppercase;letter-spacing:.06em}
+.cmp .bad .k{color:var(--warn)} .cmp .good .k{color:var(--route)}
+.cmp p{font-style:italic}
+.cmp .why{font-size:13px;color:var(--muted)}
+.example{border:1px dashed var(--line);border-radius:8px;padding:10px 14px}
+.example>summary{font-weight:600;color:var(--route)}
+.ex{padding-top:10px;font-size:14px}
+@media (prefers-reduced-motion:no-preference){.giro-text{animation:rise .4s ease-out}@keyframes rise{from{transform:translateY(6px)}to{transform:none}}}
+</style>
+
+<header class="band">
+  <div class="wrap">
+    <div class="eyebrow">Arquitectura de Software · Bloque 3 · Tácticas</div>
+    <h1>Pedal<span>Va</span>: el sistema de bicicletas públicas</h1>
+    <p class="lede">La Secretaría de Movilidad contrató a 10 equipos para resolver cinco problemas del sistema. Cada pareja de equipos recibe el mismo problema con una restricción distinta. Su trabajo es proponer mecanismos concretos, ponerles nombre de táctica y decir qué sacrifican.</p>
+    <div class="facts">
+      <span><b>800</b> estaciones</span><span><b>9.000</b> bicicletas</span><span><b>120.000</b> usuarios</span><span><b>45.000</b> viajes/día</span><span>pico <b>6:30–8:00</b></span>
+    </div>
+    <div class="docklabel" id="docklabel">Elijan su equipo</div>
+    <div class="docks" id="docks" role="group" aria-label="Equipo"></div>
+  </div>
+</header>
+
+<nav class="tabs" aria-label="Secciones">
+  <div class="wrap" role="tablist">
+    <button class="tab" role="tab" id="t-caso" aria-selected="true" data-tab="caso">Nuestro caso</button>
+    <button class="tab" role="tab" id="t-cat" aria-selected="false" data-tab="cat">Catálogo de tácticas</button>
+    <button class="tab" role="tab" id="t-lam" aria-selected="false" data-tab="lam">Lámina<span class="n" id="mechcount">0</span></button>
+  </div>
+</nav>
+
+<main>
+  <div class="wrap">
+    <section class="panel" id="p-caso"></section>
+    <section class="panel" id="p-cat" hidden></section>
+    <section class="panel" id="p-lam" hidden></section>
+  </div>
+</main>
+
+<script>
+const ENC = {"check":"1a860418e319840e0a4d4bbbe5211121a4d0311cce0bfa07a468b018e348fa23","giros":{"1A":"Ck0u2Oze8vyu3pd+rN44okgTkbovZXY1K9s4XbU5km/Xxzx8zsHAYnULUKD0vR44tnqpI5h6iL5qweX1NSOcri5KFAvbxToG8zc56DwXkGd1UgYM/DPeHIltWg/sOKsaMVDcLUnDY5TVlpilnP0NZH0S76/ZulcbRpeXMP6ftlwy7nBJNx2W1v8nPdJGPCyl3PqstgbHbi2qlIDYi7P5FU5vFpaZEd8o+qB5mvPFlGA8RxBFXXm1VxcVZu6Gf/ZFSNGyj4GYneVWNtaG1m+Yf/qS3nZEBqHAWfL+kU4tEeMNIs+CBHD+eOSvU31r8bp3IdldftV4hZUZoN9wExabUdQ=","1B":"3f/NS/whM/L9en1Wcd1+bY8hwo9lQZGWRIT7XlVdzhvDX8ldImOMWY8L796fnw8ojohOXq0tZAQy91VK6uYaqkU0KUnyd3xtzpOexuIsOVdyGc+bKRn0073nQ/I9mNxNmJN3ysDq5gPy3EJDUaTLzStwpmADFrL2jUymBH6BKKldknCSILHTF/NRFOQNjgAa+NtBhZmfzIqVzLb05Rv/d7XDI5mLtBl6yA==","2A":"d0fLVamhd5skuziF4ctn6Hwz4KvwAPDDC6fe9v2zAEiz3cHwymvI+eVPUU2LU0XZz2TZWwIBVRd9eLGzXcHHUfJzbiKK5EBczR49ILIB/I/DeS1ke5vGwKq70giCAP6niT/MYlW0GbxSSN+4hl7wm/N6tS/zrW6fhUGOMTmAgxM+iSp/Yv8Bkzf4cfyW7pp7U7Rtgd90bUeikpiT2gKlTZoUReLBoR+Sz/Lj311zvuzZ9Kiy7roiDqXWS3CtfQU9bqLACs10ah8C7Fwh4Csff+R/8URwbbeQw0WfqFo=","2B":"4LLUm3hvj12MFgHeIroI55B6NcsRfDyLG2Vt0rgqUiaawT/ZLro8vdX7YrDQXhxXipzPeDzKFhoVf7fEM5snH6BH+mx+fn/0zxMulYRNEB0j3PEgPAaCS2ptvTqM3xpQrRwNuWnwgqTeQMLs0k202+mhCO7hu4AbLUloteSz6BNa0Ukbi40OPqWqiL+X04Z6aPGyyJS29nyKncwcQWM1YbCPTThT5Nvi16PQjwTO+ANwQC/tHLKRZ967U0lFbhoZdPfnsLU=","3A":"Ui1ioPc/NV82QNe5luQg8UoWNDe5q4V9GRtrA/cYgP6oiymMeaMv1g4jycXHW2BZ4VcEb5itUUHS3POoAQJGI+5vh3LGOcNeYPgaON0VOSfhmxG2i7Saa0q8To+aC0YRdEml3dRuyrFrV/nE62XZynEvKSrflBOqd6wPHAPxbv5W9kvqAxoo/oHyMp3fy6ZRlwWteRUzldQlHThlQMCYBFkdxbiOZqmgmzlHWs8dNQ==","3B":"Jh83MuUaUkHSNizjGqeAJVdZDRXsxxtsDf+LNBg/g7MUvpf3XGE42jnnoOaCeocn1bzOPdarT/ZbqafrVUjXZrjoCpKL3lYqXJsKI1f8RTe1UAW8aluPde88/JvuGXyu+lXaZkGqH2Zkt2Gf3k4+EHPdrItU9XKFloUpQYvZ/YVbT/DcWrkAwlAR1JPWkVyTUEQIvjN1gYCDbj5YhIFhIjGJUvFM7D0X9+AsPeCPYW7HtZuuPSbpTIoeORt2a2eeYNc2iEZGCy1MuhGYSeHjLc6HgQYg4xY=","4A":"1XfK+ykH10P9Q1PgH+jTrL5CteWNOq2QjMuMgXqfAzi6Mr7i6bQWa9TsRya/7/D8Ylgu+o+oaPLnMhNwbCIi6v8S1vrw9AGphbiTGchg0yGhYJIObxlZYwN11NYv4EA8W9rbPplnNbpdfcQZBHPAFhWMaMmLqUtd/KTqZQl50H/Lb2ZywfX0eC/UdeR/yGRwrx4uMNx3SVFn6iGFQ1QphzqkFOYHvf7wl68t0TEqzS0Gt69BFDxXFkUxepi/Se4Ey3Wj","4B":"fXlpPlTPoP5NBL4ia/xlIGTrNGNc/NQpSr1Yu4mXT4Lc4jeAB3H01vuiMNL4k/AMqPwe+BpR5SOO1R4fv2cU3I37eCgayFeoxzM62ILXyXywyDvxhka/apSV9Qtl9YwXKQ8wpoGU5nU8wfA5JaNR3vYt42g/i933kZG2cVwVbRcH6PNa5Kt5VM3DxJYhxZhrzUkGFXywEJyocuuUAAnqAk9wFesonBR/qPpnn69gdDMeytUi/rvINH5oDw20huNQ7jwJaGW06gYraPUuBw==","5A":"rop8S5vHtRPSr7CNfS+ynvp6gRCMr6ju4xK4OGrkTu3G4irVn+XhuuePWIlvy4L9+TvrAvI3B1kXjMPLAcv5U/VuEt7RefCO1EgvmMRKCjwNKHpAWltb6elHPcjkSUbhCPEcYB6im1P5c/5OkIh+vtG/GMKWJHzVyQ2Vu2ykc1fQsUbDzT9mHBLiPo3k6FfH0UMsR7alnlL+09+AswmgvG/5RSkb2uLUiZc=","5B":"A7SgqfRiQYbNzEijGXHHfkgOAh/BnFvoCyL9b9rd0D0Kl7BDb/0EoHOZffOiiWT2P0rmzT13ceqCTsvSEcPj0UXAszBwcdrRQcIPGCbgWnq0T2rMvRdOB6SZOYmoDZ4RVfxlMcWHP6Ndy2XTRm3F+ZrR2sZLI0UnjSemgAru/afGrarVfh6UisZVesPamavjEPNwG26OnjOFJpePxW8kceEtBv0Tr8M3I64e+MDWQO9JaxU7erTN085RcSNmAouBKlBwE2NclU7zvjjnoLJ7E6rl5zixCTuNCE/ZknMWwivMZg=="}};
+
+const ATTRS = {
+  disp:{n:"Disponibilidad"}, rend:{n:"Rendimiento"}, seg:{n:"Seguridad"},
+  mod:{n:"Modificabilidad"}, desp:{n:"Despliegue"}, test:{n:"Testabilidad"}
+};
+
+const TEAMS = {
+  "1A":{a:"disp",t:"El desbloqueo se cae en hora pico",
+    s:["El martes pasado el servidor de desbloqueo se cayó 47 minutos a las 7:10 a.m. Unos 3.100 usuarios quedaron frente a anclajes cerrados y nadie en la Secretaría se enteró hasta que llegaron los reclamos por redes, 25 minutos después.",
+       "Cada estación tiene un microcontrolador con 4 MB de memoria local y conexión 4G, y hoy depende del servidor para cada desbloqueo."],
+    m:"Una caída del servidor no puede dejar a ningún usuario sin bicicleta más de 2 minutos, y el equipo debe enterarse en menos de 1 minuto.",
+    tl:"Presupuesto cero",
+    tt:"El presupuesto de infraestructura del año ya está comprometido. No hay un peso para un segundo servidor, otra zona en la nube ni un servicio pago de monitoreo. Lo que ya existe es lo que hay.",
+    p:"1B"},
+  "1B":{a:"disp",t:"El desbloqueo se cae en hora pico",
+    s:["El martes pasado el servidor de desbloqueo se cayó 47 minutos a las 7:10 a.m. Unos 3.100 usuarios quedaron frente a anclajes cerrados y nadie en la Secretaría se enteró hasta que llegaron los reclamos por redes, 25 minutos después.",
+       "El Concejo aprobó presupuesto para redundancia completa: pueden contratar servidores en varias zonas de nube, bases de datos replicadas y balanceadores."],
+    m:"Una caída del servidor no puede dejar a ningún usuario sin bicicleta más de 2 minutos, y el equipo debe enterarse en menos de 1 minuto.",
+    tl:"Dinero sí, experiencia no",
+    tt:"El equipo son 3 desarrolladores web que nunca han operado más de un servidor. El contrato de soporte externo termina en 6 meses. Las fallas de madrugada las atiende quien esté de turno, solo.",
+    p:"1A"},
+  "2A":{a:"rend",t:"La hora pico ahoga el desbloqueo",
+    s:["Entre 7:00 y 7:20 llegan hasta 600 desbloqueos por minuto, y la app hace además unas 15.000 consultas por minuto (mapa de disponibilidad y saldo). Fuera del pico el desbloqueo tarda 0,4 s; en el pico tarda 9 s, los usuarios reintentan y la carga crece.",
+       "Hoy cada desbloqueo hace, en secuencia y antes de responder: validar la cuenta, consultar el saldo, registrar el viaje, ordenar a la estación liberar el anclaje y recalcular el mapa de disponibilidad que ve la app."],
+    m:"El 95 % de los desbloqueos en hora pico deben completarse en menos de 2 segundos.",
+    tl:"Hardware fijo",
+    tt:"El backend corre en un servidor del datacenter municipal con contrato a 3 años. No se puede ampliar, no se pueden añadir máquinas y no se puede migrar a la nube durante el contrato.",
+    p:"2B"},
+  "2B":{a:"rend",t:"La hora pico ahoga el desbloqueo",
+    s:["Entre 7:00 y 7:20 llegan hasta 600 desbloqueos por minuto, y la app hace además unas 15.000 consultas por minuto (mapa de disponibilidad y saldo). Fuera del pico el desbloqueo tarda 0,4 s; en el pico tarda 9 s, los usuarios reintentan y la carga crece.",
+       "El backend ya está en la nube y pueden escalarlo cuanto quieran. Todo cobro pasa por el sistema de recaudo del metro, que es legado."],
+    m:"El 95 % de los desbloqueos en hora pico deben completarse en menos de 2 segundos.",
+    tl:"Un cuello de botella intocable",
+    tt:"El sistema de recaudo del metro le asigna a PedalVa un cupo máximo de 5 transacciones por segundo, porque lo comparte con los torniquetes del metro en la misma hora pico. Es de otra entidad: no se puede modificar, ampliar ni reemplazar este año. En el pico ustedes generan unas 10 por segundo.",
+    p:"2A"},
+  "3A":{a:"seg",t:"Códigos de desbloqueo compartidos",
+    s:["Al escanear el QR del anclaje, la app muestra un código de desbloqueo. Usuarios están reenviando capturas de ese código por WhatsApp: una sola cuenta paga desbloqueó 61 bicicletas en un día.",
+       "Se estima que el 4 % de los viajes de octubre se hicieron con códigos ajenos."],
+    m:"Detectar y bloquear el uso de un código ajeno en menos de 1 minuto, y bajar los viajes fraudulentos a menos del 1 %.",
+    tl:"Fricción mínima",
+    tt:"El 38 % de los usuarios son mayores de 60 años del programa municipal de movilidad, muchos con celulares básicos. En un piloto, pedir un código por SMS en cada viaje hizo caer el uso de ese grupo un 40 %. La Secretaría no acepta perderlos.",
+    p:"3B"},
+  "3B":{a:"seg",t:"Códigos de desbloqueo compartidos",
+    s:["Al escanear el QR del anclaje, la app muestra un código de desbloqueo. Usuarios están reenviando capturas de ese código por WhatsApp: una sola cuenta paga desbloqueó 61 bicicletas en un día.",
+       "Se estima que el 4 % de los viajes de octubre se hicieron con códigos ajenos."],
+    m:"Detectar y bloquear el uso de un código ajeno en menos de 1 minuto, y bajar los viajes fraudulentos a menos del 1 %.",
+    tl:"Hardware de 2019",
+    tt:"Las estaciones tienen un microcontrolador de 8 bits sin acelerador criptográfico: verificar una firma digital toma 6 segundos. Reemplazar las 800 estaciones cuesta lo mismo que 4 años del presupuesto del sistema.",
+    p:"3A"},
+  "4A":{a:"mod",t:"Un nuevo medio de pago",
+    s:["La alcaldía anunció que PedalVa aceptará la billetera digital BilletaYa. Hoy la lógica de cobro vive en una clase de 2.400 líneas; el medio de pago se decide con condicionales repetidos en 14 lugares (cobro, reembolso, reportes, conciliación).",
+       "Ya existen dos medios: tarjeta del metro y tarjeta bancaria."],
+    m:"Agregar BilletaYa sin romper los medios existentes, y que el siguiente medio de pago cueste como máximo una semana de trabajo.",
+    tl:"Plazo político",
+    tt:"El alcalde lanza BilletaYa en 3 semanas, con prensa. No hay forma de mover la fecha. Un refactor completo del módulo de cobro se estimó en 6 semanas.",
+    p:"4B"},
+  "4B":{a:"mod",t:"Un nuevo medio de pago",
+    s:["La alcaldía anunció que PedalVa aceptará la billetera digital BilletaYa. Hoy la lógica de cobro vive en una clase de 2.400 líneas; el medio de pago se decide con condicionales repetidos en 14 lugares (cobro, reembolso, reportes, conciliación).",
+       "Ya existen dos medios: tarjeta del metro y tarjeta bancaria."],
+    m:"Integrar cada operador de pago nuevo en máximo 2 días-persona, sin tocar el código de los demás.",
+    tl:"Uno por mes, dos personas",
+    tt:"BilletaYa es solo el primero: hay convenios firmados con 6 billeteras y 2 bancos para este año, casi uno por mes. El equipo de pagos son 2 personas que además atienden soporte.",
+    p:"4A"},
+  "5A":{a:"desp",t:"Una actualización que bloqueó estaciones",
+    s:["La versión 2.3 del firmware de estaciones se instaló en las 800 estaciones la misma noche. Al día siguiente 200 quedaron bloqueadas durante 2 días: la falla solo ocurre con los anclajes de uno de los dos fabricantes.",
+       "La versión se había probado en un emulador de estación y pasó todas las pruebas."],
+    m:"Una versión defectuosa no puede afectar a más de 10 estaciones, y debe poder revertirse en menos de 15 minutos.",
+    tl:"Sin laboratorio",
+    tt:"No existe un ambiente de pruebas con hardware real y no hay presupuesto para armarlo: cada estación cuesta 18 millones de pesos y los fabricantes no prestan equipos.",
+    p:"5B"},
+  "5B":{a:"desp",t:"Una actualización que bloqueó estaciones",
+    s:["La versión 2.3 del firmware de estaciones se instaló en las 800 estaciones la misma noche. Al día siguiente 200 quedaron bloqueadas durante 2 días: la falla solo ocurre con los anclajes de uno de los dos fabricantes.",
+       "La versión acumulaba 40 cambios, porque cada versión necesita aprobación externa."],
+    m:"Llevar una corrección a producción en menos de una semana, y que una versión defectuosa no afecte a más de 10 estaciones.",
+    tl:"Aprobación externa",
+    tt:"La interventoría del contrato debe aprobar cada versión que se instale en estaciones. Hoy cada aprobación toma 3 semanas y revisa la versión completa. La interventoría no es negociable: es un requisito legal del contrato.",
+    p:"5A"}
+};
+
+const CATALOG = [
+ // DISPONIBILIDAD
+ {a:"disp",g:"Detectar fallas",n:"Ping / eco",d:"Un componente pregunta periódicamente a otro si está vivo y espera respuesta.",c:"Tráfico extra y un umbral de espera que hay que calibrar."},
+ {a:"disp",g:"Detectar fallas",n:"Latido (heartbeat)",aka:"keep-alive",d:"El componente vigilado envía una señal periódica; si deja de llegar, se declara caído.",c:"Falsos positivos si la red es inestable."},
+ {a:"disp",g:"Detectar fallas",n:"Monitor",d:"Un componente aparte observa la salud de otros (CPU, errores, latencia) y alerta o actúa.",c:"Es una pieza más que también puede fallar."},
+ {a:"disp",g:"Detectar fallas",n:"Marca de tiempo",d:"Cada mensaje lleva hora o secuencia para detectar mensajes perdidos, duplicados o fuera de orden.",c:"Requiere relojes razonablemente sincronizados."},
+ {a:"disp",g:"Detectar fallas",n:"Verificación de cordura",aka:"sanity checking",d:"Se valida que un resultado o valor esté dentro de lo razonable antes de usarlo.",c:"Hay que conocer qué es 'razonable' en el dominio."},
+ {a:"disp",g:"Detectar fallas",n:"Votación",d:"Varios componentes calculan lo mismo y se compara; la diferencia revela la falla.",c:"Multiplica el costo de cómputo."},
+ {a:"disp",g:"Detectar fallas",n:"Autoprueba",d:"El componente ejecuta pruebas sobre sí mismo al arrancar o periódicamente.",c:"Consume recursos y no detecta todo."},
+ {a:"disp",g:"Recuperarse",n:"Redundancia activa",aka:"hot spare",d:"Varias réplicas procesan todo en paralelo; si una cae, otra ya tiene el estado.",c:"Duplica o triplica infraestructura y obliga a sincronizar."},
+ {a:"disp",g:"Recuperarse",n:"Redundancia pasiva",aka:"warm spare",d:"Una réplica recibe el estado periódicamente y toma el control si la principal cae.",c:"Pierde lo ocurrido desde la última sincronización; la conmutación toma tiempo."},
+ {a:"disp",g:"Recuperarse",n:"Repuesto en frío",aka:"cold spare",d:"Un repuesto apagado que se enciende y configura cuando hace falta.",c:"Recuperación lenta (minutos u horas)."},
+ {a:"disp",g:"Recuperarse",n:"Reintento",d:"Ante una falla transitoria, se repite la operación tras una espera.",c:"Si la falla no es transitoria, empeora la carga. Exige operaciones idempotentes."},
+ {a:"disp",g:"Recuperarse",n:"Interruptor de circuito",aka:"circuit breaker",d:"Tras varias fallas seguidas, deja de llamar al componente caído por un tiempo y responde de inmediato con un error o una alternativa.",c:"Hay que diseñar qué hacer mientras el circuito está abierto."},
+ {a:"disp",g:"Recuperarse",n:"Degradación",d:"Ante una falla se mantienen las funciones críticas y se apagan las secundarias.",c:"Hay que decidir qué es crítico; el usuario recibe menos."},
+ {a:"disp",g:"Recuperarse",n:"Reconfiguración",d:"Se reasignan responsabilidades entre los componentes que siguen sanos.",c:"Complejidad de operación y de pruebas."},
+ {a:"disp",g:"Recuperarse",n:"Rollback",d:"Se vuelve a un estado o versión anterior conocido como bueno.",c:"Se pierde lo hecho después del punto de retorno."},
+ {a:"disp",g:"Recuperarse",n:"Manejo de excepciones",d:"El componente atrapa la falla y la convierte en una respuesta controlada.",c:"Si se abusa, oculta fallas (falla silenciosa)."},
+ {a:"disp",g:"Reintroducir",n:"Resincronización de estado",d:"El componente que vuelve se pone al día con el estado actual antes de atender.",c:"Ventana en la que el estado puede estar inconsistente."},
+ {a:"disp",g:"Reintroducir",n:"Sombra",aka:"shadow",d:"El componente recuperado opera en paralelo sin efectos reales hasta confirmar que está bien.",c:"Recursos duplicados durante la observación."},
+ {a:"disp",g:"Reintroducir",n:"Reinicio escalonado",d:"Se reinician partes pequeñas primero y solo se escala si no basta.",c:"Requiere diseñar niveles de reinicio."},
+ {a:"disp",g:"Prevenir fallas",n:"Sacar de servicio",d:"Se retira un componente de forma planeada (mantenimiento, sospecha de falla) antes de que falle.",c:"Capacidad reducida mientras está fuera."},
+ {a:"disp",g:"Prevenir fallas",n:"Transacciones",d:"Agrupar pasos para que se completen todos o ninguno.",c:"Bloqueos y menor rendimiento; difícil entre sistemas distintos."},
+ {a:"disp",g:"Prevenir fallas",n:"Modelo predictivo",d:"Se vigilan tendencias (memoria, cola, errores) para actuar antes de la falla.",c:"Necesita historia de datos y puede equivocarse."},
+ // RENDIMIENTO
+ {a:"rend",g:"Controlar la demanda",n:"Limitar la tasa de eventos",aka:"rate limiting, throttling",d:"Se acepta como máximo cierta cantidad de solicitudes por unidad de tiempo; el resto espera o se rechaza.",c:"Algunos usuarios son rechazados o esperan."},
+ {a:"rend",g:"Controlar la demanda",n:"Priorizar eventos",d:"Las solicitudes importantes se atienden primero; las secundarias, después o nunca.",c:"Las de baja prioridad pueden quedar sin atender."},
+ {a:"rend",g:"Controlar la demanda",n:"Gestionar la tasa de muestreo",d:"Se procesan menos datos de entrada (cada N segundos en vez de cada evento).",c:"Menos precisión o datos menos frescos."},
+ {a:"rend",g:"Controlar la demanda",n:"Reducir el sobrecosto",d:"Se eliminan pasos, intermediarios o conversiones innecesarias en el camino crítico.",c:"Suele reducir modificabilidad (menos indirección)."},
+ {a:"rend",g:"Controlar la demanda",n:"Acotar el tiempo de ejecución",aka:"timeout",d:"Se fija un tiempo máximo para una operación; si no termina, se corta.",c:"Algunas operaciones quedan incompletas."},
+ {a:"rend",g:"Controlar la demanda",n:"Aumentar la eficiencia",d:"Mejores algoritmos, consultas o estructuras de datos en el camino crítico.",c:"Tiempo de desarrollo; código más difícil de entender."},
+ {a:"rend",g:"Gestionar recursos",n:"Aumentar recursos",aka:"escalar vertical u horizontalmente",d:"Más CPU, memoria, máquinas o red.",c:"Dinero, y no sirve si el cuello de botella está en otro lado."},
+ {a:"rend",g:"Gestionar recursos",n:"Introducir concurrencia",d:"Procesar varias solicitudes en paralelo (hilos, procesos, particiones).",c:"Condiciones de carrera, bloqueos, más difícil de probar."},
+ {a:"rend",g:"Gestionar recursos",n:"Múltiples copias de cómputo",aka:"réplicas + balanceador",d:"Varias instancias idénticas atienden la carga repartida.",c:"Hay que manejar el estado compartido entre instancias."},
+ {a:"rend",g:"Gestionar recursos",n:"Múltiples copias de datos",aka:"caché, réplicas de lectura",d:"Se guarda una copia cercana o precalculada de los datos más consultados.",c:"Datos posiblemente desactualizados; hay que invalidar."},
+ {a:"rend",g:"Gestionar recursos",n:"Acotar el tamaño de las colas",d:"Las solicitudes esperan en una cola de capacidad limitada; lo que no cabe se rechaza.",c:"Rechazos explícitos en vez de lentitud."},
+ {a:"rend",g:"Gestionar recursos",n:"Procesamiento asíncrono",aka:"diferir trabajo, colas de mensajes",d:"Se responde de inmediato y el trabajo no urgente se hace después, desde una cola.",c:"Consistencia eventual: el resultado no se ve de inmediato. Hay que manejar fallas tardías."},
+ {a:"rend",g:"Gestionar recursos",n:"Planificar recursos",aka:"scheduling",d:"Se decide qué trabajo usa qué recurso y cuándo (por ejemplo, tareas pesadas de noche).",c:"Política más compleja de operar."},
+ // SEGURIDAD
+ {a:"seg",g:"Detectar ataques",n:"Detectar intrusiones",d:"Se comparan patrones de uso con firmas o comportamiento normal para encontrar abuso.",c:"Falsos positivos que bloquean a usuarios legítimos."},
+ {a:"seg",g:"Detectar ataques",n:"Detectar denegación de servicio",d:"Se reconoce tráfico anómalo masivo y se filtra.",c:"Puede filtrar picos legítimos (como la hora pico)."},
+ {a:"seg",g:"Detectar ataques",n:"Verificar integridad del mensaje",aka:"firma, HMAC, checksum",d:"Se verifica que el mensaje no fue alterado ni fabricado.",c:"Cómputo extra en ambos extremos y gestión de llaves."},
+ {a:"seg",g:"Detectar ataques",n:"Detectar retraso del mensaje",aka:"expiración, nonce",d:"Un mensaje que llega tarde o repetido se rechaza (evita reenvíos).",c:"Requiere relojes sincronizados o estado de mensajes vistos."},
+ {a:"seg",g:"Resistir ataques",n:"Identificar actores",d:"Saber quién o qué origina cada solicitud (usuario, dispositivo, estación).",c:"Datos personales que hay que proteger."},
+ {a:"seg",g:"Resistir ataques",n:"Autenticar actores",d:"Comprobar que el actor es quien dice ser (contraseña, token, factor del dispositivo).",c:"Fricción para el usuario."},
+ {a:"seg",g:"Resistir ataques",n:"Autorizar actores",d:"Comprobar que el actor tiene permiso para esa operación.",c:"Reglas que hay que mantener."},
+ {a:"seg",g:"Resistir ataques",n:"Limitar el acceso",d:"Restringir quién puede llegar a un recurso (red, puertos, horarios, ubicación).",c:"Usuarios legítimos fuera de las reglas quedan bloqueados."},
+ {a:"seg",g:"Resistir ataques",n:"Limitar la exposición",d:"Reducir lo que un atacante gana: datos mínimos, permisos mínimos, credenciales de vida corta.",c:"Más rotación y más pasos internos."},
+ {a:"seg",g:"Resistir ataques",n:"Cifrar datos",d:"Que los datos en tránsito o guardados no se puedan leer sin la llave.",c:"Cómputo extra y gestión de llaves."},
+ {a:"seg",g:"Resistir ataques",n:"Separar entidades",d:"Aislar componentes o datos sensibles para que un compromiso no se propague.",c:"Más infraestructura e integración."},
+ {a:"seg",g:"Resistir ataques",n:"Validar entradas",d:"Rechazar entradas mal formadas o inesperadas antes de procesarlas.",c:"Reglas que hay que mantener al día."},
+ {a:"seg",g:"Reaccionar",n:"Revocar acceso",d:"Retirar credenciales o sesiones comprometidas de inmediato.",c:"Puede afectar al usuario legítimo dueño de la cuenta."},
+ {a:"seg",g:"Reaccionar",n:"Restringir el inicio de sesión",d:"Bloquear o frenar tras intentos sospechosos.",c:"Un atacante puede usarlo para bloquear cuentas ajenas."},
+ {a:"seg",g:"Reaccionar",n:"Informar a los actores",d:"Avisar al usuario, operador o sistema de un posible ataque.",c:"Alertas en exceso se ignoran."},
+ {a:"seg",g:"Recuperarse",n:"Auditoría",aka:"no repudio, bitácora",d:"Registrar quién hizo qué y cuándo, para investigar y para que nadie niegue lo que hizo.",c:"Almacenamiento y datos personales sensibles."},
+ // MODIFICABILIDAD
+ {a:"mod",g:"Aumentar la cohesión",n:"Dividir el módulo",d:"Partir un módulo grande en piezas con una responsabilidad cada una.",c:"Tiempo de refactor y riesgo de romper lo que funciona."},
+ {a:"mod",g:"Aumentar la cohesión",n:"Redistribuir responsabilidades",d:"Mover lógica al lugar donde cambia junto con lo demás.",c:"Requiere entender bien qué cambia con qué."},
+ {a:"mod",g:"Reducir el acoplamiento",n:"Encapsular",d:"Ocultar los detalles detrás de una interfaz estable.",c:"Diseñar la interfaz bien desde el principio."},
+ {a:"mod",g:"Reducir el acoplamiento",n:"Usar un intermediario",aka:"adaptador, fachada, broker",d:"Un componente traduce entre quien llama y quien es llamado, para que no se conozcan.",c:"Una capa más: latencia y otro punto de falla."},
+ {a:"mod",g:"Reducir el acoplamiento",n:"Abstraer servicios comunes",d:"Lo que varias partes hacen igual se implementa una sola vez.",c:"La abstracción puede no encajar con el siguiente caso."},
+ {a:"mod",g:"Reducir el acoplamiento",n:"Restringir dependencias",d:"Reglas sobre qué módulo puede usar a cuál (capas, fronteras).",c:"Disciplina y verificación constante."},
+ {a:"mod",g:"Diferir el enlace",n:"Parametrizar por configuración",d:"Decidir el comportamiento en tiempo de despliegue o ejecución, sin recompilar.",c:"Configuraciones inválidas que solo fallan en producción."},
+ {a:"mod",g:"Diferir el enlace",n:"Componentes enchufables",aka:"plugins, estrategia",d:"Implementaciones intercambiables detrás de un contrato común, cargadas sin tocar el núcleo.",c:"Diseñar el contrato y probar cada implementación por separado."},
+ {a:"mod",g:"Diferir el enlace",n:"Publicar-suscribir",d:"Quien produce un evento no sabe quién lo consume; los consumidores se agregan sin tocarlo.",c:"Flujo difícil de seguir y de depurar."},
+ // DESPLIEGUE
+ {a:"desp",g:"Gestionar el pipeline",n:"Despliegue escalonado",aka:"canary, por oleadas",d:"La versión nueva llega primero a una porción pequeña; se amplía si se comporta bien.",c:"Conviven dos versiones; despliegue completo más lento."},
+ {a:"desp",g:"Gestionar el pipeline",n:"Revertir despliegue",aka:"rollback",d:"Volver a la versión anterior de forma rápida y automática.",c:"Hay que conservar la versión anterior y datos compatibles."},
+ {a:"desp",g:"Gestionar el pipeline",n:"Automatizar el despliegue",aka:"script de despliegue",d:"El despliegue lo hace un proceso repetible, no una persona paso a paso.",c:"Inversión inicial y mantenimiento del pipeline."},
+ {a:"desp",g:"Gestionar el sistema desplegado",n:"Interruptores de funcionalidad",aka:"feature toggles",d:"El código nuevo se instala apagado y se enciende por configuración.",c:"Código muerto y combinaciones difíciles de probar."},
+ {a:"desp",g:"Gestionar el sistema desplegado",n:"Gestionar versiones entre servicios",d:"Varias versiones conviven con contratos compatibles.",c:"Mantener compatibilidad hacia atrás."},
+ {a:"desp",g:"Gestionar el sistema desplegado",n:"Empaquetar dependencias",d:"La versión viaja con todo lo que necesita, para comportarse igual en todas partes.",c:"Paquetes más grandes."},
+ // TESTABILIDAD
+ {a:"test",g:"Controlar y observar el estado",n:"Interfaces especializadas",d:"Puntos de entrada para fijar o leer el estado interno durante las pruebas.",c:"Superficie extra que hay que proteger en producción."},
+ {a:"test",g:"Controlar y observar el estado",n:"Grabar y reproducir",d:"Capturar entradas reales y reproducirlas para recrear una falla.",c:"Almacenamiento y datos sensibles en las grabaciones."},
+ {a:"test",g:"Controlar y observar el estado",n:"Abstraer fuentes de datos",d:"Poder reemplazar una base de datos o servicio externo por uno de prueba.",c:"Diseñar interfaces desde el inicio."},
+ {a:"test",g:"Controlar y observar el estado",n:"Entorno aislado",aka:"sandbox, emulador",d:"Probar contra un entorno que simula el real sin consecuencias.",c:"El simulador nunca es idéntico al real."},
+ {a:"test",g:"Controlar y observar el estado",n:"Aserciones ejecutables",d:"Comprobaciones en el código que revelan un estado inválido en cuanto ocurre.",c:"Costo de ejecución si quedan activas."},
+ {a:"test",g:"Limitar la complejidad",n:"Limitar la complejidad estructural",d:"Menos dependencias y ciclos entre módulos para poder probarlos por separado.",c:"Refactor previo."},
+ {a:"test",g:"Limitar la complejidad",n:"Limitar el no determinismo",d:"Eliminar fuentes de comportamiento impredecible (hilos, tiempo, azar) o controlarlas en pruebas.",c:"Puede reducir el paralelismo."}
+];
+
+const RESP = ["Detecta","Previene","Resiste","Recupera","Reacciona","Controla la demanda","Gestiona recursos","Desacopla","Difiere decisiones","Hace observable","Otra"];
+
+// ---------- estado ----------
+const store = {
+  get(k,d){try{const v=localStorage.getItem("pv:"+k);return v?JSON.parse(v):d}catch(e){return d}},
+  set(k,v){try{localStorage.setItem("pv:"+k,JSON.stringify(v))}catch(e){}}
+};
+let team = store.get("team", null);
+let tab = "caso";
+let catAttr = "todos";
+let catQuery = "";
+const blankLam = () => ({fuente:"",estimulo:"",artefacto:"",entorno:"",respuesta:"",medida:"",mechs:[],giro:"",abierto:false});
+const lam = () => { if(!team) return blankLam(); return store.get("lam:"+team, blankLam()); };
+const saveLam = (L) => { if(team) store.set("lam:"+team, L); updateCount(); };
+let giroOpen = {}; // en memoria; también se recuerda si ya abrieron
+const esc = s => String(s).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+
+// ---------- equipos ----------
+function renderDocks(){
+  const el=document.getElementById("docks");
+  el.innerHTML = Object.keys(TEAMS).map(k=>`<button class="dock" aria-pressed="${k===team}" data-team="${k}"><span class="code">${k}</span><span class="attr">${ATTRS[TEAMS[k].a].n}</span></button>`).join("");
+  el.querySelectorAll(".dock").forEach(b=>b.onclick=()=>{team=b.dataset.team;store.set("team",team);renderAll()});
+  document.getElementById("docklabel").textContent = team ? `Equipo ${team} · pareja con ${TEAMS[team].p}` : "Elijan su equipo";
+}
+
+// ---------- pestañas ----------
+document.querySelectorAll(".tab").forEach(b=>b.onclick=()=>setTab(b.dataset.tab));
+function setTab(t){
+  tab=t;
+  document.querySelectorAll(".tab").forEach(b=>b.setAttribute("aria-selected", b.dataset.tab===t));
+  ["caso","cat","lam"].forEach(k=>document.getElementById("p-"+k).hidden = k!==t);
+  if(t==="cat") renderCatList();
+  if(t==="lam") renderLam();
+  window.scrollTo({top:document.querySelector(".tabs").offsetTop,behavior:"instant"});
+}
+
+// ---------- caso ----------
+const CONTEXTO = () => `
+  <details class="ctx" open id="ctx">
+    <summary><span class="pill">Contexto</span> ¿Qué es PedalVa?</summary>
+    <div class="ctx-body">
+      <div class="prose">
+        <p>PedalVa es el sistema público de bicicletas compartidas de una ciudad colombiana de 2,5 millones de habitantes. Lo administra la <b>Secretaría de Movilidad</b> y funciona desde 2019. Las bicicletas están ancladas en 800 estaciones repartidas por la ciudad: el usuario toma una en una estación, la usa y la devuelve en cualquier otra.</p>
+        <p>La mayoría de los viajes son trayectos cortos al trabajo o al estudio, combinados con el metro. Por eso el sistema vive una hora pico muy marcada entre 6:30 y 8:00 a. m.: casi un tercio de los viajes del día empieza en esa hora y media.</p>
+        <p>El usuario paga cada viaje con saldo de su tarjeta del metro o con tarjeta bancaria. El programa municipal de movilidad para adultos mayores incluyó a miles de usuarios mayores de 60 años en los últimos dos años.</p>
+      </div>
+      <div class="parts" aria-label="Partes del sistema">
+        <div class="part"><b>App móvil</b><span>Escanea el QR del anclaje, muestra el mapa de bicicletas disponibles y el saldo.</span></div>
+        <div class="arrow" aria-hidden="true">→</div>
+        <div class="part"><b>Backend PedalVa</b><span>Valida cuentas, registra viajes, cobra y da órdenes a las estaciones. Lo construyó y lo opera el equipo de la Secretaría.</span></div>
+        <div class="arrow" aria-hidden="true">→</div>
+        <div class="part"><b>Estaciones</b><span>Cada una tiene un microcontrolador, conexión 4G, memoria local y entre 8 y 20 anclajes de dos fabricantes distintos.</span></div>
+        <div class="part ext"><b>Recaudo del metro</b><span>Sistema externo que descuenta el saldo de la tarjeta del metro. Es de otra entidad.</span></div>
+      </div>
+      <div class="prose">
+        <p><b>Quiénes intervienen.</b> El equipo de tecnología de la Secretaría (7 personas), el proveedor que fabrica e instala las estaciones, la empresa del metro (dueña del recaudo) y una interventoría externa que vigila el contrato.</p>
+        <p><b>Su papel.</b> La Secretaría contrató a 10 equipos de arquitectura, que son ustedes. Hay cinco problemas abiertos y cada uno lo reciben dos equipos con una restricción distinta. No se trata de reconstruir PedalVa: deben proponer cambios concretos que resuelvan su problema dentro de su restricción, y decir con honestidad qué empeora.</p>
+      </div>
+    </div>
+  </details>`;
+
+function renderCaso(){
+  const el=document.getElementById("p-caso");
+  const agenda = `<div class="agenda">
+    <div><b>Min 0–35</b>Entender el caso, explorar el catálogo y llenar la lámina.</div>
+    <div><b>Min 35</b>El profesor comparte la contraseña. Abran el giro.</div>
+    <div><b>Min 35–60</b>Ajustar la propuesta al giro y copiar la lámina.</div>
+    <div><b>Segunda hora</b>Socialización por parejas: 3 min cada equipo, 4 min de preguntas cruzadas.</div></div>`;
+  if(!team){ el.innerHTML = `${CONTEXTO()}<p class="prose">Elijan su equipo arriba para ver su caso. Todos los equipos trabajan sobre el mismo sistema, PedalVa.</p>${agenda}`; return; }
+  const T=TEAMS[team];
+  el.innerHTML = `${CONTEXTO()}
+    <div class="attrline"><span class="pill">${ATTRS[T.a].n}</span><h2>${esc(T.t)}</h2></div>
+    <div class="prose">${T.s.map(p=>`<p>${esc(p)}</p>`).join("")}</div>
+    <div class="measure"><span class="k">Lo que exige la Secretaría</span><p>${esc(T.m)}</p></div>
+    <div class="tension"><span class="k">Su restricción · ${esc(T.tl)}</span><p>${esc(T.tt)}</p></div>
+    <p class="pair">Su pareja es el equipo <b>${T.p}</b>: mismo problema, otra restricción. <button id="seepair">Ver su restricción</button></p>
+    <div id="pairbox" hidden class="tension"><span class="k">Restricción del ${T.p} · ${esc(TEAMS[T.p].tl)}</span><p>${esc(TEAMS[T.p].tt)}</p></div>
+    <div class="flow"><h3>Así funciona hoy un desbloqueo en PedalVa</h3><ol>
+      <li>El usuario escanea el QR del anclaje con la app.</li>
+      <li>El backend valida la cuenta y consulta el saldo.</li>
+      <li>Registra el viaje y cobra (tarjeta del metro o tarjeta bancaria).</li>
+      <li>Ordena por 4G a la estación liberar el anclaje.</li>
+      <li>Recalcula el mapa de disponibilidad que ve la app.</li></ol></div>
+    <div class="seal" id="seal"></div>
+    ${agenda}`;
+  document.getElementById("seepair").onclick=()=>{const b=document.getElementById("pairbox");b.hidden=!b.hidden};
+  renderSeal();
+}
+
+function renderSeal(){
+  const el=document.getElementById("seal"); if(!el) return;
+  const g=giroOpen[team];
+  if(g){
+    el.innerHTML = `<span class="giro-from">Giro · viene de ${esc(g.from)}</span><h3>Algo cambió</h3><p class="giro-text">${esc(g.text)}</p><p class="msg">Revisen sus mecanismos: ¿cuál se rompe, cuál sobrevive, qué agregan? Anótenlo en la sección "Giro" de la lámina.</p>`;
+    return;
+  }
+  el.innerHTML = `<span class="giro-from">Sellado hasta el minuto 35</span><h3>Giro</h3>
+    <p class="msg">El profesor compartirá la contraseña cuando sea el momento.</p>
+    <form class="row" id="sealform"><input id="pw" type="password" autocomplete="off" placeholder="Contraseña" aria-label="Contraseña del giro"><button class="btn seal-btn" type="submit">Abrir</button></form>
+    <p class="msg" id="sealmsg" aria-live="polite"></p>`;
+  document.getElementById("sealform").onsubmit = async ev => {
+    ev.preventDefault();
+    const pw=document.getElementById("pw").value.trim().toLowerCase();
+    const msg=document.getElementById("sealmsg");
+    if(!pw){msg.textContent="Escriban la contraseña.";return}
+    try{
+      const res = await openGiro(pw, team);
+      if(!res){msg.textContent="Esa contraseña no abre el giro. Revisen con el profesor.";return}
+      giroOpen[team]=res; renderSeal();
+    }catch(e){msg.textContent="Este navegador no pudo abrir el giro. Prueben en otro navegador.";}
+  };
+}
+
+// ---------- descifrado ----------
+async function sha(bytes){return new Uint8Array(await crypto.subtle.digest("SHA-256",bytes))}
+const te=new TextEncoder();
+const hex=b=>[...b].map(x=>x.toString(16).padStart(2,"0")).join("");
+async function openGiro(pw, t){
+  const chk = hex(await sha(te.encode(pw+"|pedalva-check")));
+  if(chk!==ENC.check) return null;
+  const key = await sha(te.encode(pw+"|"+t));
+  const data = Uint8Array.from(atob(ENC.giros[t]),c=>c.charCodeAt(0));
+  const out = new Uint8Array(data.length);
+  for(let i=0;i<data.length;i+=32){
+    const blk = new Uint8Array(key.length+4); blk.set(key); new DataView(blk.buffer).setUint32(key.length, i/32);
+    const ks = await sha(blk);
+    for(let j=0;j<32 && i+j<data.length;j++) out[i+j]=data[i+j]^ks[j];
+  }
+  return JSON.parse(new TextDecoder().decode(out));
+}
+
+// ---------- catálogo ----------
+function renderCat(){
+  const el=document.getElementById("p-cat");
+  const mine = team ? TEAMS[team].a : null;
+  const L=lam(); const used=new Set(L.mechs.map(m=>m.tactica));
+  el.innerHTML = `
+    <div class="prose"><p>Estas son tácticas: decisiones de diseño pequeñas que mueven un atributo de calidad. Ninguna es gratis. Busquen las que se parezcan a lo que se les ocurrió y agréguenlas a la lámina con su propio mecanismo.</p></div>
+    <div class="filters">
+      <input class="search" id="q" type="search" placeholder="Buscar: caché, cola, firma, réplica…" value="${esc(catQuery)}" aria-label="Buscar táctica">
+      <div class="chips" id="chips">${["todos",...Object.keys(ATTRS)].map(k=>`<button class="chip ${k===mine?"mine":""}" aria-pressed="${k===catAttr}" data-a="${k}">${k==="todos"?"Todos":ATTRS[k].n}</button>`).join("")}</div>
+    </div>
+    <div id="catlist" class="panel"></div>`;
+  document.getElementById("q").oninput=e=>{catQuery=e.target.value;renderCatList()};
+  document.querySelectorAll("#chips .chip").forEach(b=>b.onclick=()=>{catAttr=b.dataset.a;document.querySelectorAll("#chips .chip").forEach(x=>x.setAttribute("aria-pressed",x===b));renderCatList()});
+  renderCatList();
+}
+function norm(s){return s.toLowerCase().normalize("NFD").replace(/[̀-ͯ]/g,"")}
+function renderCatList(){
+  const el=document.getElementById("catlist"); if(!el) return;
+  const q=norm(catQuery.trim());
+  const L=lam(); const used=new Set(L.mechs.map(m=>m.tactica));
+  const items=CATALOG.filter(t=>(catAttr==="todos"||t.a===catAttr)&&(!q||norm(t.n+" "+(t.aka||"")+" "+t.d+" "+t.g).includes(q)));
+  if(!items.length){el.innerHTML=`<p class="empty">Ninguna táctica coincide. Prueben otra palabra.</p>`;return}
+  let html="", lastA=null, lastG=null;
+  for(const t of items){
+    if(t.a!==lastA){ if(lastA) html+="</div>"; html+=`<div class="cat-group"><h3>${ATTRS[t.a].n}</h3>`; lastA=t.a; lastG=null; }
+    if(t.g!==lastG){ html+=`<div class="cat-sub">${esc(t.g)}</div>`; lastG=t.g; }
+    const on=used.has(t.n);
+    html+=`<article class="tactic"><div class="top"><div><h4>${esc(t.n)}</h4>${t.aka?`<div class="aka">${esc(t.aka)}</div>`:""}</div>
+      <button class="add ${on?"on":""}" data-t="${esc(t.n)}">${on?"En la lámina ✓":"+ Lámina"}</button></div>
+      <p>${esc(t.d)}</p><p class="cost"><b>Cuesta:</b> ${esc(t.c)}</p></article>`;
+  }
+  html+="</div>";
+  el.innerHTML=html;
+  el.querySelectorAll(".add").forEach(b=>b.onclick=()=>{
+    if(!team){setTab("caso");return}
+    const L=lam(); if(L.mechs.some(m=>m.tactica===b.dataset.t)) return;
+    L.mechs.push({tactica:b.dataset.t,mecanismo:"",resp:"",sacrifica:""}); saveLam(L);
+    b.classList.add("on"); b.textContent="En la lámina ✓";
+  });
+}
+
+// ---------- lámina ----------
+function field(id,label,val,hint,area){
+  return `<div class="field"><label for="${id}">${label}</label>${hint?`<span class="hint">${hint}</span>`:""}${area?`<textarea id="${id}">${esc(val)}</textarea>`:`<input id="${id}" value="${esc(val)}">`}</div>`;
+}
+const GUIA = `
+  <details class="guide" open id="guia">
+    <summary>Qué hay que hacer en la lámina</summary>
+    <div class="guide-body">
+      <div class="prose">
+        <p><b>El objetivo.</b> Al final de la primera hora su equipo debe poder explicar en 3 minutos cómo resolvería su problema de PedalVa <b>dentro de su restricción</b>, con qué tácticas y qué está dispuesto a sacrificar. No hay una respuesta única: dos equipos con el mismo problema y distinta restricción deberían llegar a propuestas distintas.</p>
+      </div>
+      <ol class="steps">
+        <li><b>Lean su caso completo</b> en la pestaña "Nuestro caso", incluida la restricción. La restricción no es un detalle: es lo que hace difícil el problema. Una propuesta que la ignora no sirve.</li>
+        <li><b>Escriban el escenario en 6 partes</b>, como en el Bloque 2. La medida debe salir de lo que exige la Secretaría, con su número.</li>
+        <li><b>Piensen primero el mecanismo, después el nombre.</b> Pregúntense qué cambiarían en PedalVa: qué componente, qué dato, en qué momento del flujo de desbloqueo. Luego busquen en el catálogo qué táctica es esa.</li>
+        <li><b>Registren 2 o 3 mecanismos, no más.</b> Cada uno con su táctica, su responsabilidad y lo que sacrifica.</li>
+        <li><b>En el minuto 35 abran el giro</b> con la contraseña que dará el profesor. Revisen cuál de sus mecanismos se rompe y qué cambian.</li>
+        <li><b>Antes del minuto 60, copien la lámina</b> con el botón del final y péguenla en el tablero de la clase. La lámina se guarda solo en este navegador.</li>
+      </ol>
+      <div class="cmp">
+        <div class="bad"><span class="k">Mecanismo vago</span><p>"Usar caché para que la app de domicilios sea más rápida."</p><span class="why">No dice qué se guarda, dónde ni por cuánto tiempo. No se puede discutir ni evaluar.</span></div>
+        <div class="good"><span class="k">Mecanismo concreto</span><p>"El servicio de pedidos guarda en memoria el menú de cada restaurante y lo refresca cada 5 minutos. Al crear un pedido ya no consulta la base de menús."</p><span class="why">Se sabe qué cambia, en qué paso y con qué número. Ahora sí se puede preguntar qué pasa si un restaurante cambia un precio en esos 5 minutos.</span></div>
+      </div>
+      <div class="prose">
+        <p><b>Responsabilidad.</b> Qué hace el mecanismo frente al problema: lo <i>detecta</i>, lo <i>previene</i>, se <i>recupera</i> de él, <i>controla la demanda</i>, <i>desacopla</i> partes… Un buen conjunto de mecanismos suele cubrir más de una responsabilidad; si los tres "detectan", nadie resuelve.</p>
+        <p><b>Qué sacrifican.</b> Toda táctica cuesta algo: dinero, latencia, datos menos frescos, complejidad para operar, fricción para el usuario. El catálogo da una pista en "Cuesta", pero escriban el costo en PedalVa. "Nada" nunca es una respuesta válida.</p>
+      </div>
+      <details class="example">
+        <summary>Ver una lámina de ejemplo (otro sistema: domicilios de comida)</summary>
+        <div class="prose ex">
+          <p><b>Escenario.</b> Fuente: clientes de la app. Estímulo: 3.000 pedidos simultáneos un viernes a las 7 p. m. Artefacto: servicio de pedidos. Entorno: operación normal, hora pico. Respuesta: confirmar el pedido al cliente. Medida: 95 % de los pedidos confirmados en menos de 3 s.</p>
+          <p><b>Mecanismo 1 · Múltiples copias de datos.</b> El servicio de pedidos guarda en memoria el menú de cada restaurante por 5 minutos y deja de consultar la base de menús en cada pedido. Gestiona recursos. Sacrifica: un cambio de precio tarda hasta 5 minutos en verse.</p>
+          <p><b>Mecanismo 2 · Procesamiento asíncrono.</b> El pedido se confirma al cliente al validarlo; la notificación al restaurante y la factura se envían desde una cola. Gestiona recursos. Sacrifica: si el restaurante rechaza el pedido, el cliente se entera después de haber recibido la confirmación.</p>
+          <p><b>Giro.</b> "Los restaurantes exigen ver cada pedido en menos de 10 s." La cola de notificaciones se mantiene, pero con prioridad alta para notificaciones y baja para facturas (táctica: priorizar eventos).</p>
+        </div>
+      </details>
+      <div class="prose">
+        <p><b>En la socialización</b> cada equipo tiene 3 minutos. Lean su restricción, su mecanismo más importante y lo que sacrifican. Después vienen 4 minutos de preguntas cruzadas con su pareja: prepárense para que les pregunten por qué no hicieron lo que hizo el otro equipo.</p>
+      </div>
+    </div>
+  </details>`;
+
+function renderLam(){
+  const el=document.getElementById("p-lam");
+  if(!team){el.innerHTML=`<p class="prose">Elijan su equipo arriba para abrir su lámina.</p>`;return}
+  const L=lam();
+  el.innerHTML = `${GUIA}
+    <div class="form">
+      <h2 class="section-title">1. El escenario <small>en las 6 partes del Bloque 2</small></h2>
+      <div class="grid6">
+        ${field("fuente","Fuente",L.fuente,"¿Quién o qué genera el estímulo?")}
+        ${field("estimulo","Estímulo",L.estimulo,"¿Qué ocurre?")}
+        ${field("artefacto","Artefacto",L.artefacto,"¿Qué parte del sistema lo recibe?")}
+        ${field("entorno","Entorno",L.entorno,"¿En qué condiciones?")}
+        ${field("respuesta","Respuesta",L.respuesta,"¿Qué debe hacer el sistema?")}
+        ${field("medida","Medida",L.medida,"¿Cómo sabemos que lo logró?")}
+      </div>
+      <h2 class="section-title">2. Mecanismos <small>2 o 3, cada uno con nombre de táctica</small></h2>
+      <div id="mechs" class="panel"></div>
+      <div class="actions"><button class="btn ghost" id="addmech">+ Mecanismo sin táctica aún</button><button class="btn ghost" id="gocat">Ir al catálogo</button></div>
+      <h2 class="section-title">3. Giro <small>después del minuto 35</small></h2>
+      ${field("giro","¿Qué se rompió, qué sobrevivió y qué agregaron?",L.giro,"",true)}
+      <h2 class="section-title">4. Para la socialización</h2>
+      <div class="actions"><button class="btn" id="copy">Copiar lámina</button><span class="note" id="copymsg" aria-live="polite"></span></div>
+      <p class="note">La lámina se guarda solo en este navegador. Copien el texto y péguenlo en el tablero compartido de la clase.</p>
+      <textarea class="copybox" id="copybox" readonly hidden aria-label="Texto de la lámina"></textarea>
+    </div>`;
+  ["fuente","estimulo","artefacto","entorno","respuesta","medida","giro"].forEach(k=>{
+    document.getElementById(k).oninput=e=>{const L=lam();L[k]=e.target.value;saveLam(L)};
+  });
+  document.getElementById("addmech").onclick=()=>{const L=lam();L.mechs.push({tactica:"",mecanismo:"",resp:"",sacrifica:""});saveLam(L);renderMechs()};
+  document.getElementById("gocat").onclick=()=>{setTab("cat")};
+  document.getElementById("copy").onclick=copyLam;
+  renderMechs();
+}
+function renderMechs(){
+  const el=document.getElementById("mechs"); if(!el) return;
+  const L=lam();
+  if(!L.mechs.length){el.innerHTML=`<p class="empty">Aún no hay mecanismos. Agreguen uno desde el catálogo con "+ Lámina" o con el botón de abajo.</p>`;return}
+  const opts = n => `<option value="">— elegir táctica —</option>`+Object.keys(ATTRS).map(a=>`<optgroup label="${ATTRS[a].n}">${CATALOG.filter(t=>t.a===a).map(t=>`<option ${t.n===n?"selected":""}>${esc(t.n)}</option>`).join("")}</optgroup>`).join("");
+  el.innerHTML = L.mechs.map((m,i)=>`<div class="mech">
+    <div class="head"><b>Mecanismo ${i+1}</b><button class="x" data-del="${i}">Quitar</button></div>
+    <div class="field"><label for="tac${i}">Táctica</label><select id="tac${i}" data-i="${i}" data-k="tactica">${opts(m.tactica)}</select></div>
+    <div class="field"><label for="mec${i}">¿Qué hacen exactamente en PedalVa?</label><span class="hint">Concreto: qué componente, qué dato, qué número.</span><textarea id="mec${i}" data-i="${i}" data-k="mecanismo">${esc(m.mecanismo)}</textarea></div>
+    <div class="grid6">
+      <div class="field"><label for="res${i}">Responsabilidad</label><select id="res${i}" data-i="${i}" data-k="resp"><option value="">— elegir —</option>${RESP.map(r=>`<option ${r===m.resp?"selected":""}>${r}</option>`).join("")}</select></div>
+      <div class="field"><label for="sac${i}">¿Qué sacrifican?</label><input id="sac${i}" data-i="${i}" data-k="sacrifica" value="${esc(m.sacrifica)}"></div>
+    </div></div>`).join("");
+  el.querySelectorAll("[data-k]").forEach(inp=>{
+    const h=e=>{const L=lam();L.mechs[+inp.dataset.i][inp.dataset.k]=e.target.value;saveLam(L)};
+    inp.oninput=h; inp.onchange=h;
+  });
+  el.querySelectorAll("[data-del]").forEach(b=>b.onclick=()=>{const L=lam();L.mechs.splice(+b.dataset.del,1);saveLam(L);renderMechs()});
+}
+function lamText(){
+  const L=lam(), T=TEAMS[team];
+  const lines=[`EQUIPO ${team} · ${ATTRS[T.a].n} · Restricción: ${T.tl}`,"",
+    "ESCENARIO",`Fuente: ${L.fuente}`,`Estímulo: ${L.estimulo}`,`Artefacto: ${L.artefacto}`,`Entorno: ${L.entorno}`,`Respuesta: ${L.respuesta}`,`Medida: ${L.medida}`,"","MECANISMOS"];
+  L.mechs.forEach((m,i)=>{lines.push(`${i+1}. [${m.tactica||"sin táctica"}] ${m.mecanismo}`, `   Responsabilidad: ${m.resp||"-"} · Sacrifica: ${m.sacrifica||"-"}`)});
+  lines.push("","GIRO", giroOpen[team]?`(${giroOpen[team].text})`:"", L.giro);
+  return lines.join("\n");
+}
+async function copyLam(){
+  const txt=lamText(), box=document.getElementById("copybox"), msg=document.getElementById("copymsg");
+  box.value=txt;
+  try{ await navigator.clipboard.writeText(txt); msg.textContent="Copiada. Péguenla en el tablero."; box.hidden=true; }
+  catch(e){ box.hidden=false; box.focus(); box.select(); msg.textContent="Seleccionamos el texto: cópienlo con Ctrl+C."; }
+}
+function updateCount(){document.getElementById("mechcount").textContent = lam().mechs.length}
+
+function renderAll(){renderDocks();renderCaso();renderCat();renderLam();updateCount()}
+renderAll();
+</script>
+
+</body></html>
