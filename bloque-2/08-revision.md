@@ -145,6 +145,7 @@ El plan pide una lectura de alguien que no haya participado en la redacción. Pr
 - Cada cifra de ESC-05 tiene origen en la ficha: S4, S6, S14 y S26–S29.
 
 **Pendiente:** la revisión en frío (sección 5) debe incluir ESC-05 y ADR-04.
+
 ---
 
 ## 8. Cambio posterior a la exposición (13 de noviembre de 2026)
