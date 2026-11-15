@@ -133,13 +133,18 @@ No son errores, pero un evaluador podría leerlos distinto. Continúan la numera
 
 ## 6. Lo que el equipo reconoce (tarea 9.4)
 
-*Esta sección la escribe el equipo (plan, tarea 9.4). No se redacta por él. Abajo están los insumos que dejaron las fases, para que el equipo elija y escriba con sus palabras.*
+*El equipo eligió los puntos de esta sección entre los insumos de la tabla final y aprobó su redacción el 15 de noviembre de 2026 (plan, tarea 9.4).*
 
 **Números de los que menos estamos seguros, y por qué:**
-[Pendiente del equipo]
+
+1. **El límite de la base de datos, ~10.000 operaciones de saldo por segundo** (F34 y S36). Sale de una prueba pública hecha en otra máquina y con otros datos. Le restamos un 30 % por criterio propio, sin medirlo. El valor real puede estar entre 10.000 y 14.000/s, o por debajo si la prueba no se parece tanto a nuestra operación. De ese número dependen el margen de 3,3 sobre el pico y la conclusión de la extensión.
+2. **Cuántas veces reenvía cada proveedor una operación durante un cambio de servidor** (supusimos 3). Depende de la política de reintentos de cada proveedor, que no está publicada. Con 3 copias, el sistema se recupera en ~39 s y el tope de 7.500/s de la extensión queda con un margen de apenas 1,07. Con más copias, ese margen desaparece.
+3. **El límite del proveedor de listas, 5 consultas por segundo** (F37). Lo dijo el personal técnico del proveedor en su foro, no en la documentación formal, y en otra respuesta del mismo foro aparece 1/s. Con 1/s, la reconsulta en la línea base tardaría ~97 h y superaría el máximo legal de 72 h para pagar un retiro.
 
 **Lo que más discutimos como equipo y no resolvimos:**
-[Pendiente del equipo]
+
+1. **Cómo leer la extensión X1.** El texto dice que el resto del perfil de carga se mantiene. Con los mismos 12.000 jugadores, cada uno tendría que hacer 1,25 operaciones por segundo, tres veces más que el juego más rápido. La lectura coherente con nuestros números es que lleguen 60.000 jugadores. Elegimos la lectura literal porque es lo que dice el enunciado, y mostramos la otra al lado, pero no sabemos cuál espera el profesor.
+2. **Si la respuesta a X1 merece un ADR propio.** ADR-05 (admitir solo hasta 7.500 operaciones/s) sacrifica jugadas, es decir, Adecuación funcional, que tiene 2 puntos y no está entre los atributos altos. Con nuestro propio criterio del Bloque 2 no sería un escenario crítico. Lo declaramos como ADR nuevo sin formalizarlo.
 
 **Insumos (números que las propias fases señalaron como débiles):**
 
@@ -184,9 +189,9 @@ Decisiones que el equipo tomó con variantes registradas y que podrían salir en
 |---|----------|---------------|-----------|
 | D1 | Origen de los 720 retiros del *crash* (H10) | **S44 en la ficha del Bloque 2**, con la trazabilidad de ESC-04, la constante `SUPS` de la presentación del Bloque 2 y una nota fechada en `bloque-2/08-revision.md`. Es lo que pide la regla del proyecto: una cifra de requisito de un escenario va a la ficha | Registrarlo en `03` §7 como supuesto del Bloque 3 (no toca el Bloque 2, pero pone una cifra de requisito fuera de la ficha); o dejarlo como riesgo, con la defensa de que la ráfaga de ~4.000/s ya lo cubre |
 | D2 | Cómo se presenta el efecto de TAC-10 (H11) | **Cambiar el nombre del valor de comparación** a "sin la táctica (opción C sin ritmo máximo)": métrica principal, uso de la base ~1,0 → 0,31; la duración como efecto conjunto de TAC-09 y TAC-10 | Dejar el texto como está y defenderlo en la sustentación |
-| D3 | Sección 6, "Lo que el equipo reconoce" | **El equipo la escribe** con los insumos de §6, antes de la fase 10 | — |
+| D3 | Sección 6, "Lo que el equipo reconoce" | **Tres números** (límite de la base, copias por operación, F37) y **dos discusiones** (lectura de X1, ADR-05), elegidos y aprobados por el equipo el 15 de noviembre de 2026 | Cuarto número: S33. Otras discusiones: el cuello de botella (base frente a proveedor de listas) y la tensión dominante (T2 frente a T1) |
 | D4 | Campo `caso` de la plantilla (pendiente desde `00` §8) | **"Proyecto final (pregrado)"**, definido por el equipo el 15 de noviembre de 2026: Casino Andino es el proyecto final de la materia | "Proyecto propio" |
 
-D1 y D2 están aplicadas (sección 3). El campo `caso` quedó definido (D4). Antes de la fase 10, el equipo escribe la sección 6 (D3).
+D1 y D2 están aplicadas (sección 3). El campo `caso` quedó definido (D4) y la sección 6 quedó escrita (D3).
 
 La fase 10 (integración) puede arrancar.
