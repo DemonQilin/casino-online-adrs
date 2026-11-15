@@ -2,7 +2,7 @@
 
 **Materia:** Arquitectura de Software · Bloque 3 (tácticas y sizing)
 **Sistema:** Casino Andino, casino online regulado en Colombia
-**Nivel:** pregrado · **Caso:** proyecto propio
+**Nivel:** pregrado · **Caso:** proyecto final (pregrado)
 **Material de autoridad:** `docs/class-material/Tácticas y sizing · Bloque 3.html` (entrega, plantilla y rúbrica) y `docs/class-material/PedalVa Tácticas.html` (catálogo de tácticas del curso)
 **Insumos del Bloque 2:** `bloque-2/02-ficha-contexto.md`, `bloque-2/06-escenarios.md`, `bloque-2/07-adrs.md` y `bloque-2/08-revision.md`
 **Estado del plan:** validado por el equipo el 13 de noviembre de 2026.
@@ -295,4 +295,4 @@ El material anuncia estas preguntas; cada fase debe dejar su respuesta a la vist
 1. **Mapa de fases aprobado**, con sus puntos de control.
 2. **Convención de cifras nuevas aprobada** (§5). La regla correspondiente de `CLAUDE.md` se actualizó en el mismo cambio.
 3. **Identificador `TAC-NN` aprobado** para las tácticas.
-4. **Pendiente:** el valor del campo `caso` de la plantilla, "proyecto propio" o "proyecto final (pregrado)". Lo define el equipo antes de la fase 10; mientras tanto el plan usa "proyecto propio".
+4. **Campo `caso` de la plantilla: "proyecto final (pregrado)"**, definido por el equipo el 15 de noviembre de 2026. Casino Andino es el proyecto final de la materia. Hasta esa fecha el plan usaba "proyecto propio".

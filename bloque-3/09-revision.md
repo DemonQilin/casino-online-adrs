@@ -185,8 +185,8 @@ Decisiones que el equipo tomó con variantes registradas y que podrían salir en
 | D1 | Origen de los 720 retiros del *crash* (H10) | **S44 en la ficha del Bloque 2**, con la trazabilidad de ESC-04, la constante `SUPS` de la presentación del Bloque 2 y una nota fechada en `bloque-2/08-revision.md`. Es lo que pide la regla del proyecto: una cifra de requisito de un escenario va a la ficha | Registrarlo en `03` §7 como supuesto del Bloque 3 (no toca el Bloque 2, pero pone una cifra de requisito fuera de la ficha); o dejarlo como riesgo, con la defensa de que la ráfaga de ~4.000/s ya lo cubre |
 | D2 | Cómo se presenta el efecto de TAC-10 (H11) | **Cambiar el nombre del valor de comparación** a "sin la táctica (opción C sin ritmo máximo)": métrica principal, uso de la base ~1,0 → 0,31; la duración como efecto conjunto de TAC-09 y TAC-10 | Dejar el texto como está y defenderlo en la sustentación |
 | D3 | Sección 6, "Lo que el equipo reconoce" | **El equipo la escribe** con los insumos de §6, antes de la fase 10 | — |
-| D4 | Campo `caso` de la plantilla (pendiente desde `00` §8) | **Definirlo antes de la fase 10**: "proyecto propio" o "proyecto final (pregrado)" | — |
+| D4 | Campo `caso` de la plantilla (pendiente desde `00` §8) | **"Proyecto final (pregrado)"**, definido por el equipo el 15 de noviembre de 2026: Casino Andino es el proyecto final de la materia | "Proyecto propio" |
 
-D1 y D2 están aplicadas (sección 3). Antes de la fase 10, el equipo escribe la sección 6 (D3) y define el campo `caso` (D4).
+D1 y D2 están aplicadas (sección 3). El campo `caso` quedó definido (D4). Antes de la fase 10, el equipo escribe la sección 6 (D3).
 
 La fase 10 (integración) puede arrancar.

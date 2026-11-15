@@ -150,7 +150,7 @@ La plantilla pide marcar cada número con uno de tres tipos. El proyecto ya usa 
 |----------------------|----------------------|-------------------------|
 | **Referencia** | Sale de una fuente externa que se puede citar | Toda cifra con `F#`, definidas en `bloque-2/01-investigacion-dominio.md`. Incluye las normas de Coljuegos, como el máximo de 72 h para el retiro, el bloqueo a los 5 intentos fallidos o el cierre a los 20 min de inactividad [F1]. Las fuentes nuevas del Bloque 3 (límites de componentes) continúan la numeración. |
 | **Supuesto** | Lo decide el equipo, con una razón | Toda cifra con `S#`, definidas en `bloque-2/02-ficha-contexto.md` §6, y las nuevas del Bloque 3, que se registran con su razón en la fase donde nacen. |
-| **Dato** | Lo dio el cliente o la semilla | Casino Andino es un proyecto propio, sin cliente. Se marcan como dato las **definiciones del caso** que el equipo fijó como enunciado y que no se derivan de nada: 5 proveedores de juego, 4 tipos de juego, 5 medios de pago y el horizonte de diseño en el año 3 (ficha §1 y §2). El equipo hace de cliente. |
+| **Dato** | Lo dio el cliente o la semilla | Casino Andino es el proyecto final del equipo, sin cliente. Se marcan como dato las **definiciones del caso** que el equipo fijó como enunciado y que no se derivan de nada: 5 proveedores de juego, 4 tipos de juego, 5 medios de pago y el horizonte de diseño en el año 3 (ficha §1 y §2). El equipo hace de cliente. |
 
 **Cómo se escribe la marca en los markdown del Bloque 3:** `[S6 · supuesto]`, `[F27 · referencia]`, `[dato]`. Una cifra que combina varias fuentes lleva todas sus marcas, como `[S13 · supuesto][F1 · referencia]`.
 
