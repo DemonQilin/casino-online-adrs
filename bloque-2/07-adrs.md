@@ -263,4 +263,6 @@
 >
 > **1 de noviembre de 2026:** se agrega ADR-04 (escenario ESC-05, tensión T7), a pedido del equipo. Ver `08-revision.md`, sección 7.
 >
-> **13 de noviembre de 2026:** cambian los puntajes de Fiabilidad (4 → 3) y de Adecuación funcional (1 → 2) en la sección "Selección de los ADR". El texto de los cuatro ADR no cambia: su Context, sus opciones y su estado siguen igual. Ver `08-revision.md`, sección 8.
+> **13 de noviembre de 2026:** cambian los puntajes de Fiabilidad (4 → 3) y de Adecuación funcional (1 → 2) en la sección "Selección de los ADR". El texto de los cuatro ADR no cambia: su Context, sus opciones y su estado siguen igual. Ver `08-revision.md`, sección 8.>
+>
+> **15 de noviembre de 2026:** los cuatro ADR pasan de Propuesto a **Aceptado**. La opción elegida, la Decision, el "hasta dónde" y las Consequences están en `bloque-3/06-adrs.md`. El Context, las opciones y el texto original de este archivo no cambian.
