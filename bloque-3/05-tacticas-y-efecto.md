@@ -98,7 +98,7 @@ Con un solo enlace, la opción A gasta en el enlace todo el margen de caída del
 
 | Campo | Contenido |
 |-------|-----------|
-| **Táctica (catálogo)** | Redundancia activa (Disponibilidad → Recuperarse de fallas) |
+| **Táctica (catálogo)** | Redundancia activa (Disponibilidad → Recuperarse) |
 | **Mecanismo** | El sitio principal pasa de 1 a **3 servidores de base de datos**, del tamaño de S32. Cada transacción de saldo (paso 5 de `02` §3.1) se anota en orden en una libreta de solo agregar que los tres reciben. El servidor que atiende responde al proveedor (paso 6) cuando **al menos 2 de los 3** tienen la operación grabada en disco. El saldo de cada jugador se calcula desde esa libreta. La copia al sistema alterno (paso 7) sigue igual, leyendo la libreta |
 | **Responsabilidad** | Previene (la pérdida de lo confirmado) |
 | **Métrica que mueve** | Operaciones de saldo confirmadas que se pierden cuando falla el servidor de base de datos |
@@ -128,7 +128,7 @@ Con un solo enlace, la opción A gasta en el enlace todo el margen de caída del
 
 | Campo | Contenido |
 |-------|-----------|
-| **Táctica (catálogo)** | Reconfiguración (Disponibilidad → Recuperarse de fallas) |
+| **Táctica (catálogo)** | Reconfiguración (Disponibilidad → Recuperarse) |
 | **Mecanismo** | Cuando TAC-02 declara caído al servidor que atendía, los dos que quedan eligen al que tiene la libreta completa, y ese pasa a atender. El servidor de aplicación (paso 4) se reconecta al nuevo y retoma las operaciones. Las que estaban en curso sin confirmar no tienen efecto; el proveedor las revierte o las reenvía [F24] |
 | **Responsabilidad** | Recupera |
 | **Métrica que mueve** | Tiempo con el juego y el saldo detenidos tras la caída del servidor de base de datos |
@@ -311,10 +311,10 @@ uso del proveedor de listas   línea base:  16,2 consultas/s ÷ 5 /s = 3,24
 | **Táctica (catálogo)** | Limitar la tasa de eventos (Rendimiento → Controlar la demanda) |
 | **Mecanismo** | La reconsulta (paso 5 de `02` §3.2) recorre las 350.000 cuentas, compara el documento de cada una con la lista en memoria de TAC-09 y guarda la marca solo si cambió. Lo hace con un **ritmo máximo de 50 cuentas/s**, en lugar de "sin ritmo máximo" como en la línea base |
 | **Responsabilidad** | Controla la demanda |
-| **Métrica que mueve** | (1) Duración de la reconsulta. (2) Uso de la base única durante la reconsulta |
-| **Valor en la línea base** | (1) **~19,4 h**, al ritmo del proveedor. (2) Sin ritmo máximo y sin el proveedor de por medio, la reconsulta leería tan rápido como responda la base: tomaría la capacidad libre, 10.000 − 3.000 = 7.000 lecturas/s, y llevaría el uso de **0,30 a ~1,0** |
-| **Valor con la táctica** | (1) **~1,9 h**, frente a ≤ 6 h. (2) Uso de **0,30 a 0,31** |
-| **Cómo se estimó** | 350.000 cuentas ÷ 50 /s = 7.000 s ÷ 3.600 s/h = 1,94 h. Carga: 50 lecturas/s + hasta 50 escrituras/s = 100 ÷ 10.000 = +0,01 de uso. El ritmo de 50/s es ~3 veces el mínimo de 16,2/s [S19] |
+| **Métrica que mueve** | Uso de la base única durante la reconsulta. La duración de la reconsulta es un efecto conjunto con TAC-09 (ver "Cómo se estimó") |
+| **Valor en la línea base** | **Sin la táctica (opción C sin ritmo máximo): uso de ~1,0.** Con la lista propia y sin ritmo máximo, la reconsulta leería tan rápido como responda la base: tomaría la capacidad libre, 10.000 − 3.000 = 7.000 lecturas/s, y llevaría el uso de 0,30 a ~1,0. La línea base no sirve de comparación para esta métrica: en ella la reconsulta va al ritmo del proveedor (5 consultas/s) y el uso de la base se queda en 0,30 |
+| **Valor con la táctica** | Uso de **0,31** (+0,01 sobre el 0,30 del saldo). Efecto conjunto con TAC-09: la reconsulta pasa de **~19,4 h** en la línea base a **~1,9 h**, frente a ≤ 6 h |
+| **Cómo se estimó** | Carga: 50 lecturas/s + hasta 50 escrituras/s = 100 ÷ 10.000 = +0,01 de uso, frente a 7.000 ÷ 10.000 = +0,70 sin el tope. Duración: 350.000 cuentas ÷ 50 /s = 7.000 s ÷ 3.600 s/h = 1,94 h. La baja desde ~19,4 h la produce TAC-09, que saca al proveedor de la reconsulta; el tope de TAC-10 la hace más lenta que sin tope, pero la deja dentro de las 6 h. El ritmo de 50/s es ~3 veces el mínimo de 16,2/s [S19] |
 | **Tipo de la estimación** | Supuesto [S42] con el límite de la base de la fase 4 [F34][S36] |
 | **Costo cuantificado** | **Tiempo:** la reconsulta dura ~1,9 h en lugar de los minutos que tardaría sin ritmo máximo. Los retiros no esperan por eso (TAC-09), pero una marca de riesgo que cambie llega a su cuenta hasta 1,9 h después de recibir la lista |
 | **Atributo que paga** | Eficiencia de desempeño (comportamiento temporal de la reconsulta) |
@@ -341,7 +341,7 @@ Adelanto para las fases 6 y 7, que calculan el "hasta dónde" sobre la opción e
 | Base única: transacciones de saldo | ~10.000/s, uso 0,30 | **~10.000/s, uso 0,31** | TAC-01 y TAC-04 no mueven el límite (§2.1 y §2.2); TAC-10 suma 0,01 |
 | Servidor de aplicación | 16.000 peticiones/s, uso 0,26 | Uso **0,27** | TAC-07: +135 ms de cómputo por segundo; (4.200 + 135) ÷ 16.000 = 0,27 |
 | Proveedor de listas | 5 consultas/s, uso **3,24** | Uso **0,002** | TAC-09 |
-| Tiempo de la operación de saldo | p99 < 40 ms en la base | +~2 ms (1 de TAC-01, ≤ 1 de TAC-04, 0,05 de TAC-07) | La suma completa contra los 250 ms es tarea 7.2 |
+| Tiempo de la operación de saldo | p99 < 40 ms en la base | +~2,15 ms (1 de TAC-01, ≤ 1 de TAC-04, 0,05 de TAC-07, < 0,1 de TAC-06) | La suma completa contra los 250 ms es tarea 7.2 |
 
 **Lectura:** las tácticas de la operación de saldo compran garantías (pérdida cero, duplicados cero, origen verificado), no capacidad. El cuello de la fase 4 sigue en la base única con ~10.000/s. En cambio, en el retiro, la táctica de ADR-01 sí elimina el límite que ya estaba superado.
 
@@ -360,7 +360,7 @@ Adelanto para las fases 6 y 7, que calculan el "hasta dónde" sobre la opción e
 | TAC-07 | Verificar integridad del mensaje | ADR-04 | Batería de falsificación rechazada | 67 % → 100 % | +0,05 ms; 0,8 % de CPU; 5 claves con validación |
 | TAC-08 | Informar a los actores | ADR-04 (y ADR-03) | Tiempo hasta la alerta de seguridad | Sin alerta → ≤ 1 min | Hasta 240 alertas falsas al día |
 | TAC-09 | Múltiples copias de datos | ADR-01 | Evaluación del retiro durante la reconsulta | ≤ 19,4 h → ≤ 10 ms | 500 MB de memoria; dos procesos coherentes |
-| TAC-10 | Limitar la tasa de eventos | ADR-01 | Duración de la reconsulta · uso de la base | 19,4 h → 1,9 h · 0,30 → 0,31 | Marca de riesgo hasta 1,9 h tarde |
+| TAC-10 | Limitar la tasa de eventos | ADR-01 | Uso de la base durante la reconsulta · duración (con TAC-09) | ~1,0 sin tope → 0,31 · 19,4 h → 1,9 h | Marca de riesgo hasta 1,9 h tarde |
 
 Diez tácticas: 3 en ADR-02, 3 en ADR-03 (una compartida con ADR-04), 2 propias en ADR-04 y 2 en ADR-01. Todas dentro del rango de 2 a 3 por ADR del plan.
 
@@ -393,7 +393,7 @@ Se reutilizan sin cambios: F24 (una integración firma el cuerpo de cada petici�
 | S42 | **(a)** Los 5 proveedores firman el contenido de cada petición con su propio esquema, sin garantía de que firmen la hora. **(b)** La lista del proveedor tiene **hasta 1 M de registros** de ~500 bytes y se carga en memoria en **≤ 1 min**. **(c)** La evaluación local de un retiro tarda **≤ 10 ms**. **(d)** La reconsulta contra la lista propia corre a **50 cuentas/s** | (a) Las dos integraciones documentadas lo hacen [F24][F26] y S29 dice que cada proveedor trae su esquema. (b) La lista vinculante tiene 877 registros [F42]; 1 M es una cota para listas comerciales más amplias. Construir un índice de 1 M de entradas en memoria toma segundos; 1 min es margen. (c) Una búsqueda en memoria y una lectura en la base, del orden de la operación de saldo [F34]. (d) ~3 veces el mínimo de 16,2/s [S19], con +0,01 de uso de la base. Agregado el 13 de noviembre de 2026. |
 | S43 | Los rechazos se agrupan por origen en ventanas de **1 minuto** para alertar | Con el primer rechazo de un origen se abre el incidente; agrupar por minuto evita una alerta por petición y queda 5 veces por debajo del plazo de ≤ 5 min [S25][S28]. Agregado el 13 de noviembre de 2026. |
 
-**S42 junta cuatro cifras** porque todas nacen de la opción C de ADR-01 y de la B de ADR-04 y se discuten juntas en el punto de control. Si el equipo prefiere un supuesto por cifra, se separan en S42 a S45 antes de cerrar la fase.
+**S42 junta cuatro cifras** porque todas nacen de la opción C de ADR-01 y de la B de ADR-04 y se discuten juntas en el punto de control. Si el equipo prefiere un supuesto por cifra, se separan en cuatro supuestos antes de cerrar la fase.
 
 ---
 

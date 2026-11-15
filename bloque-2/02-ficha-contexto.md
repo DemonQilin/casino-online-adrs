@@ -20,7 +20,7 @@
 
 - **Carga:** 120.000 jugadores activos al mes y 350.000 cuentas registradas en el año 3. Pico normal de **5.000 jugadores simultáneos** y pico de diseño de **12.000** (viernes o sábado de quincena con promoción).
 - **Dinero en movimiento:** en el pico de diseño, cerca de **3.000 operaciones de saldo por segundo**, con ráfagas de hasta 4.000/s. Cada jugada descuenta y abona el saldo a pedido del proveedor del juego. Además, unos **12.000 depósitos y 3.000 retiros al día**.
-- **Tiempo real:** en el *crash*, el premio depende del instante exacto en que el jugador se retira, y hasta 720 jugadores pueden retirarse en el mismo segundo. En el blackjack en vivo, la ventana de apuesta dura entre 10 y 20 s y la cierra el servidor.
+- **Tiempo real:** en el *crash*, el premio depende del instante exacto en que el jugador se retira, y hasta 720 jugadores pueden retirarse en el mismo segundo [S44]. En el blackjack en vivo, la ventana de apuesta dura entre 10 y 20 s y la cierra el servidor.
 - **Disponibilidad:** juego y saldo al **99,9 % mensual** (≤ 43 min de caída al mes), con recuperación en ≤ 15 min. **Ninguna transacción de saldo confirmada puede perderse.** Hay un sistema alterno certificado obligatorio.
 - **Regulación:** concesión de Coljuegos, con certificación integral por laboratorio, **recertificación anual** y **validación previa de cada cambio crítico**. Sistema de inspección en Colombia que reporta cada transacción al regulador. Antilavado con **SARLAFT** (basado en riesgo, cumpliendo los mínimos del SIPLAFT), Ley 1581 (datos personales) y juego responsable.
 - **Seguridad:** bloqueo a los 5 intentos fallidos, cierre de sesión a los 20 minutos de inactividad y detección de suplantación por cambios bruscos de comportamiento. Además:
@@ -68,7 +68,7 @@ Además incluye: registro y verificación, cuenta y saldo, depósitos y retiros,
 |----------------|-------------------|---------------------------------|---------------------|
 | 3 proveedores de tragamonedas y ruleta | Lanzamiento de juego; peticiones de descuento, abono y reversión del saldo | ~2.760 operaciones de saldo/s en conjunto | Cada operación trae un identificador (en algunos protocolos, único solo por jugador [F26]) y puede llegar repetida. Si el operador no responde a tiempo, el proveedor revierte la operación [F24][F26]. Tiempo de espera del proveedor: ~3 s **[S14]**. Cada proveedor usa su propio esquema de autenticación **[S29]** |
 | 1 proveedor de casino en vivo | Video, apuestas por ronda, resultados y liquidación | 80 apuestas/s en ráfagas de ventana | La ventana la cierra el servidor del proveedor [F32] |
-| 1 proveedor de *crash* | Apuestas al inicio de ronda, retiros durante la ronda y liquidación | 480 apuestas/s y hasta 720 retiros en un mismo segundo | El premio se calcula con el multiplicador vigente en el instante del retiro [F13] |
+| 1 proveedor de *crash* | Apuestas al inicio de ronda, retiros durante la ronda y liquidación | 480 apuestas/s y hasta 720 retiros en un mismo segundo **[S44]** | El premio se calcula con el multiplicador vigente en el instante del retiro [F13] |
 | 5 medios de pago (PSE, Nequi, Daviplata, tarjetas, efectivo) | Depósitos, retiros y códigos de autorización | ~1.800 depósitos en la hora pico | PSE concentra ~60 % de las transacciones [F22]. El medio debe estar a nombre del jugador [F27] |
 | Servicio de verificación de identidad | Validación de documento y edad | ~1.000 registros al día **[S3]** | Documentos aceptados: CC, CE, PPT y PEP [F1] |
 | Coljuegos | Datos transaccionales para inspección, acceso remoto y certificaciones | Continuo, según la periodicidad del modelo de datos | Formato fijado por Coljuegos (XML y XSD); sistema en Colombia en un centro Tier III [F1] |
@@ -245,6 +245,7 @@ Estas condiciones no son negociables y valen para cualquier diseño.
 | S27 | **≤ 0,001 %** de las peticiones legítimas rechazadas por la verificación (≈ 240 al día con ~24 M de operaciones) | Cada rechazo indebido hace que el proveedor revierta la jugada y el jugador vea un error. Unos 240 al día, repartidos entre ~36.000 jugadores, es tolerable; más no **[Estimación]**. Agregado el 1 de noviembre de 2026. |
 | S28 | Alerta al equipo de seguridad ante una petición no emitida por un proveedor en **≤ 5 min** | Un intento de suplantación suele llegar en ráfaga; 5 min permite actuar antes de que se acumulen intentos, y es el mismo plazo de las alertas técnicas de integración (S25) **[Estimación]**. Agregado el 1 de noviembre de 2026. |
 | S29 | Cada uno de los 5 proveedores trae su propio esquema de autenticación y no acepta cambiarlo | Las integraciones con proveedores son específicas de cada uno [F25], y un operador mediano tiene poco poder para imponer condiciones a proveedores establecidos **[Estimación]**. Agregado el 1 de noviembre de 2026. |
+| S44 | En una ronda de *crash*, **hasta el 30 %** de sus jugadores se retira en el mismo segundo: con 2.400 jugadores en la ronda (S5), **720 retiros** a la vez | Muchos jugadores fijan el retiro automático en un multiplicador redondo, como 2,00x, y la ronda los alcanza a todos en el mismo instante. El 30 % es una cota para diseñar la ráfaga, no una medición **[Estimación]**. Agregado el 15 de noviembre de 2026, en la revisión del Bloque 3 (`bloque-3/09-revision.md`, H10): la cifra ya estaba en la ficha y en ESC-04, pero no tenía supuesto. |
 
 ---
 
@@ -271,3 +272,5 @@ Estas condiciones no son negociables y valen para cualquier diseño.
 > **Estado:** el equipo validó todas las métricas, incluidas las del SARLAFT (punto 5), el 25 de octubre de 2026. **Fase cerrada.**
 >
 > **1 de noviembre de 2026:** se agregaron S26–S29 y los requisitos de autenticación de proveedores (§1, §3, §4.2, §4.4) para respaldar ESC-05.
+>
+> **15 de noviembre de 2026:** se agregó S44 (720 retiros del *crash* en el mismo segundo), que no tenía supuesto, y se citó en §1 y §3. Hallazgo H10 de `bloque-3/09-revision.md`. S30 a S43 y S45 son cifras sobre la solución y viven en el Bloque 3.

@@ -51,7 +51,7 @@
 | TAC-07 Verificar integridad | ▼ +0,05 ms | · | ▼ +0,05 ms | ▼ +0,05 ms; 720 × 0,045 ms = 32 ms de cómputo ese segundo | ▲ batería 67 % → 100 % |
 | TAC-08 Informar a los actores | · | · | ▲ alerta de la clave repetida ≤ 1 min | · | ▲ alerta sin alerta → ≤ 1 min · ▼ alertas falsas (I5) |
 | TAC-09 Múltiples copias de datos | ▲ evaluación hasta ~19,4 h → ≤ 10 ms | · | · | · | · |
-| TAC-10 Limitar la tasa de eventos | ▲ reconsulta ~19,4 h → ~1,9 h | ▼ +0,01 de uso (I4) | ▼ +0,01 de uso | ▼ +0,01 de uso | ▼ +0,01 de uso |
+| TAC-10 Limitar la tasa de eventos | ▲ reconsulta ~19,4 h → ~1,9 h (con TAC-09) | ▼ +0,01 de uso (I4) | ▼ +0,01 de uso | ▼ +0,01 de uso | ▼ +0,01 de uso |
 
 **ESC-04 (sin ADR).** Es el escenario que no eligió una táctica, pero las usa: sus 720 abonos pasan por TAC-06, TAC-07, TAC-04 y TAC-01. Ninguna lo rompe (ver §3.1 y §3.5).
 

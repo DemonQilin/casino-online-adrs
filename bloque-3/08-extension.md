@@ -18,7 +18,7 @@
 3. Qué ve cada actor cuando se rompe (tarea 8.4).
 4. Qué se cambiaría y si implica un ADR nuevo o reemplazar uno (tarea 8.5).
 
-**No se agregan fuentes ni supuestos.** Toda cifra viene de las fases 3 a 7 con su marca `F#` o `S#`; las cuentas nuevas son derivadas y se escriben completas. Lo que no cuadra en una fase cerrada **no se corrige aquí**: se anota en §10 como observación para la fase 9.
+**No se agregan fuentes.** La fase 9 agregó un supuesto, S45, para el costo de rechazar una petición (§12). Toda otra cifra viene de las fases 3 a 7 con su marca `F#` o `S#`; las cuentas nuevas son derivadas y se escriben completas. Lo que no cuadra en una fase cerrada **no se corrige aquí**: se anota en §10 como observación para la fase 9.
 
 ---
 
@@ -56,7 +56,7 @@ Sin números nuevos: la tasa de la fase 3 por el factor de X1.
 ```
 tasa del pico              5 × 3.000 = 15.000 operaciones de saldo/s        [S6][X1]
                            (5 × 2.992 = 14.960; se usa 15.000 como en la fase 7)
-ráfaga                     5 × 4.000 = 20.000 operaciones/s                  (supuesto: la ráfaga escala igual)
+ráfaga                     5 × 4.000 = 20.000 operaciones/s                  (X1 multiplica la tasa del pico y la ráfaga es parte del pico)
 duración                   2 h = 7.200 s
 operaciones en las 2 h     15.000 × 7.200 = 108 M
                            108 ÷ 24 = 4,5 días normales; 108 ÷ 58 = 1,9 días pico, comprimidos en 2 h
@@ -84,7 +84,7 @@ tasa a la que se satura cada componente (literal):
   base única               ~10.000 /s (9.900 /s con la reconsulta corriendo, TAC-10)
 ```
 
-**Lectura.** Con 15.000/s se superan **dos** límites a la vez: el de la base (que ninguna táctica movió) y, en el borde, el del servidor de aplicación. La diferencia entre ellos importa para la respuesta (§8): el servidor de aplicación se multiplica sin tocar ningún ADR; la base única no.
+**Lectura.** Con 15.000/s se superan **dos** límites a la vez: el de la base (que ninguna táctica movió) y, en el borde, el del servidor de aplicación. La diferencia entre ellos importa para la respuesta (§8): el servidor de aplicación se multiplica sin tocar ningún ADR de la operación de saldo (solo replica la lista de ADR-01, I6); la base única no.
 
 ---
 
@@ -169,7 +169,7 @@ cambio de servidor (3 copias) 90 × 7.500 ÷ (9.900 − 7.500) = 675.000 ÷ 2.40
 **Por qué 7.500 y no 9.900.** Con el tope en 9.900/s no queda capacidad libre: un cambio de servidor no drena nunca. 7.500 es además el umbral que ADR-02 ya adoptó (condición (a)) y el valor más alto que cumple la medida de TAC-03 con 3 copias por operación (7.615). El margen es **estrecho (1,07)** y depende de cuántas copias envía cada proveedor, cifra que no está en las fuentes (observación 4 de `07` §8).
 
 **Qué más cambia.**
-1. **Segundo servidor de aplicación.** Rechazar también cuesta cómputo. Con el tope, el servidor lleva 7.500 admitidas + 7.500 rechazadas: (7.500 × 1,045 + 7.500 × c + 1.200) ÷ 16.000 es 0,80 si rechazar cuesta c = 0,5 ms y **1,03 si cuesta 1 ms** (el máximo que cabe es 0,93 ms). Con la lectura de 60.000 no cabe ni con 0,5 ms (1,10). Dos servidores bajan el uso a 0,52 (c = 1 ms). Costo: ~USD 1.002 × 12 = **~USD 12.000 al año** [F41] y 1.000 MB de lista en lugar de 500 (I6).
+1. **Segundo servidor de aplicación.** Rechazar también cuesta cómputo. Con el tope, el servidor lleva 7.500 admitidas + 7.500 rechazadas: (7.500 × 1,045 + 7.500 × c + 1.200) ÷ 16.000 es 0,80 si rechazar cuesta c = 0,5 ms [S45] y **1,03 si cuesta 1 ms** (el máximo que cabe es 0,93 ms). Con la lectura de 60.000 no cabe ni con 0,5 ms (1,10). Dos servidores bajan el uso a 0,52 (c = 1 ms). Costo: ~USD 1.002 × 12 = **~USD 12.000 al año** [F41] y 1.000 MB de lista en lugar de 500 (I6).
 2. **Pausar la reconsulta durante el evento.** Pausa de 2 h y luego 350.000 ÷ 50 /s = 7.000 s = 1,94 h: 2 + 1,94 = **3,9 h ≤ 6 h** [S19]. Quita los +100/s a una base que ya está cargada.
 3. **Mantener fuera de este tope las operaciones críticas de otras funciones** (retiros y depósitos): son 0,5 depósitos/s (`03` §5.2) y no compiten.
 
@@ -231,7 +231,7 @@ cambio de servidor (3 copias) 90 × 7.500 ÷ (9.900 − 7.500) = 675.000 ÷ 2.40
 | La respuesta no se reduce a "más servidores" | ✔ §8.1: la base única no se multiplica |
 | Dice si implica un ADR nuevo o reemplazar uno | ✔ §8.4: nuevo, ADR-05 |
 | Cuentas recalculadas | ✔ 5 × 3.000 = 15.000; 15.000 × 7.200 = 108 M; 108 ÷ 24 = 4,5; 15.000 ÷ 10.000 = 1,5; 15.000 ÷ 14.000 = 1,07; 20.000 ÷ 10.000 = 2,0; (15.000 × 1,045 + 1.200) ÷ 16.000 = 1,05; (20.000 × 1,045 + 1.200) ÷ 16.000 = 1,38; (15.000 × 1,045 + 6.000) ÷ 16.000 = 1,35; 432 ÷ 1.000 = 0,43; 1.200 ÷ 1.000 = 1,2; 108 M × 350 bytes = 37,8 GB; 2,5 ÷ 1,44 = 1,7; 2.970.000 ÷ 390 = 7.615; 2.970.000 ÷ 330 = 9.000; (16.000 − 1.200) ÷ 1,045 = 14.162; (16.000 − 6.000) ÷ 1,045 = 9.569; 30.000 ÷ 5.000 = 6 s; 5.000 × 7.200 = 36 M; 15.000 × 30 = 450.000; 15.000 × 0,045 = 675 ms/s = 0,675 núcleos = 4,2 %; 3.750 × 7.200 = 27 M; 675.000 ÷ 2.400 = 281; 300 ÷ 281 = 1,07; 2 + 350.000 ÷ 50 ÷ 3.600 = 3,94 h; (7.500 × 1,045 + 7.500 × 1 + 1.200) ÷ 16.000 = 1,03 y ÷ 32.000 = 0,52; 43,2 ÷ 0,5 = 86; 1.002 × 12 = 12.024 |
-| No se agregaron fuentes ni supuestos | ✔ Solo F24, F26, F34, F36, F41, S6, S14, S19, S24, S26, S27, S32 a S36, S40 a S42 (ya registradas); ningún `F#` ni `S#` nuevo |
+| No se agregaron fuentes ni supuestos | ✔ Solo F24, F26, F34, F36, F41, S6, S14, S19, S24, S26, S27, S32 a S36, S40 a S42 (ya registradas); ningún `F#` nuevo. S45 lo agregó la fase 9 (§12) |
 | Las cifras de las fases 3 a 7 no cambiaron | ✔ Se reutilizan sin modificar |
 | Solo nombres de táctica del catálogo y ningún mecanismo con marcas | ✔ Limitar la tasa de eventos y Priorizar eventos están en el catálogo (Rendimiento → Controlar la demanda) |
 | Ninguna fase cerrada se modificó | ✔ Solo se agregó este archivo |
@@ -261,3 +261,11 @@ cambio de servidor (3 copias) 90 × 7.500 ÷ (9.900 − 7.500) = 675.000 ÷ 2.40
 **Para llevar a la sustentación:** "Con la extensión, ¿qué táctica se rompe primero y qué ve el usuario?" Respuesta corta: TAC-03, desde ~7.600/s; a 15.000/s la cola alcanza los 3 s del proveedor en 6 s y las jugadas se revierten. Y la pregunta que sigue: "¿por qué no más servidores?", porque la base única recibe todas las escrituras (§8.1).
 
 La fase 9 (revisión integral) puede arrancar.
+
+---
+
+## 12. Cifra nueva (agregada en la fase 9, 15 de noviembre de 2026)
+
+| ID | Supuesto | Razón |
+|----|----------|-------|
+| S45 | Rechazar una petición de saldo en la puerta de admisión cuesta **~0,5 ms** de cómputo en el servidor de aplicación, con **1 ms** como extremo pesimista | Un rechazo interpreta la petición y arma una respuesta corta, pero no verifica el saldo ni llama a la base. S33 da ~1 ms para la petición completa, así que el rechazo cuesta menos; 0,5 ms es la mitad y 1 ms la cota. El servidor cabe hasta 0,93 ms (§8.2). Agregado en la revisión de la fase 9 (`09-revision.md`, H12). |

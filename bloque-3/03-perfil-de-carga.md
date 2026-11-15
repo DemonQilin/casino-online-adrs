@@ -135,7 +135,7 @@ No todo se mide en operaciones de saldo por segundo. Estas son las que usan las 
 |-----------|--------|-------|---------------|--------------|
 | Identificadores de transacción por conservar para conciliación (≥ 4 meses) | 24 M/día × 122 días | **~3.000 millones** | [S4][S6 · supuesto][F24 · referencia] | ADR-03: la búsqueda del identificador recorre este volumen |
 | Historial de operaciones disponible (≥ 6 meses) | 24 M/día × 183 días | **~4.400 millones** | [S4][S6 · supuesto][F1 · referencia] | Línea base: el historial es donde se busca el identificador |
-| Historial en un año | 24,2 M/día × 365 días | **~8.850 millones** (la ficha §4.5 lo redondea a ~8.900) | [S4][S6 · supuesto] | Fase 4: crecimiento de la base única |
+| Historial en un año | 24,2 M/día × 365 días | **~8.830 millones** (24,2 M × 365 = 8.834 M; la ficha §4.5 lo redondea a ~8.900) | [S4][S6 · supuesto] | Fase 4: crecimiento de la base única |
 
 Se calcula con el día promedio de S4, que ya promedia los días pico del mes. El tamaño en bytes depende de cómo se guarde cada registro: es una cifra sobre la solución y nace en la fase donde se proponga el mecanismo.
 
@@ -258,7 +258,7 @@ promedio de un día normal = 24 M operaciones ÷ 86.400 s ≈ 280 /s  →  el pi
 | Cifras nuevas registradas con razón | ✔ S31 en §7 |
 | No hay límites de componentes | ✔ Quedan para la fase 4 |
 
-**Observación para la fase 9.** Los 720 retiros del *crash* en un mismo segundo son el 30 % de los 2.400 jugadores del *crash* (S5). Ese 30 % no está escrito en ningún supuesto; `bloque-2/08-revision.md` traza la cifra a S5, S6 y S14. Se anota como candidato a hallazgo, sin cambiarlo aquí.
+**Observación para la fase 9.** Los 720 retiros del *crash* en un mismo segundo son el 30 % de los 2.400 jugadores del *crash* (S5). Ese 30 % no está escrito en ningún supuesto; `bloque-2/08-revision.md` traza la cifra a S5, S6 y S14. Se anota como candidato a hallazgo, sin cambiarlo aquí. *Resuelto en la fase 9: es el supuesto S44 de la ficha (`09-revision.md`, H10).*
 
 ---
 

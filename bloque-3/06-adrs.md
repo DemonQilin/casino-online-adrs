@@ -35,7 +35,7 @@ Las fichas de las tácticas no se repiten aquí: cada ADR enlaza las suyas en `0
 
 ## 2. ADR-01: Evaluación de los retiros contra listas restrictivas recién recibidas
 
-- **Estado:** **Aceptado** (13 de noviembre de 2026).
+- **Estado:** **Aceptado** (15 de noviembre de 2026).
 - **Escenario que lo origina:** ESC-01.
 - **Tácticas:** TAC-09 Múltiples copias de datos, TAC-10 Limitar la tasa de eventos (fichas en `05` §4).
 
@@ -77,7 +77,7 @@ Usaremos una **lista vigente propia en la memoria del servidor de aplicación** 
 | ID | Táctica (catálogo) | Métrica | Antes → después |
 |----|--------------------|---------|-----------------|
 | TAC-09 | Múltiples copias de datos | Evaluación del retiro durante la reconsulta | hasta ~19,4 h → ≤ 10 ms |
-| TAC-10 | Limitar la tasa de eventos | Duración de la reconsulta · uso de la base | ~19,4 h → ~1,9 h · 0,30 → 0,31 |
+| TAC-10 | Limitar la tasa de eventos | Uso de la base durante la reconsulta · duración (con TAC-09) | ~1,0 sin tope → 0,31 · ~19,4 h → ~1,9 h |
 
 ### Hasta dónde llegan estas tácticas
 
@@ -117,7 +117,7 @@ uso de la base única                 0,30 + (50 lecturas + 50 escrituras) ÷ 10
 
 ## 3. ADR-02: Permanencia de las operaciones de saldo confirmadas ante la caída de un servidor
 
-- **Estado:** **Aceptado** (13 de noviembre de 2026).
+- **Estado:** **Aceptado** (15 de noviembre de 2026).
 - **Escenario que lo origina:** ESC-02.
 - **Tácticas:** TAC-01 Redundancia activa, TAC-02 Latido (heartbeat), TAC-03 Reconfiguración (fichas en `05` §2.1).
 
@@ -172,7 +172,7 @@ margen sobre el pico            10.000 ÷ 3.000 = 3,3
 margen sobre la ráfaga          10.000 ÷ 4.000 = 2,5
 tolerancia a fallas             1 servidor de 3 (mayoría de 2)
 cambio de servidor              3.000 /s × 30 s = ~90.000 operaciones sin respuesta
-vuelta a p99 ≤ 250 ms           ~90.000 reenvíos ÷ (10.000 − 3.000) /s ≈ 13 s     (medida: ≤ 5 min)
+vuelta a p99 ≤ 250 ms           ~90.000 reenvíos ÷ (10.000 − 3.000) /s ≈ 13 s     (medida: ≤ 5 min; ~39 s si cada operación llega 3 veces, `07` I1)
 ```
 
 - **Siguiente componente que se satura:** la **base única**, ahora el servidor de base de datos que atiende: todas las escrituras del saldo pasan por él, y los otros dos reciben la libreta pero no suman capacidad de escritura.
@@ -185,7 +185,7 @@ vuelta a p99 ≤ 250 ms           ~90.000 reenvíos ÷ (10.000 − 3.000) /s ≈
 | Juego y saldo restablecidos en ≤ 15 min | ≤ 30 s; margen 15 min ÷ 0,5 min = 30 veces | Sí |
 | 100 % de jugadas incompletas con resultado visible | Las operaciones en curso sin confirmar no tienen efecto y el proveedor las revierte o reenvía [F24] | Sí |
 | Aviso a Coljuegos ≤ 30 min | No cambia; la detección en ≤ 0,3 s adelanta el registro del inicio del evento | Sí |
-| p99 ≤ 250 ms a los 5 min del restablecimiento | ≈ 13 s para absorber los reenvíos | Sí |
+| p99 ≤ 250 ms a los 5 min del restablecimiento | ≈ 13 s para absorber los reenvíos (~39 s con 3 copias por operación, `07` I1) | Sí |
 
 ### Consequences
 
@@ -200,7 +200,7 @@ vuelta a p99 ≤ 250 ms           ~90.000 reenvíos ÷ (10.000 − 3.000) /s ≈
 
 ## 4. ADR-03: Tratamiento de las peticiones de saldo repetidas de los proveedores de juego
 
-- **Estado:** **Aceptado** (13 de noviembre de 2026).
+- **Estado:** **Aceptado** (15 de noviembre de 2026).
 - **Escenario que lo origina:** ESC-03.
 - **Tácticas:** TAC-04 Transacciones, TAC-05 Validar entradas, TAC-06 Usar un intermediario (fichas en `05` §2.2).
 
@@ -274,9 +274,9 @@ margen sobre el pico            10.000 ÷ 3.000 = 3,3   (ráfaga: 10.000 ÷ 4.00
 ### Consequences
 
 - **Gana:** 0 duplicados sin importar el momento en que lleguen las copias (incluidos los ~90.000 reenvíos de un cambio de servidor), alerta en ≤ 1 min en lugar de sin alerta, y un proveedor nuevo es 1 pieza nueva con 0 cambios en la interfaz de saldo [S11].
-- **Paga:** ~300 GB de disco [S41]; +3.000 inserciones/s y ≤ 1 ms por operación; 5 piezas que mantener y recertificar, cada cambio entre **2 y 4 semanas** de laboratorio [S10]; hasta 240 alertas falsas al día si los rechazos legítimos llegan al tope de S27.
+- **Paga:** ~300 GB de disco [S41]; +3.000 inserciones/s y ≤ 1 ms por operación; 5 piezas que mantener y recertificar, cada cambio entre **2 y 4 semanas** de laboratorio [S10]; hasta 240 alertas falsas al día **entre ADR-03 y ADR-04** si los rechazos legítimos llegan al tope de S27, que es común a los dos (`07` I5).
 - **No resuelve:** (1) un proveedor que reutilice un identificador para otra operación del mismo jugador ve rechazada una petición legítima; (2) las repeticiones posteriores a los 4 meses de conservación [F24]; (3) el registro suma volumen a la misma base que es el cuello del saldo.
-- **Condición de revisión (propuesta):** revisar si **(a)** los datos de la base superan **2,5 TB** o el promedio supera **~43 M de operaciones al día**, **(b)** los rechazos legítimos superan **0,001 %** de las peticiones (240 al día) [S27], o **(c)** un proveedor reutiliza identificadores entre operaciones distintas del mismo jugador.
+- **Condición de revisión (propuesta):** revisar si **(a)** los datos de la base superan **2,5 TB** o el promedio supera **~43 M de operaciones al día**, **(b)** los rechazos legítimos de ADR-03 y ADR-04, sumados, superan **0,001 %** de las peticiones (240 al día) [S27], o **(c)** un proveedor reutiliza identificadores entre operaciones distintas del mismo jugador.
 
 **Dónde está este ADR en la entrega:** presentación HTML, sección "ADR" (fase 10), y este archivo.
 
@@ -284,7 +284,7 @@ margen sobre el pico            10.000 ÷ 3.000 = 3,3   (ráfaga: 10.000 ÷ 4.00
 
 ## 5. ADR-04: Verificación del origen de las peticiones de saldo de los proveedores
 
-- **Estado:** **Aceptado** (13 de noviembre de 2026).
+- **Estado:** **Aceptado** (15 de noviembre de 2026).
 - **Escenario que lo origina:** ESC-05.
 - **Tácticas:** TAC-06 Usar un intermediario (compartida con ADR-03), TAC-07 Verificar integridad del mensaje, TAC-08 Informar a los actores (fichas en `05` §3).
 
@@ -344,7 +344,7 @@ margen sobre el pico            44.400 ÷ 12.000 = 3,7
 presupuesto de verificación     20 ms ÷ 0,05 ms = 400 veces
 ```
 
-- **Siguiente componente que se satura:** la **base única** (~40.000 jugadores, `04` §3). Sigue siendo anterior al servidor de aplicación, que además se multiplica sin tocar ningún ADR.
+- **Siguiente componente que se satura:** la **base única** (~40.000 jugadores, `04` §3). Sigue siendo anterior al servidor de aplicación, que además se multiplica sin tocar ningún ADR de la operación de saldo; solo obliga a replicar la lista vigente de ADR-01 (`07` I6).
 - **¿Se cumple la medida con la carga del pico?** **Sí, con S42 (a)**: los 5 proveedores firman el contenido con su propio esquema.
 
 | Parte de la medida | Valor con la decisión | Cumple |
@@ -358,9 +358,9 @@ presupuesto de verificación     20 ms ÷ 0,05 ms = 400 veces
 ### Consequences
 
 - **Gana:** la batería de falsificación pasa de ~67 % a 100 % con +0,05 ms de 20 ms; cada proveedor conserva su esquema; el tráfico alterado se detecta y se alerta en ≤ 1 min.
-- **Paga:** +0,05 ms por operación; 0,8 % de CPU del servidor de aplicación; 5 claves que guardar y rotar, y cada rotación o cambio de esquema pasa por el laboratorio (B3) [F1] en **2 a 4 semanas** [S10]; hasta 240 alertas falsas al día [S27].
+- **Paga:** +0,05 ms por operación; 0,8 % de CPU del servidor de aplicación; 5 claves que guardar y rotar, y cada rotación o cambio de esquema pasa por el laboratorio (B3) [F1] en **2 a 4 semanas** [S10]; hasta 240 alertas falsas al día **entre ADR-03 y ADR-04** (tope común de S27, `07` I5).
 - **No resuelve:** (1) **la filtración del secreto de un proveedor**: quien lo tenga firma como ese proveedor; (2) **un proveedor que no firme el contenido** (S42 (a) falla): para él la copia con el monto modificado pasaría, por eso no se integra; (3) **no hay rechazo por petición vieja**, porque los esquemas documentados no firman la hora [F24][F26]; las copias exactas las cubre TAC-04 (ADR-03), no este ADR; (4) un certificado propio por proveedor (opción C) queda como variante, no incluida.
-- **Condición de revisión (propuesta):** revisar si **(a)** un proveedor actual o nuevo no firma el contenido de sus peticiones, **(b)** las peticiones legítimas rechazadas superan **0,001 %** (240 al día) [S27], o **(c)** la verificación supera **20 ms (p99)**, por ejemplo con un esquema más costoso que la firma de 2.048 bits.
+- **Condición de revisión (propuesta):** revisar si **(a)** un proveedor actual o nuevo no firma el contenido de sus peticiones, **(b)** las peticiones legítimas rechazadas por ADR-03 y ADR-04, sumadas, superan **0,001 %** (240 al día) [S27], o **(c)** la verificación supera **20 ms (p99)**, por ejemplo con un esquema más costoso que la firma de 2.048 bits.
 
 **Dónde está este ADR en la entrega:** presentación HTML, sección "ADR" (fase 10), y este archivo.
 
@@ -425,7 +425,7 @@ Nota agregada al final de `bloque-2/07-adrs.md` al cerrar el punto de control. E
 | # | Decisión | Aprobado | Variantes registradas |
 |---|----------|----------|-----------------------|
 | 1 | Umbrales de las condiciones de revisión | **Los propuestos en §2 a §5** | ADR-02 (b) con 10 cambios al mes; ADR-01 (a) con 900.000 cuentas |
-| 2 | ADR-04: proveedor que no firme el contenido | **No integrarlo** | Integrarlo con tope de monto por abono y alerta en cada abono atípico (exigiría S44) |
+| 2 | ADR-04: proveedor que no firme el contenido | **No integrarlo** | Integrarlo con tope de monto por abono y alerta en cada abono atípico (exigiría un supuesto nuevo) |
 | 3 | Redacción de cada Decision | **La de §2 a §5** | — |
 
 La fase 7 (interacción y límites) puede arrancar.

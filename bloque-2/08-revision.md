@@ -186,3 +186,25 @@ El plan pide una lectura de alguien que no haya participado en la redacción. Pr
 - El Context de los cuatro ADR sigue idéntico a su escenario: el cambio no toca ninguna fila de los escenarios ni el cuerpo de los ADR.
 - No se agregó ninguna cifra nueva a escenarios ni ADR, así que no hay supuestos nuevos.
 - La presentación HTML muestra el mismo reparto y los mismos cuatro escenarios críticos.
+
+---
+
+## 9. Cambio posterior a la revisión del Bloque 3 (15 de noviembre de 2026)
+
+**Hallazgo:** los 720 retiros del *crash* en un mismo segundo (30 % de los 2.400 jugadores del *crash*) aparecían en la ficha (§1 y §3) y en ESC-04, pero ningún supuesto los definía. La tabla 2.2 de esta revisión los trazaba a S5 y S6, que no derivan esa cifra. Lo encontró la revisión integral del Bloque 3 (`bloque-3/09-revision.md`, H10).
+
+**Decisión del equipo:** agregar el supuesto **S44** a la ficha, porque la regla del proyecto manda a la ficha toda cifra de requisito de un escenario.
+
+**Qué no cambia:** el texto de ESC-04, su medida y los ADR. Solo se agrega el origen de una cifra que ya estaba.
+
+**Documentos actualizados:**
+
+| Archivo | Cambio |
+|---------|--------|
+| `02` | S44 en §6, citado en §1 y §3; nota fechada al final |
+| `06` | Trazabilidad de ESC-04 |
+| `08` | Esta sección |
+| `Casino Andino.html` | Constante `SUPS` (S44) y conteo de supuestos (29 → 30) |
+
+**Numeración:** S44 sigue a S43, el último supuesto del Bloque 3. Los números S30 a S43 y S45 son cifras sobre la solución y viven en el Bloque 3; no entran en la ficha.
+

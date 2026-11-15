@@ -94,7 +94,7 @@ En la línea base el identificador se busca con el proveedor y el jugador (`02` 
 | Dimensión | Cuenta | Valor |
 |-----------|--------|-------|
 | Historial de 6 meses | 4.400 millones × 250 bytes [S34] | **~1,1 TB** |
-| Crecimiento en un año | 8.850 millones × 250 bytes | **~2,2 TB por año** |
+| Crecimiento en un año | 8.830 millones × 250 bytes | **~2,2 TB por año** |
 | Memoria del servidor | — | 128 GB [S32] |
 
 **Conclusión:** no se satura en el pico. Su costo ya está dentro del descuento de S36. Es una dimensión de **crecimiento**: el historial no deja de crecer y la opción A de ADR-03 lo usa para buscar. Se retoma en la fase 5 al cerrar esa opción.
@@ -191,7 +191,7 @@ Todos los candidatos en una tabla, ordenados por los jugadores conectados que ag
 | **Proveedor de listas** (reconsulta) | 5 consultas/s | Referencia [F37] | **3,24** | — (no depende del juego) | 108.000 cuentas en 6 h |
 | **Base única: transacciones de saldo** | ~10.000 /s (~14.000) | Supuesto sobre referencia [F34][S36] | **0,30** | 0,40 | **~40.000 jugadores** |
 | Servidor de aplicación | 16.000 peticiones/s | Supuesto [S32][S33] | 0,26 | 0,33 | ~46.000 jugadores |
-| Red pública | 1 Gbit/s | Supuesto [S35] | 0,24 | ~0,30 | ~50.000 jugadores |
+| Red pública | 1 Gbit/s | Supuesto [S35] | 0,24 | 0,26 | ~50.000 jugadores |
 | Base del alterno | Igual a la principal | Supuesto sobre referencia [F34][S36] | 0,30 | 0,40 | ~40.000 jugadores |
 | Enlace entre sitios para la copia | 6 Mbit/s de carga | Supuesto [S34] | Despreciable | Despreciable | — |
 | Búsqueda del identificador y lecturas de fondo | Dentro del límite de la base | Supuesto [S36] | Incluido arriba | Incluido arriba | — |
@@ -341,7 +341,7 @@ proveedor de listas: 350.000 cuentas ÷ 21.600 s = 16,2 consultas/s ÷ 5 /s = 3,
 | Se dice hasta cuánta carga aguanta hoy la línea base | ✔ §5: ~10.000/s, ~40.000 jugadores, margen 3,3 |
 | Hay una consecuencia para el usuario | ✔ §6: jugador, proveedor y regulador |
 | Las cuentas cuadran | ✔ 14.046 × 0,7 = 9.832; 10.000 ÷ 0,249 = 40.160; 16.000 ÷ 0,349 = 45.845; 350.000 ÷ 5 = 70.000 s = 19,4 h; 3.000 × 19,44 ÷ 24 = 2.430; 4.400 M × 250 B = 1,1 TB |
-| Las cifras que llegan de la fase 3 no cambiaron | ✔ 3.000/s, 4.000/s, 0,249, 12.000, 16,2/s, 4.400 M y 8.850 M |
+| Las cifras que llegan de la fase 3 no cambiaron | ✔ 3.000/s, 4.000/s, 0,249, 12.000, 16,2/s, 4.400 M y 8.830 M |
 | Cada cifra nueva tiene tipo y origen | ✔ F34 a F38 con su enlace; S32 a S36 con su razón |
 | Ningún mecanismo nombra tecnologías ni marcas | ✔ Los nombres de productos solo están en la lista de fuentes (§7.1) |
 | No se proponen tácticas | ✔ Las salidas al cuello quedan para la fase 5; solo se nombra a qué ADR toca cada uno |

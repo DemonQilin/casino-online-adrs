@@ -81,10 +81,11 @@ ADR-4 nace de E5, no de E4. Se dice así en la plantilla para que no parezca un 
 | Fecha | Cambio | Razón | Qué no cambia |
 |-------|--------|-------|---------------|
 | 13 de noviembre de 2026 | Adecuación funcional sube de 1 a 2 y Fiabilidad baja de 4 a 3. Reparto vigente: Seguridad 4, Fiabilidad 3, Compatibilidad 3, Desempeño 3, Adecuación funcional 2 y el resto en 1. | Retroalimentación del profesor a la exposición: el operador calcula reglas que exige el reglamento (saldo nunca negativo, límites de depósito, autoexclusión, plazo del retiro, reglas fiscales). El punto sale de Fiabilidad porque el saldo nunca negativo ya estaba atribuido entero a ella (`08` §8). | Las tensiones críticas, los cuatro atributos altos, el texto de los cinco escenarios y de los cuatro ADR. |
+| 15 de noviembre de 2026 | Se agrega a la ficha el supuesto S44: en una ronda de *crash*, hasta el 30 % de los 2.400 jugadores se retira en el mismo segundo (720 retiros). | La revisión del Bloque 3 encontró que la cifra estaba en la ficha y en ESC-04 sin supuesto que la definiera (`09-revision.md`, H10; `bloque-2/08-revision.md` §9). | El texto y la medida de ESC-04, los ADR y los puntajes. |
 
-Es el único cambio. T7, ESC-05 y ADR-04 (agregados el 1 de noviembre, `08` §7) ya estaban en la versión expuesta al profesor, así que no cuentan como cambio desde el Bloque 2.
+Son los dos únicos cambios; el segundo se agregó en la fase 9. T7, ESC-05 y ADR-04 (agregados el 1 de noviembre, `08` §7) ya estaban en la versión expuesta al profesor, así que no cuentan como cambio desde el Bloque 2.
 
-**Ningún supuesto ni medida de un escenario cambió.** Los supuestos S23 a S29 se agregaron antes de la exposición.
+**Ninguna medida de un escenario cambió.** Los supuestos S23 a S29 se agregaron antes de la exposición; S44 solo da origen a una cifra que ya estaba.
 
 **Riesgo que trae el cambio de puntajes (R5).** Con Fiabilidad en 3, ESC-02 y ESC-03 tienen dominante en 3. La defensa está en `08` §8: el corte de atributo alto es 3, esos tres atributos concentran 6 de los 10 puntos libres y el siguiente atributo tiene 2.
 
@@ -171,7 +172,7 @@ No usar el tipo "dato" y marcar las definiciones del caso como supuestos, con la
 | Comprobación | Estado |
 |--------------|--------|
 | Los ADR son los mismos del Bloque 2: cuatro, con los mismos títulos y en estado Propuesto | ✔ Títulos copiados de `bloque-2/07-adrs.md` |
-| Todo lo que cambió desde el Bloque 2 está declarado, con fecha y razón | ✔ §3: un solo cambio, el de puntajes del 13 de noviembre |
+| Todo lo que cambió desde el Bloque 2 está declarado, con fecha y razón | ✔ §3: el de puntajes del 13 de noviembre y, desde la fase 9, S44 (15 de noviembre) |
 | Cada cifra citada tiene `F#` o `S#` y su tipo | ✔ S3, S4, S6, S8, S13, S14, S19, S20, S29 y F1, todas en la ficha del Bloque 2 |
 | Las cuentas cuadran | ✔ 350.000 / 21.600 s ≈ 16,2 consultas por segundo, igual que S19 |
 | No se nombran tácticas, tecnologías ni marcas | ✔ |
@@ -186,6 +187,6 @@ No usar el tipo "dato" y marcar las definiciones del caso como supuestos, con la
 1. **Tensión dominante: T2**, Fiabilidad × Desempeño (§1). T1 y T7 quedan como variantes registradas.
 2. **Operación crítica: la operación de saldo pedida por un proveedor**, con el camino del retiro (ADR-01) como otra dimensión del perfil de carga (§4).
 3. **Tipos de cifra:** `F#` es referencia, `S#` es supuesto y "dato" se usa solo para las definiciones del caso (§5).
-4. **Versión expuesta del Bloque 2:** ya incluía ESC-05 y ADR-04. El único cambio declarado es el de puntajes del 13 de noviembre (§3.1).
+4. **Versión expuesta del Bloque 2:** ya incluía ESC-05 y ADR-04. El único cambio declarado es el de puntajes del 13 de noviembre (§3.1). *El 15 de noviembre, la fase 9 agregó S44 a §3.1 (`09-revision.md`, H10).*
 
 La fase 2 (línea base) puede arrancar.

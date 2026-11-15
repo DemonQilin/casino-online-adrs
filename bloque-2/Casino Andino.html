@@ -671,13 +671,13 @@ const QA = [
   ['Si sumamos un sexto proveedor, ¿qué duele?','Compatibilidad × Mantenibilidad: si llega sobre otra plataforma, hay que recertificar la integración. Y Seguridad × Compatibilidad: trae otro esquema de autenticación, otra pieza que verificar (ADR-04) y otro protocolo de repeticiones que entender (ADR-03).'],
   ['Si cae el Decreto 0240 o Coljuegos publica nuevos requerimientos técnicos, ¿qué cambia?','El decreto mueve las cargas al Estado (hoy ~31 % del GGR) y con ellas el presupuesto. Los requerimientos técnicos pueden mover restricciones de la ficha y de los ADR. Es justo el riesgo que asumimos al dejar Mantenibilidad en 1.'],
   ['¿Por qué los ADR no tienen decisión?','Porque el material pide llegar hasta las opciones consideradas: la decisión se toma en el Bloque 3, con las tácticas como vocabulario. Cada ADR deja escrito qué hay que medir para decidir con fundamento.'],
-  ['¿De dónde salen las cifras?','De fuentes públicas (regulación de Coljuegos, cifras del mercado colombiano y documentación de integración de proveedores) y de 29 supuestos declarados, cada uno con su razón. Las 31 cifras derivadas se recalcularon con un script.'],
+  ['¿De dónde salen las cifras?','De fuentes públicas (regulación de Coljuegos, cifras del mercado colombiano y documentación de integración de proveedores) y de 30 supuestos declarados, cada uno con su razón. Las 31 cifras derivadas se recalcularon con un script.'],
   ['¿Por qué el casino no desarrolla sus propios juegos?','Un juego propio obliga a certificar su generador aleatorio, su matemática y su retorno al jugador. El blackjack en vivo exige un estudio con crupieres operando todo el día. Un concesionario mediano compra catálogos certificados y concentra su arquitectura en la cuenta, el dinero y el cumplimiento.']
 ];
 
 /* ---------- Rúbrica ---------- */
 const RUB = [
-  ['Ficha de contexto','Ficha resumen con cifras de carga, disponibilidad, regulación, presupuesto y usuarios; 29 supuestos con razón.','Bajo. Lo que no tiene fuente pública está declarado como supuesto.'],
+  ['Ficha de contexto','Ficha resumen con cifras de carga, disponibilidad, regulación, presupuesto y usuarios; 30 supuestos con razón.','Bajo. Lo que no tiene fuente pública está declarado como supuesto.'],
   ['Priorización','Cada atributo alto y bajo justificado con el contexto, y la tabla “Lo que nos costó”.','Bajo.'],
   ['Estímulo y entorno','Estímulos que el operador observa; entornos con franja horaria, carga y modo de operación.','Bajo. ESC-04 se corrigió para que fuente y estímulo sean lo que el operador ve.'],
   ['Respuesta','Cada respuesta distingue de dos a cuatro casos.','Bajo.'],
@@ -718,7 +718,8 @@ const SUPS = [
   ['S26','La verificación del origen añade ≤ 20 ms (p99)','Deja más del 90 % del presupuesto de 250 ms.'],
   ['S27','≤ 0,001 % de peticiones legítimas rechazadas (~240 al día)','Cada rechazo indebido revierte una jugada; más sería intolerable.'],
   ['S28','Alerta de seguridad ante una petición falsificada en ≤ 5 min','La suplantación suele llegar en ráfaga.'],
-  ['S29','Cada proveedor conserva su propio esquema de autenticación','Un operador mediano tiene poco poder para imponer condiciones.']
+  ['S29','Cada proveedor conserva su propio esquema de autenticación','Un operador mediano tiene poco poder para imponer condiciones.'],
+  ['S44','Hasta el 30 % de los jugadores de una ronda de crash se retira en el mismo segundo: 720 de 2.400','Muchos fijan el retiro automático en un multiplicador redondo, como 2,00x. Agregado el 15 de noviembre de 2026.']
 ];
 const SRCS = [
   ['Coljuegos, Requerimientos Técnicos de Juegos Operados por Internet (Res. 20224000026034 de 2022)','https://sidn.ramajudicial.gov.co/SIDN/NORMATIVA/TEXTOS_COMPLETOS/8_RESOLUCIONES/RESOLUCIONES%202022/AMRJSA%20Resoluciones%2020224000026034%20de%202022%20(Requerimientos%20T%C3%A9cnicos%20de%20Juegos%20Operados%20por%20Internet).pdf'],

@@ -109,7 +109,7 @@
 
 **Por qué NO es crítico:** el dominante, Desempeño (3), es alto. Pero su costo cae en la corrección del premio (Adecuación funcional, 2), que no está entre los altos. Esa corrección la calcula el proveedor y la certifica el laboratorio, así que cumplir este escenario no obliga al operador a sacrificar un atributo que priorizamos alto. **Se escribe sin ADR, a propósito:** muestra el criterio de selección.
 
-**Trazabilidad:** ficha §4.1, §4.2, S5, S6, S15, S23 (saldo visible en p95 ≤ 2 s, agregado en la fase 8); mapa T6; priorización §2.2.
+**Trazabilidad:** ficha §4.1, §4.2, S5, S6, S15, S23 (saldo visible en p95 ≤ 2 s, agregado en la fase 8), S44 (720 retiros en el mismo segundo, agregado el 15 de noviembre de 2026); mapa T6; priorización §2.2.
 
 ---
 
