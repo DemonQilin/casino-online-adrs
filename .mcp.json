@@ -5,7 +5,7 @@
       "command": "pnpm",
       "args": [
         "dlx",
-        "chrome-devtools-mcp",
+        "chrome-devtools-mcp@1.13.0",
         "--incognito"
       ]
     }
