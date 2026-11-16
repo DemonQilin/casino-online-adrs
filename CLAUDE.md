@@ -13,7 +13,7 @@ No hay código de producto, ni build, ni lint, ni pruebas. Los entregables son d
 | Bloque | Tema | Estado | Efecto sobre los ADR |
 |--------|------|--------|----------------------|
 | 2 | Atributos de calidad, escenarios y ADR | Entregado (`bloque-2/`) | Context y opciones consideradas. Estado: Propuesto |
-| 3 | Tácticas y sizing | En curso (`bloque-3/`) | Se completan Decision y Consequences. Estado: Aceptado |
+| 3 | Tácticas y sizing | En curso: falta la plantilla (10.2) (`bloque-3/`) | Se completan Decision y Consequences. Estado: Aceptado |
 | 4 | Estilos arquitectónicos | Pendiente | Un estilo puede condicionar o reemplazar decisiones; los ADR se enlazan |
 
 ## Fuente de autoridad
@@ -84,7 +84,12 @@ No hay herramientas automáticas en el repositorio. Antes de dar una fase por te
 
 ## La presentación HTML
 
-`bloque-2/Casino Andino.html` es un único archivo autocontenido; su única dependencia externa son las fuentes de Google. El contenido vive en constantes JavaScript (`ATTRS`, `TENS`, `SC`, `ADR`, `SUPS`, `SRCS`, entre otras) y el marcado solo lo pinta. Para cambiar contenido, edita esas constantes.
+Cada bloque tiene su presentación en `bloque-N/Casino Andino.html`: un único archivo autocontenido cuya única dependencia externa son las fuentes de Google. El contenido vive en constantes JavaScript y el marcado solo lo pinta. Para cambiar contenido, edita esas constantes.
+
+| Presentación | Constantes principales | Notas |
+|--------------|------------------------|-------|
+| `bloque-2/Casino Andino.html` | `ATTRS`, `TENS`, `SC`, `ADR`, `SUPS`, `SRCS` | Identidad de mesa de paño: verde y latón |
+| `bloque-3/Casino Andino.html` | `CHAIN`, `CAND`, `TACS`, `ADR`, `INTER`, `MX`, `LIM`, `X1USE`, `X1STEP`, `X1TAC`, `QA`, `RUB`, `SUPS`, `SRCS` | Identidad de plano de capacidad: azul noche, ámbar, cian y coral, en claro y oscuro. `renderRuler()` pinta la regla de operaciones de saldo por segundo (0 a 20.000) con las marcas de `RULER_MAIN`, `RULER_BASE` y `RULER_X1`. El Context de cada `ADR` se copia tal cual de su escenario |
 
 ## Git
 

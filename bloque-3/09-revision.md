@@ -177,7 +177,7 @@ Decisiones que el equipo tomó con variantes registradas y que podrían salir en
 | Los 10 puntos del autochequeo están marcados con evidencia | ✔ §5 |
 | Las observaciones que las fases 3, 7 y 8 dejaron para la fase 9 están resueltas | ✔ `03` §9 → H10; `07` §8 → H13, H18, H19, H20 y R6; `08` §10 → H12, R6, R11, R12 y R13 (la 5 y la 6, latido bajo saturación e ingreso por jugada, se mantienen como riesgos razonados en `08`) |
 | Cada `S#` y `H#` nuevo es único | ✔ S44 definido solo en la ficha del Bloque 2 y S45 solo en `08` §12; H10 a H21 sin repetir los H1 a H9 del Bloque 2 |
-| La presentación HTML dice lo mismo que los markdown | Bloque 2: ✔ la presentación incluye S44 y cuenta 30 supuestos. Bloque 3: pendiente, se integra en la fase 10 |
+| La presentación HTML dice lo mismo que los markdown | Bloque 2: ✔ la presentación incluye S44 y cuenta 30 supuestos. Bloque 3: pendiente, se integra en la fase 10. *Actualizado el 16 de noviembre de 2026: ✔ integrada (§9).* |
 
 ---
 
@@ -195,3 +195,11 @@ Decisiones que el equipo tomó con variantes registradas y que podrían salir en
 D1 y D2 están aplicadas (sección 3). El campo `caso` quedó definido (D4) y la sección 6 quedó escrita (D3).
 
 La fase 10 (integración) puede arrancar.
+
+---
+
+## 9. Cambios posteriores al cierre
+
+| Fecha | Cambio | Archivos |
+|-------|--------|----------|
+| 16 de noviembre de 2026 | La presentación del Bloque 3 se integró en la fase 10 (tarea 10.1, commit `0ff6085`). Dice lo mismo que los markdown: las 176 cifras de la presentación aparecen literales en ellos, el Context de los cuatro ADR coincide con su escenario en las 28 filas y ningún producto aparece fuera de la lista de fuentes. La comprobación "La presentación HTML dice lo mismo que los markdown" de §7 pasa a ✔ para el Bloque 3 | `bloque-3/Casino Andino.html`, este archivo |
