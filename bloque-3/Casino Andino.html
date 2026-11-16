@@ -1,0 +1,1222 @@
+<!doctype html><html lang="es"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Casino Andino · Bloque 3</title>
+<meta name="description" content="Casino Andino, Bloque 3: tácticas, ADR completos y sizing de la operación de saldo, con su límite, su margen y la extensión X1.">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;700&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@500&display=swap">
+<style>
+/* Concepto: plano de capacidad. Azul noche, ámbar para lo que limita, cian para la carga y coral para lo que se rompe. Pestañas que siguen la cadena del bloque: punto de partida → línea base → carga → cuello → tácticas → ADR → interacción → extensión. */
+:root{
+  --bg:#F3F5F9; --surface:#FFFFFF; --surface2:#E7EBF2; --ink:#0F1A2B; --muted:#4A5670; --line:#CDD4E0;
+  --amber:#8A5A00; --amber-soft:#F7EBCF; --on-amber:#FFFFFF;
+  --cyan:#0B6A88; --cyan-soft:#DCEFF5; --red:#B0322A; --red-soft:#F8DEDA; --good:#1A6B40; --good-soft:#DCF0E4;
+  --z-cap:#CFE6EE; --z-unc1:#EED9A6; --z-unc2:#F7EBCF; --z-over:#F4D3CF;
+  --display:"Space Grotesk","Trebuchet MS",system-ui,sans-serif;
+  --body:"Inter","Segoe UI",system-ui,-apple-system,sans-serif;
+  --mono:"JetBrains Mono",ui-monospace,Menlo,Consolas,monospace;
+  color-scheme:light;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --bg:#0D1320; --surface:#141C2B; --surface2:#1C2638; --ink:#E7ECF4; --muted:#A0ABBF; --line:#2A364C;
+    --amber:#F2B544; --amber-soft:#3A2F12; --on-amber:#0D1320;
+    --cyan:#67C7E6; --cyan-soft:#12303D; --red:#FF8A7A; --red-soft:#3E1D19; --good:#6FD39B; --good-soft:#143322;
+    --z-cap:#1F4A5A; --z-unc1:#5A4618; --z-unc2:#3B2F14; --z-over:#4A2420;
+    color-scheme:dark;
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#0D1320; --surface:#141C2B; --surface2:#1C2638; --ink:#E7ECF4; --muted:#A0ABBF; --line:#2A364C;
+  --amber:#F2B544; --amber-soft:#3A2F12; --on-amber:#0D1320;
+  --cyan:#67C7E6; --cyan-soft:#12303D; --red:#FF8A7A; --red-soft:#3E1D19; --good:#6FD39B; --good-soft:#143322;
+  --z-cap:#1F4A5A; --z-unc1:#5A4618; --z-unc2:#3B2F14; --z-over:#4A2420;
+  color-scheme:dark;
+}
+*,*::before,*::after{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font:400 16px/1.55 var(--body);
+  padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+.wrap{max-width:1060px;margin:0 auto;padding-block:32px 72px}
+button{font:inherit;color:inherit}
+a{color:var(--cyan)}
+:focus-visible{outline:3px solid var(--amber);outline-offset:2px}
+h1,h2,h3,h4{font-family:var(--display);text-wrap:balance;margin:0}
+h1{font-weight:700;font-size:clamp(40px,8vw,72px);line-height:.95;letter-spacing:-.03em}
+h2{font-weight:700;font-size:clamp(24px,3.4vw,32px);line-height:1.1;letter-spacing:-.015em;margin-bottom:8px}
+h3{font-weight:500;font-size:20px;line-height:1.25}
+h4{font-weight:500;font-size:17px;line-height:1.25}
+p{margin:0 0 12px}
+ul,ol{margin:0;padding-left:20px}
+li+li{margin-top:5px}
+b{font-weight:600}
+.muted{color:var(--muted)}
+.kicker{font:500 12px var(--mono);letter-spacing:.12em;text-transform:uppercase;color:var(--amber);margin-bottom:12px}
+.lead{font-size:18px;color:var(--muted);margin-top:16px}
+.by{font:500 13px var(--mono);color:var(--muted);margin-top:14px}
+
+nav.tabs{display:flex;flex-wrap:wrap;align-items:center;gap:6px;border-bottom:1px solid var(--line);margin:28px 0 30px;padding-bottom:16px}
+nav.tabs button{border:0;background:none;padding:8px 14px;cursor:pointer;font-weight:600;font-size:15px;color:var(--muted);border-radius:999px;white-space:nowrap;transition:background .15s,color .15s}
+nav.tabs button:hover{background:var(--surface2);color:var(--ink)}
+nav.tabs button[aria-selected="true"]{background:var(--amber);color:var(--on-amber)}
+nav.tabs .sep{width:1px;height:22px;background:var(--line);margin:0 6px;flex:0 0 auto}
+@media (max-width:620px){nav.tabs .sep{display:none}}
+section.panel>*+*{margin-top:28px}
+.sub{color:var(--muted)}
+
+.chips{display:flex;flex-wrap:wrap;gap:8px}
+.chip{border:1.5px solid var(--line);background:var(--surface);border-radius:999px;padding:6px 14px;cursor:pointer;font-weight:500;font-size:15px}
+.chip:hover{border-color:var(--amber)}
+.chip[aria-pressed="true"]{background:var(--amber);border-color:var(--amber);color:var(--on-amber)}
+.tag{display:inline-block;font:500 12px var(--mono);padding:3px 10px;border-radius:999px;background:var(--surface2);color:var(--muted);white-space:nowrap}
+.tag.amber{background:var(--amber-soft);color:var(--amber)}
+.tag.cyan{background:var(--cyan-soft);color:var(--cyan)}
+.tag.red{background:var(--red-soft);color:var(--red)}
+.tag.good{background:var(--good-soft);color:var(--good)}
+
+.stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:1px;background:var(--line);border:1px solid var(--line);border-radius:12px;overflow:hidden}
+.stats>div{background:var(--surface);padding:14px 18px;min-width:0}
+.stats .n{font:500 28px/1.15 var(--mono);font-variant-numeric:tabular-nums}
+.stats .n small{font-size:15px;color:var(--muted)}
+.stats .d{font-size:14px;color:var(--muted);margin-top:4px}
+.c-cyan{color:var(--cyan)} .c-amber{color:var(--amber)} .c-red{color:var(--red)} .c-good{color:var(--good)}
+
+.three{display:grid;grid-template-columns:repeat(auto-fit,minmax(250px,1fr));gap:16px}
+.three>div{min-width:0;border-top:3px solid var(--cyan);padding-top:12px}
+.three>div:nth-child(2){border-top-color:var(--amber)}
+.three>div:nth-child(3){border-top-color:var(--red)}
+.three h3{margin-bottom:6px}
+.three p{font-size:15px;color:var(--muted);margin:0}
+.note{font-size:14px;color:var(--muted)}
+
+.card{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:20px 22px}
+.card>*+*{margin-top:12px}
+.card-head{display:flex;flex-wrap:wrap;justify-content:space-between;align-items:baseline;gap:8px}
+.card-head .src{font:500 12px var(--mono);color:var(--muted)}
+.quote{border-left:0;background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:16px 20px;font-size:17px}
+.quote p:last-child{margin-bottom:0}
+.callout{background:var(--amber-soft);border-radius:12px;padding:16px 20px}
+.callout h3{margin-bottom:6px}
+.callout p:last-child{margin-bottom:0}
+.callout.red{background:var(--red-soft)}
+.callout.cyan{background:var(--cyan-soft)}
+
+/* Regla de capacidad */
+.ruler{overflow-x:auto}
+.ruler-in{min-width:820px;display:flex;flex-direction:column;gap:6px;padding:4px 10px}
+.r-row{position:relative;height:46px}
+.r-lbl{position:absolute;text-align:center;white-space:nowrap;transform:translateX(-50%)}
+.r-lbl.top{bottom:0}
+.r-lbl.bot{top:0}
+.r-lbl.l{transform:none}
+.r-lbl.r{transform:translateX(-100%)}
+.r-lbl .v{font:500 15px var(--mono);font-variant-numeric:tabular-nums}
+.r-lbl .t{font-size:12px;color:var(--muted)}
+.r-bar{position:relative;height:18px;border-radius:9px;background:var(--surface2);overflow:hidden}
+.r-zone{position:absolute;top:0;bottom:0}
+.r-zone.cap{background:var(--z-cap)}
+.r-zone.unc{background:repeating-linear-gradient(135deg,var(--z-unc1) 0 6px,var(--z-unc2) 6px 12px)}
+.r-zone.over{background:var(--z-over)}
+.r-mark{position:absolute;top:0;bottom:0;width:3px;margin-left:-1px}
+.r-ticks{display:flex;justify-content:space-between;font:500 11px var(--mono);color:var(--muted);border-top:1px solid var(--line);padding-top:6px}
+.r-legend{display:flex;flex-wrap:wrap;gap:6px 18px;font-size:13px;color:var(--muted)}
+.r-legend i{display:inline-block;width:14px;height:10px;border-radius:3px;margin-right:6px;vertical-align:0}
+
+.tblwrap{overflow-x:auto;border:1px solid var(--line);border-radius:12px;background:var(--surface)}
+table{border-collapse:collapse;width:100%;font-size:15px}
+th,td{text-align:left;vertical-align:top;padding:10px 14px;border-bottom:1px solid var(--line)}
+tr:last-child td{border-bottom:0}
+th{font:500 12px var(--mono);letter-spacing:.08em;text-transform:uppercase;color:var(--muted);background:var(--surface2)}
+td.num{font-family:var(--mono);font-variant-numeric:tabular-nums;white-space:nowrap}
+td.nowrap{white-space:nowrap}
+tr.hi td{background:var(--cyan-soft)}
+.wide{min-width:760px}
+
+pre.calc{margin:0;font:500 13.5px/1.6 var(--mono);background:var(--surface2);border-radius:10px;padding:14px 16px;overflow-x:auto;white-space:pre}
+
+.steps{list-style:none;padding:0;margin:0;counter-reset:st;border-top:1px solid var(--line)}
+.steps>li{display:grid;grid-template-columns:44px minmax(0,1fr);gap:4px 14px;padding:14px 0;border-bottom:1px solid var(--line);margin:0}
+.steps>li::before{counter-increment:st;content:counter(st);grid-row:span 3;width:32px;height:32px;border-radius:50%;background:var(--surface2);display:grid;place-items:center;font:500 14px var(--mono)}
+.steps>li.after::before{background:transparent;border:1.5px dashed var(--line)}
+.steps h4{margin:3px 0 0}
+.steps p{margin:0;font-size:15px}
+.steps .fig{font-size:14px;color:var(--muted)}
+
+.parts{border-top:1px solid var(--line)}
+.part{display:grid;grid-template-columns:180px minmax(0,1fr);gap:6px 24px;padding:13px 0;border-bottom:1px solid var(--line)}
+.part .k{font:500 12px var(--mono);letter-spacing:.1em;text-transform:uppercase;color:var(--amber);padding-top:3px}
+.part .v{min-width:0}
+@media (max-width:620px){.part{grid-template-columns:1fr}}
+.ba{display:flex;flex-wrap:wrap;align-items:center;gap:10px;font:500 20px var(--mono)}
+.ba .arrow{color:var(--muted)}
+
+details{border:1px solid var(--line);border-radius:12px;padding:14px 18px;background:var(--surface)}
+details+details{margin-top:10px}
+summary{cursor:pointer;font-weight:500;font-family:var(--display);font-size:17px}
+details[open]>summary{margin-bottom:12px}
+details p:last-child{margin-bottom:0}
+
+.head{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+.opts{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:12px}
+.opt{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:14px 16px;display:flex;gap:12px;align-items:flex-start;min-width:0}
+.opt.on{border-color:var(--amber);border-width:2px}
+.letter{flex:0 0 30px;height:30px;border-radius:50%;background:var(--surface2);display:grid;place-items:center;font:500 15px var(--mono)}
+.opt.on .letter{background:var(--amber);color:var(--on-amber)}
+.opt p{margin:0;font-size:15px}
+.cons{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:16px}
+.cons>div{min-width:0;border-top:3px solid var(--good);padding-top:12px}
+.cons>div:nth-child(2){border-top-color:var(--amber)}
+.cons>div:nth-child(3){border-top-color:var(--red)}
+.cons>div:nth-child(4){border-top-color:var(--cyan)}
+.cons h4{margin-bottom:6px}
+.cons p{font-size:15px;margin:0}
+.ok{font:500 12px var(--mono);padding:3px 10px;border-radius:999px;background:var(--good-soft);color:var(--good);white-space:nowrap}
+
+.mx td{font-size:13.5px;min-width:120px}
+.mx td:first-child{min-width:170px;font-weight:600}
+.cell-up{background:var(--good-soft);color:var(--good)}
+.cell-dn{background:var(--red-soft);color:var(--red)}
+.cell-0{color:var(--muted);text-align:center}
+.cell-mx{background:var(--amber-soft);color:var(--amber)}
+.legend{display:flex;flex-wrap:wrap;gap:8px 18px;font-size:14px;color:var(--muted);align-items:center}
+.legend i{display:inline-block;width:14px;height:14px;border-radius:4px;vertical-align:-2px;margin-right:6px}
+
+.verd{font:500 12px var(--mono);padding:3px 10px;border-radius:999px;white-space:nowrap}
+.verd.s{background:var(--good-soft);color:var(--good)}
+.verd.x{background:var(--red-soft);color:var(--red)}
+.verd.m{background:var(--amber-soft);color:var(--amber)}
+.lvl{font:500 12px var(--mono);padding:3px 10px;border-radius:999px;background:var(--good-soft);color:var(--good);white-space:nowrap}
+.src li{word-break:break-word}
+footer{margin-top:48px;padding-top:16px;border-top:1px solid var(--line);font-size:14px;color:var(--muted)}
+@media (prefers-reduced-motion:reduce){*{transition:none!important}}
+</style></head>
+<body>
+<div class="wrap">
+  <header>
+    <div class="kicker">Arquitectura de software · ITM · Bloque 3</div>
+    <h1>Casino Andino</h1>
+    <p class="lead">De los cuatro ADR propuestos en el Bloque 2 a diez tácticas con su efecto, su costo y su límite. Se dimensiona la operación de saldo para el pico de diseño, se buscan el componente que se satura primero y hasta dónde llegan las tácticas, y se prueba todo contra un evento que multiplica el pico por 5.</p>
+    <p class="by">Equipo 8 · Fabio Guillermo Rodriguez Díaz · Sara Isabel Torres Isaza · Yeison Andres Sanchez Rodas · Juan Esteban Velez Loaiza</p>
+  </header>
+
+  <nav class="tabs" role="tablist" aria-label="Secciones">
+    <button role="tab" data-tab="resumen">0 · Resumen</button>
+    <button role="tab" data-tab="partida">1 · Punto de partida</button>
+    <button role="tab" data-tab="base">2 · Línea base</button>
+    <button role="tab" data-tab="carga">3 · Perfil de carga</button>
+    <button role="tab" data-tab="cuello">4 · Cuello de botella</button>
+    <button role="tab" data-tab="tacticas">5 · Tácticas</button>
+    <button role="tab" data-tab="adr">6 · ADR</button>
+    <button role="tab" data-tab="interaccion">7 · Interacción y límites</button>
+    <button role="tab" data-tab="x1">8 · Extensión X1</button>
+    <span class="sep" aria-hidden="true"></span>
+    <button role="tab" data-tab="sustentar">Para sustentar</button>
+    <button role="tab" data-tab="rubrica">Autoevaluación</button>
+    <button role="tab" data-tab="anexo">Supuestos y fuentes</button>
+  </nav>
+
+  <main>
+  <!-- 0 RESUMEN -->
+  <section class="panel" id="p-resumen" role="tabpanel">
+    <div>
+      <h2>El límite no se movió. Cambió lo que se pierde.</h2>
+      <p class="sub">Las diez tácticas compran garantías, no capacidad. Con ellas el sistema sigue aguantando ~10.000 operaciones de saldo por segundo; al superarlo ya no se pierde dinero ni se duplica nada: se pierde la jugada.</p>
+    </div>
+    <div class="card">
+      <div class="card-head"><h3>Operaciones de saldo por segundo</h3><span class="src">base única · límite 10.000–14.000 /s · F34 S36</span></div>
+      <div id="rulerMain"></div>
+    </div>
+    <div class="stats">
+      <div><div class="n c-cyan">3.000<small> /s</small></div><div class="d">Tasa del pico de la operación de saldo · S6</div></div>
+      <div><div class="n c-amber">~10.000<small> /s</small></div><div class="d">Límite, con y sin tácticas · F34 S36</div></div>
+      <div><div class="n">3,3<small> ×</small></div><div class="d">Margen sobre el pico (2,5 en la ráfaga; 1,8 en volumen)</div></div>
+      <div><div class="n c-red">1,5</div><div class="d">Uso de la base con X1 (15.000 /s)</div></div>
+    </div>
+    <div class="three">
+      <div><h3>Lo que compran</h3><p>0 operaciones confirmadas perdidas, 0 abonos duplicados, 100 % de la batería de falsificación rechazada y el retiro evaluado en ≤ 10 ms durante la reconsulta.</p></div>
+      <div><h3>Lo que cuestan</h3><p>~USD 24.000 al año por dos servidores más, ~300 GB de registro, 5 piezas que recertificar (2 a 4 semanas cada cambio) y hasta 240 alertas falsas al día.</p></div>
+      <div><h3>Lo que no resuelven</h3><p>Todas las escrituras del saldo pasan por un solo servidor. Con X1 se pasa ese límite y nace ADR-05: admitir solo hasta 7.500 operaciones/s.</p></div>
+    </div>
+    <div class="callout cyan">
+      <h3>Tensión dominante · T2, Fiabilidad × Eficiencia de desempeño</h3>
+      <p>En este sistema, <b>garantizar que ninguna operación de saldo confirmada se pierda</b> choca con <b>responder cada operación en p99 ≤ 250 ms con ~3.000 operaciones por segundo en el pico</b>, porque <b>asegurar cada operación, también en el sistema alterno, antes de confirmarla alarga cada respuesta y reduce cuántas caben por segundo.</b></p>
+    </div>
+    <div class="tblwrap"><table id="mapTbl"></table></div>
+  </section>
+
+  <!-- 1 PUNTO DE PARTIDA -->
+  <section class="panel" id="p-partida" role="tabpanel" hidden>
+    <div>
+      <h2>Punto de partida</h2>
+      <p class="sub">Del Bloque 2 llegan cuatro escenarios críticos y cuatro ADR en estado Propuesto. Aquí se fijan la tensión que encabeza la entrega, la operación sobre la que se hace el sizing y cómo se marca el origen de cada número.</p>
+    </div>
+    <div class="quote">
+      <div class="kicker">Tensión dominante · T2</div>
+      <p>En este sistema, <b>garantizar que ninguna operación de saldo confirmada se pierda</b> choca con <b>responder cada operación en p99 ≤ 250 ms con ~3.000 operaciones por segundo en el pico</b>, porque <b>asegurar cada operación, también en el sistema alterno, antes de confirmarla alarga cada respuesta y reduce cuántas caben por segundo.</b></p>
+      <p class="note">Pérdida cero [S13][F1] · p99 ≤ 250 ms [S14] · ~3.000 operaciones/s [S6]. Vive en la operación de saldo, es la que más se tensa con la carga y la tocan ADR-02 y ADR-03. Variantes registradas: T1 (Seguridad × Desempeño) y T7 (Seguridad × Compatibilidad).</p>
+    </div>
+    <div>
+      <h3 style="margin-bottom:12px">Escenarios críticos que llegan del Bloque 2</h3>
+      <div class="tblwrap"><table id="escTbl" class="wide"></table></div>
+      <p class="note" style="margin-top:10px">ESC-04 (ráfaga de retiros del <i>crash</i>) sigue sin ADR: su costo cae en la Adecuación funcional, con 2 puntos. En la plantilla los escenarios son E1 a E5 y los ADR, ADR-1 a ADR-4; ADR-4 nace de E5.</p>
+    </div>
+    <div class="cols-2" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:24px">
+      <div>
+        <h3 style="margin-bottom:8px">Operación crítica: el saldo pedido por un proveedor</h3>
+        <p class="note">Cada jugada hace que el proveedor pida descontar, abonar o revertir saldo. Es la de mayor volumen, mueve dinero y en ella viven ADR-02, ADR-03 y ADR-04, que comparten los 250 ms.</p>
+        <div class="tblwrap"><table id="opTbl"></table></div>
+      </div>
+      <div>
+        <h3 style="margin-bottom:8px">ADR-01 se mide en otra dimensión</h3>
+        <p class="note">Vive en el camino del retiro, no en la operación de saldo. Entra al perfil de carga como "otra dimensión que importa".</p>
+        <div class="tblwrap"><table id="dimTbl"></table></div>
+      </div>
+    </div>
+    <div>
+      <h3 style="margin-bottom:12px">Tipos de cifra</h3>
+      <div class="tblwrap"><table id="typTbl"></table></div>
+      <p class="note" style="margin-top:10px">Una cifra derivada toma el tipo de su insumo más débil: si un insumo es supuesto, la cifra es supuesto. La cuenta se escribe completa.</p>
+    </div>
+    <div>
+      <h3 style="margin-bottom:12px">Qué cambió desde el Bloque 2</h3>
+      <div class="tblwrap"><table id="chgTbl" class="wide"></table></div>
+      <p class="note" style="margin-top:10px">Ninguna medida de un escenario cambió. Desde este bloque las tácticas se nombran con el catálogo del curso y las cifras sobre la solución continúan la numeración S# y F# en la fase donde nacen.</p>
+    </div>
+  </section>
+
+  <!-- 2 LINEA BASE -->
+  <section class="panel" id="p-base" role="tabpanel" hidden>
+    <div>
+      <h2>La versión más simple que funcionaría</h2>
+      <p class="sub">Casino Andino no existe, así que la línea base es el sistema sin ninguna de las tácticas que se van a proponer: de cada ADR, la opción más simple del Bloque 2, más el piso que exige el reglamento en su forma más débil. Las cuatro opciones incumplen su medida; si no, las tácticas no tendrían contra qué compararse.</p>
+    </div>
+    <div class="tblwrap"><table id="critTbl" class="wide"></table></div>
+    <div class="quote">
+      <div class="kicker">Cómo funciona hoy</div>
+      <p>El operador tiene un sitio principal en un centro de datos Tier III con un servidor de aplicación y un servidor de base de datos, y un sistema alterno en un sitio separado con la misma composición [S30][F1]. Cuando un proveedor pide descontar, abonar o revertir saldo, la petición llega cifrada, se acepta solo si viene de una dirección registrada y trae su clave fija, y la aplicación la interpreta con el código propio de ese proveedor. Busca el identificador en el historial; si no está, en una sola transacción comprueba el saldo, lo cambia y anota la operación, y responde en cuanto queda grabada en el disco del sitio principal. Después copia las operaciones al alterno, segundos más tarde. Los retiros se evalúan contra la marca de listas guardada en cada cuenta; cuando llega una lista nueva, la reconsulta recorre todas las cuentas consultando al proveedor de listas y, mientras dura, los retiros quedan retenidos.</p>
+    </div>
+    <div class="three" style="grid-template-columns:repeat(auto-fit,minmax(300px,1fr))">
+      <div style="border-top-color:var(--cyan)">
+        <h3>Operación de saldo, en orden</h3>
+        <p>Los pasos 1 a 6 consumen los 250 ms; los dos últimos no la retrasan, pero leen la misma base.</p>
+        <ol class="steps" id="stepsSaldo" style="margin-top:12px"></ol>
+      </div>
+      <div style="border-top-color:var(--amber)">
+        <h3>Retiro, la otra dimensión</h3>
+        <p>La reconsulta corre sin ritmo máximo, tan rápido como respondan la base y el proveedor de listas.</p>
+        <ol class="steps" id="stepsRetiro" style="margin-top:12px"></ol>
+      </div>
+    </div>
+    <div>
+      <h3 style="margin-bottom:8px">Frontera con la regulación</h3>
+      <p class="sub">Algunas piezas coinciden con tácticas del catálogo, pero están porque el reglamento las exige. No se presentan como mejora; las tácticas solo pueden reforzarlas y su efecto se mide contra la forma débil.</p>
+      <div class="tblwrap"><table id="fronTbl" class="wide"></table></div>
+      <p class="note" style="margin-top:10px"><b>Riesgo de interpretación (E1).</b> El reglamento dice que el alterno recibe los cambios "de inmediato" y la línea base copia segundos después. La diferencia entre las dos lecturas es justamente la ventana de pérdida que mide ESC-02.</p>
+    </div>
+  </section>
+
+  <!-- 3 PERFIL DE CARGA -->
+  <section class="panel" id="p-carga" role="tabpanel" hidden>
+    <div>
+      <h2>De 350.000 cuentas a 3.000 operaciones por segundo</h2>
+      <p class="sub">Cada eslabón sale del anterior y la cuenta va completa. Todas las cifras son supuestos: el proyecto no tiene cliente ni mediciones, y no hay datos públicos de concurrencia en el mercado colombiano. Se diseña para el pico, no para el promedio.</p>
+    </div>
+    <div class="tblwrap"><table id="chainTbl" class="wide"></table></div>
+    <pre class="calc">Ley de Little:  16.000 llegadas/h ÷ 3.600 s = 4,44 llegadas/s × 2.700 s de sesión = 12.000 concurrentes
+Tasa del pico:  12.000 jugadores × 0,249 operaciones/s = 2.992 ≈ 3.000 operaciones de saldo/s</pre>
+    <div>
+      <h3 style="margin-bottom:8px">Promedio frente al pico</h3>
+      <p class="sub">El pico de diseño es ~11 veces el promedio de un día normal (3.000 ÷ 280) y 2,4 veces el pico normal. Dimensionar con los 24 millones diarios repartidos en 24 h daría ~280/s: el sistema quedaría corto justo el día que más dinero mueve.</p>
+      <div class="tblwrap"><table id="avgTbl"></table></div>
+    </div>
+    <div class="three" style="grid-template-columns:repeat(auto-fit,minmax(300px,1fr))">
+      <div>
+        <h3>La ráfaga</h3>
+        <p>S6 da ~4.000/s cuando coinciden las peticiones del <i>crash</i>. La reconstrucción segundo a segundo llega a ~3.560/s (2.760 + 720 abonos + 80): la cota es conservadora y se conserva.</p>
+      </div>
+      <div>
+        <h3>La operación escribe siempre</h3>
+        <p>Por operación: 4 lecturas y 2 escrituras (2 : 2 en el camino de la respuesta). En el pico, 3.000 transacciones/s grabadas en disco antes de responder. Las lecturas se reparten; las escrituras del saldo no.</p>
+      </div>
+    </div>
+    <div>
+      <h3 style="margin-bottom:12px">Otras dimensiones que importan</h3>
+      <div class="tblwrap"><table id="dimsTbl" class="wide"></table></div>
+    </div>
+    <div>
+      <h3 style="margin-bottom:12px">Presupuestos de tiempo</h3>
+      <div class="tblwrap"><table id="budTbl"></table></div>
+    </div>
+  </section>
+
+  <!-- 4 CUELLO DE BOTELLA -->
+  <section class="panel" id="p-cuello" role="tabpanel" hidden>
+    <div>
+      <h2>Qué se satura primero</h2>
+      <p class="sub">Se revisan los siete candidatos de la línea base con su límite, su fuente y su uso en el pico (carga ÷ límite). Los servidores son de 16 núcleos y 128 GB [S32], el tamaño de la prueba de referencia; uno de 4 núcleos quedaría por debajo de la ráfaga.</p>
+    </div>
+    <div class="card">
+      <div class="card-head"><h3>La base única en la línea base</h3><span class="src">uso 0,30 en el pico · 0,40 en la ráfaga</span></div>
+      <div id="rulerBase"></div>
+    </div>
+    <div class="tblwrap"><table id="candTbl" class="wide"></table></div>
+    <div class="cols-2" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:16px">
+      <div class="callout cyan">
+        <h3>Operación de saldo: la base única</h3>
+        <p>Aguanta entre ~10.000 y ~14.000 transacciones de saldo por segundo [F34][S36]; en el pico recibe 3.000/s, un uso de 0,30. <b>Con la carga del pico no se satura</b>: la línea base aguanta hasta ~40.000 jugadores conectados, 3,3 veces el pico, o ~30.000 si la ráfaga debe caber también.</p>
+      </div>
+      <div class="callout red">
+        <h3>Retiro: el proveedor de listas</h3>
+        <p>Recomienda como máximo 5 consultas por segundo [F37]. La reconsulta necesita 16,2/s [S19]: <b>un uso de 3,24</b>. Tarda ~19,4 h en lugar de 6 h y la línea base no cumple desde ~108.000 cuentas; hoy hay 350.000.</p>
+      </div>
+    </div>
+    <pre class="calc">operación de saldo:  10.000 /s ÷ 0,249 /s por jugador ≈ 40.000 jugadores conectados
+                     margen sobre el pico: 10.000 ÷ 3.000 = 3,3   (14.000 ÷ 3.000 = 4,7)
+con la ráfaga:       10.000 ÷ 1,33 = 7.500 operaciones/s sostenidas ≈ 30.000 jugadores
+reconsulta:          5 consultas/s × 21.600 s = 108.000 cuentas en 6 h; hoy hay 350.000</pre>
+    <p class="note">Por qué la base y no el servidor de aplicación (~46.000 jugadores): el servidor de aplicación se multiplica sin tocar ningún ADR; la base única no, porque todas las escrituras del saldo pasan por ella.</p>
+    <div>
+      <h3 style="margin-bottom:12px">Qué ve cada actor cuando se supera el límite</h3>
+      <div class="tblwrap"><table id="seeTbl" class="wide"></table></div>
+    </div>
+  </section>
+
+  <!-- 5 TACTICAS -->
+  <section class="panel" id="p-tacticas" role="tabpanel" hidden>
+    <div>
+      <h2>Diez tácticas como mecanismos</h2>
+      <p class="sub">Cada táctica lleva el nombre del catálogo del curso y se describe como un mecanismo concreto sobre un paso de la línea base: qué métrica mueve, de cuánto a cuánto, cómo se estimó, cuánto cuesta y qué atributo paga.</p>
+    </div>
+    <div class="tblwrap"><table id="tacTbl" class="wide"></table></div>
+    <div>
+      <h3 style="margin-bottom:12px">Ficha de cada táctica</h3>
+      <div class="chips" id="tacPills"></div>
+    </div>
+    <div id="tacBody"></div>
+  </section>
+
+  <!-- 6 ADR -->
+  <section class="panel" id="p-adr" role="tabpanel" hidden>
+    <div>
+      <h2>Los cuatro ADR, aceptados</h2>
+      <p class="sub">Cada ADR pasa de Propuesto a Aceptado con la opción que eligió el equipo, una Decision en voz activa, por qué se descartan las demás, hasta dónde llegan sus tácticas y sus Consequences con números. El Context es su escenario, copiado tal cual. El texto del Bloque 2 no se reescribe: recibe una nota con el cambio de estado.</p>
+    </div>
+    <div class="tblwrap"><table id="adrSum" class="wide"></table></div>
+    <div class="chips" id="adrPills"></div>
+    <div id="adrBody"></div>
+  </section>
+
+  <!-- 7 INTERACCION -->
+  <section class="panel" id="p-interaccion" role="tabpanel" hidden>
+    <div>
+      <h2>Interacción entre tácticas</h2>
+      <p class="sub">Ninguna interacción rompe una medida con la carga del pico. Las que empeoran un número de otro escenario lo hacen en una ventana corta o por menos del 1 % del presupuesto. La que más importa es I1: es la única donde una táctica crea el estímulo de otro escenario.</p>
+    </div>
+    <div class="tblwrap"><table id="intTbl" class="wide"></table></div>
+    <div>
+      <h3 style="margin-bottom:8px">Matriz táctica × escenario</h3>
+      <div class="legend" style="margin-bottom:12px"><span><i style="background:var(--good-soft);border:1px solid var(--good)"></i>▲ mejora la medida</span><span><i style="background:var(--red-soft);border:1px solid var(--red)"></i>▼ la empeora</span><span><i style="background:var(--amber-soft);border:1px solid var(--amber)"></i>▲▼ las dos cosas</span><span>· sin efecto</span></div>
+      <div class="tblwrap"><table id="mxTbl" class="mx"></table></div>
+      <p class="note" style="margin-top:10px">ESC-04 no eligió una táctica, pero las usa: sus 720 abonos pasan por TAC-06, TAC-07, TAC-04 y TAC-01, y ninguna lo rompe.</p>
+    </div>
+    <pre class="calc">I1 · cambio de servidor (TAC-03) → ESC-03
+operaciones sin respuesta en el cambio     3.000 /s × 30 s = 90.000          (ráfaga: 120.000)
+drenaje con 1 copia por operación          90.000 ÷ 6.900 /s = 13 s
+drenaje con 3 copias (estímulo de ESC-03)  270.000 ÷ 6.900 /s = 39 s
+medida vigente (ESC-02)                    p99 ≤ 250 ms a los 5 min = 300 s  → margen 7,7
+copias que agotan los 5 min                300 s × 6.900 /s ÷ 90.000 = 23</pre>
+    <div>
+      <h3 style="margin-bottom:12px">Sinergias</h3>
+      <div class="tblwrap"><table id="synTbl"></table></div>
+    </div>
+    <div>
+      <h3 style="margin-bottom:8px">Resumen de límites</h3>
+      <p class="sub">El límite con las diez tácticas es el mismo de la línea base. El margen de 3,3 es de tasa; el de volumen es 1,8, más estrecho.</p>
+      <div class="tblwrap"><table id="limTbl" class="wide"></table></div>
+    </div>
+    <pre class="calc">carga del pico                  3.000 operaciones de saldo/s    (ráfaga: 4.000)         [S6]
+límite de la línea base         ~10.000 operaciones de saldo/s  (~40.000 jugadores)     [F34][S36]
+límite con las tácticas         ~10.000 operaciones de saldo/s  (~40.000 jugadores)
+margen sobre el pico            10.000 ÷ 3.000 = 3,3            (ráfaga: 10.000 ÷ 4.000 = 2,5)
+siguiente componente            la base única, el servidor que atiende todas las escrituras
+margen más estrecho             volumen de datos: 2,5 TB ÷ 1,4 TB = 1,8</pre>
+    <div class="callout">
+      <h3>Qué haría falta para pasar el límite</h3>
+      <p>Que las escrituras del saldo no pasen todas por un solo servidor de base de datos: por ejemplo, repartir las cuentas de los jugadores entre varios grupos de tres servidores. Cada grupo repetiría el costo de TAC-01 y las operaciones entre cuentas de grupos distintos ya no serían una sola transacción. Es una pista para el Bloque 4, no una decisión.</p>
+    </div>
+  </section>
+
+  <!-- 8 EXTENSION X1 -->
+  <section class="panel" id="p-x1" role="tabpanel" hidden>
+    <div>
+      <h2>Extensión X1 · el pico por 5</h2>
+      <div class="quote" style="margin-top:12px"><p>"Un evento, una campaña o una alianza multiplica por 5 la tasa del pico de su operación crítica durante 2 horas. El resto del perfil de carga se mantiene."</p></div>
+    </div>
+    <div class="stats">
+      <div><div class="n c-red">15.000<small> /s</small></div><div class="d">5 × 3.000 durante 2 h (7.200 s)</div></div>
+      <div><div class="n">20.000<small> /s</small></div><div class="d">Ráfaga: 5 × 4.000</div></div>
+      <div><div class="n">108 M</div><div class="d">Operaciones en 2 h: 4,5 días normales</div></div>
+      <div><div class="n c-red">6<small> s</small></div><div class="d">Hasta que la cola supera la espera del proveedor</div></div>
+    </div>
+    <div class="card">
+      <div class="card-head"><h3>A qué tasa deja de alcanzar cada cosa</h3><span class="src">lectura literal · 12.000 conectados</span></div>
+      <div id="rulerX1"></div>
+    </div>
+    <div>
+      <h3 style="margin-bottom:8px">Uso por componente</h3>
+      <p class="sub">Con 12.000 conectados, 15.000/s son 1,25 operaciones/s por jugador, tres veces el juego más rápido. La tasa solo crece ×5 con 60.000 jugadores a ritmo normal. Se responde con la lectura literal y se muestra la otra al lado: la base se satura igual en las dos.</p>
+      <div class="tblwrap"><table id="x1Use" class="wide"></table></div>
+    </div>
+    <div class="tblwrap"><table id="x1Step" class="wide"></table></div>
+    <div>
+      <h3 style="margin-bottom:8px">Qué se sostiene y qué se rompe</h3>
+      <p class="sub">Una táctica se sostiene si su garantía no depende de la capacidad libre. <b>La que se rompe primero es TAC-03</b>: depende de que sobre capacidad después de un cambio de servidor, y X1 se la quita. Es I1 llevada al límite.</p>
+      <div class="tblwrap"><table id="x1Tac" class="wide"></table></div>
+    </div>
+    <pre class="calc">entran 15.000 /s y salen ~10.000 /s       la cola crece 5.000 /s
+el proveedor espera ~3 s [S14]           3 × 10.000 = 30.000 operaciones en cola
+se alcanza a los                         30.000 ÷ 5.000 = 6 s
+desde ahí falla 1 de cada 3              5.000 × 7.200 s = 36 M de operaciones en las 2 h</pre>
+    <div>
+      <h3 style="margin-bottom:12px">Qué ve cada actor</h3>
+      <div class="tblwrap"><table id="x1See" class="wide"></table></div>
+    </div>
+    <div class="callout">
+      <div class="kicker" style="margin-bottom:6px">ADR-05 · declarado, sin formalizar</div>
+      <h3>Admitir solo hasta 7.500 operaciones de saldo por segundo</h3>
+      <p>Más servidores no basta: el servidor de aplicación se multiplica, la base única no, porque todas las escrituras del saldo pasan por ella. La respuesta es <b>Limitar la tasa de eventos</b> en la puerta de saldo y <b>Priorizar eventos</b>: al llegar al tope se rechazan descuentos nuevos y se siguen aceptando abonos y reversiones, así no queda ningún premio sin pagar.</p>
+    </div>
+    <pre class="calc">tope                          7.500 operaciones/s = 3.750 jugadas/s admitidas  (demanda: 7.500 jugadas/s)
+jugadas rechazadas            50 %  →  3.750 /s × 7.200 s = 27 M en las 2 h
+uso de la base                7.500 ÷ 10.000 = 0,75
+cambio de servidor (3 copias) 675.000 ÷ (9.900 − 7.500) = 281 s ≤ 300 s   (margen 1,07)
+reconsulta pausada            2 h + 1,94 h = 3,9 h ≤ 6 h</pre>
+    <div class="tblwrap"><table id="x1Cost"></table></div>
+    <div>
+      <h3 style="margin-bottom:12px">¿ADR nuevo o reemplazo?</h3>
+      <div class="tblwrap"><table id="x1Adr"></table></div>
+      <p class="note" style="margin-top:10px"><b>Punto débil.</b> Las fuentes documentan que un descuento sin respuesta se revierte [F24], no un código de rechazo por carga. Un rechazo en milisegundos no puede ser peor que un silencio de ~3 s, pero hay que confirmarlo con cada proveedor. Y ADR-05 sacrifica Adecuación funcional (2): con el criterio del Bloque 2 su escenario no sería crítico.</p>
+    </div>
+  </section>
+
+  <!-- SUSTENTAR -->
+  <section class="panel" id="p-sustentar" role="tabpanel" hidden>
+    <div>
+      <h2>Para sustentar</h2>
+      <p class="sub">Las preguntas que anuncia el material para pregrado y las dos que más probablemente siguen. Las respuestas salen de las fases del bloque.</p>
+    </div>
+    <div id="qa"></div>
+  </section>
+
+  <!-- RUBRICA -->
+  <section class="panel" id="p-rubrica" role="tabpanel" hidden>
+    <div>
+      <h2>Autoevaluación</h2>
+      <p class="sub">Los nueve criterios de pregrado, el nivel que reclamamos, la evidencia y el riesgo de que un evaluador los lea distinto.</p>
+    </div>
+    <div class="tblwrap"><table id="rub" class="wide"></table></div>
+    <div class="callout cyan">
+      <h3>Cómo se verificó la cadena</h3>
+      <p>Se recalcularon con un script las 154 cifras derivadas de las fases 1 a 8, se rastreó cada cifra de los ADR hasta su F# o S#, se comprobó que las 28 filas del Context de los cuatro ADR aparecen textuales en sus escenarios y se cotejaron los nombres de las tácticas con el catálogo del curso. La revisión encontró 12 hallazgos (H10 a H21), ninguno de severidad alta, y todos se corrigieron.</p>
+    </div>
+    <div>
+      <h3 style="margin-bottom:12px">Autochequeo de la plantilla</h3>
+      <div class="tblwrap"><table id="auto" class="wide"></table></div>
+    </div>
+    <div>
+      <h3 style="margin-bottom:8px">Lo que el equipo reconoce</h3>
+      <div class="cols-2" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:24px">
+        <div><h4 style="margin-bottom:8px">Números de los que menos estamos seguros</h4><ol id="reconN"></ol></div>
+        <div><h4 style="margin-bottom:8px">Lo que discutimos y no resolvimos</h4><ol id="reconD"></ol></div>
+      </div>
+    </div>
+    <div>
+      <h3 style="margin-bottom:12px">Riesgos de lectura y su defensa</h3>
+      <div class="tblwrap"><table id="risks" class="wide"></table></div>
+    </div>
+  </section>
+
+  <!-- ANEXO -->
+  <section class="panel" id="p-anexo" role="tabpanel" hidden>
+    <div>
+      <h2>Supuestos y fuentes del Bloque 3</h2>
+      <p class="sub">Toda cifra tiene origen. Las cifras de requisito siguen en la ficha del Bloque 2 (S1 a S29 y S44); las cifras sobre la solución continúan la numeración aquí, en la fase donde nacen.</p>
+    </div>
+    <div>
+      <h3 style="margin-bottom:12px">Supuestos nuevos (15)</h3>
+      <div class="tblwrap"><table id="sups" class="wide"></table></div>
+    </div>
+    <div>
+      <h3 style="margin-bottom:12px">Fuentes nuevas (9)</h3>
+      <div class="tblwrap"><table id="srcs" class="wide"></table></div>
+      <p class="note" style="margin-top:12px">Los nombres de productos aparecen solo en esta lista, nunca en un mecanismo ni en una Decision. F37 es una respuesta del personal del proveedor en su foro público, no documentación formal; F41 es un agregador de precios usado como orden de magnitud.</p>
+    </div>
+  </section>
+
+  </main>
+
+  <footer>Bloque 3 · Los cuatro ADR pasan a Aceptado. ADR-05 queda declarado, sin formalizar. Fuente de cada cifra: <code>bloque-3/01</code> a <code>09</code>.</footer>
+</div>
+
+<script>
+const $ = s => document.querySelector(s);
+const $$ = s => [...document.querySelectorAll(s)];
+const thead = cols => '<thead><tr>' + cols.map(c => `<th>${c}</th>`).join('') + '</tr></thead>';
+const rows = (data, fn) => '<tbody>' + data.map(fn).join('') + '</tbody>';
+const tg = (t, c='') => `<span class="tag ${c}">${t}</span>`;
+
+/* ---------- Regla de capacidad ---------- */
+const RMAX = 20000;
+const ZONES = [{from:0,to:10000,cls:'cap'},{from:10000,to:14000,cls:'unc'},{from:14000,to:20000,cls:'over'}];
+const TICKS = ['0','5.000','10.000','15.000','20.000'];
+const COL = {cyan:'var(--cyan)', amber:'var(--amber)', red:'var(--red)', ink:'var(--ink)'};
+function renderRuler(el, marks){
+  const pct = v => (v / RMAX * 100);
+  const lbl = (m, pos) => {
+    const p = pct(m.v); const al = p > 92 ? ' r' : (p < 8 ? ' l' : '');
+    return `<div class="r-lbl ${pos}${al}" style="left:${p}%"><div class="v" style="color:${COL[m.c]}">${m.n}</div><div class="t">${m.t}</div></div>`;
+  };
+  el.innerHTML = `<div class="ruler" role="img" aria-label="${marks.map(m => m.n + ' ' + m.t).join('; ')}"><div class="ruler-in">
+    <div class="r-row">${marks.filter(m => m.pos === 'top').map(m => lbl(m,'top')).join('')}</div>
+    <div class="r-bar">${ZONES.map(z => `<div class="r-zone ${z.cls}" style="left:${pct(z.from)}%;width:${pct(z.to - z.from)}%"></div>`).join('')}${marks.map(m => `<div class="r-mark" style="left:${pct(m.v)}%;background:${COL[m.c]}"></div>`).join('')}</div>
+    <div class="r-row">${marks.filter(m => m.pos === 'bot').map(m => lbl(m,'bot')).join('')}</div>
+    <div class="r-ticks"><span>${TICKS.join('</span><span>')}</span></div>
+  </div></div>
+  <div class="r-legend" style="margin-top:10px"><span><i style="background:var(--z-cap)"></i>capacidad de la base</span><span><i style="background:repeating-linear-gradient(135deg,var(--z-unc1) 0 3px,var(--z-unc2) 3px 6px)"></i>rango del límite (10.000–14.000)</span><span><i style="background:var(--z-over)"></i>sobrecarga</span></div>`;
+}
+const RULER_MAIN = [
+  {v:3000, n:'3.000', t:'pico · S6', c:'cyan', pos:'top'},
+  {v:10000, n:'~10.000', t:'límite · 3,3 × el pico', c:'amber', pos:'top'},
+  {v:15000, n:'15.000', t:'X1 · pico × 5', c:'red', pos:'top'},
+  {v:4000, n:'4.000', t:'ráfaga', c:'cyan', pos:'bot'},
+  {v:7500, n:'7.500', t:'admisión ADR-05', c:'ink', pos:'bot'},
+  {v:14000, n:'14.000', t:'extremo alto', c:'amber', pos:'bot'}
+];
+const RULER_BASE = [
+  {v:3000, n:'3.000', t:'pico · uso 0,30', c:'cyan', pos:'top'},
+  {v:10000, n:'~10.000', t:'límite de la línea base · F34 S36', c:'amber', pos:'top'},
+  {v:4000, n:'4.000', t:'ráfaga · uso 0,40', c:'cyan', pos:'bot'},
+  {v:7500, n:'7.500', t:'deja de caber la ráfaga', c:'ink', pos:'bot'},
+  {v:14000, n:'14.000', t:'extremo alto', c:'amber', pos:'bot'}
+];
+const RULER_X1 = [
+  {v:7600, n:'~7.600', t:'TAC-03 se rompe', c:'red', pos:'top'},
+  {v:9900, n:'~9.900', t:'base saturada', c:'amber', pos:'top'},
+  {v:15000, n:'15.000', t:'X1 · uso 1,5', c:'red', pos:'top'},
+  {v:20000, n:'20.000', t:'ráfaga X1', c:'red', pos:'top'},
+  {v:3000, n:'3.000', t:'pico de diseño', c:'cyan', pos:'bot'},
+  {v:7500, n:'7.500', t:'tope ADR-05', c:'ink', pos:'bot'},
+  {v:14200, n:'~14.200', t:'servidor de aplicación', c:'amber', pos:'bot'}
+];
+
+/* ---------- 0 · Resumen ---------- */
+const MAP = [
+  ['ADR-01','ESC-01','C · lista vigente propia','TAC-09, TAC-10','Retiro evaluado en ≤ 10 ms durante la reconsulta; reconsulta de ~19,4 h a ~1,9 h'],
+  ['ADR-02','ESC-02','C · libreta confirmada por mayoría','TAC-01, TAC-02, TAC-03','Operaciones perdidas de ~3.000 a 0; restablecer de 10–30 min a ≤ 30 s'],
+  ['ADR-03','ESC-03','B con la traducción de C','TAC-04, TAC-05, TAC-06','Abonos duplicados a 0; misma clave con datos distintos rechazada al 100 %'],
+  ['ADR-04','ESC-05','B · firma por petición','TAC-06, TAC-07, TAC-08','Batería de falsificación de 67 % a 100 %; alerta en ≤ 1 min']
+];
+
+/* ---------- 1 · Punto de partida ---------- */
+const ESC = [
+  ['ESC-01 · Retiro de un jugador incluido en una lista recién recibida','ADR-01','T1','Seguridad (4)','Desempeño (3)'],
+  ['ESC-02 · Caída del servidor de saldo en pleno pico','ADR-02','T2','Fiabilidad (3)','Desempeño (3)'],
+  ['ESC-03 · El proveedor del <i>crash</i> envía tres veces el mismo abono','ADR-03','T3','Compatibilidad (3)','Fiabilidad (3)'],
+  ['ESC-05 · Petición de abono falsificada a nombre de un proveedor','ADR-04','T7','Seguridad (4)','Compatibilidad (3)']
+];
+const OP = [
+  ['Tasa sostenida en el pico de diseño','~3.000 /s','S6'],
+  ['Ráfaga','~4.000 /s','S6'],
+  ['Jugadores conectados en el pico','12.000','S4'],
+  ['Tiempo de respuesta en el operador','p99 ≤ 250 ms','S14'],
+  ['Espera del proveedor','~3 s','S14'],
+  ['Pérdida tolerada de confirmadas','Ninguna','S13 F1']
+];
+const DIM = [
+  ['Ritmo mínimo de la reconsulta','≥ 16,2 consultas/s','S3 S19'],
+  ['Cuenta','350.000 cuentas ÷ 21.600 s',''],
+  ['Retiros al día','~3.000','S8'],
+  ['Evaluación de riesgo de un retiro','p95 ≤ 1 s','S20']
+];
+const TYP = [
+  ['Referencia','Sale de una fuente externa que se puede citar','Toda cifra con F#. Incluye las normas de Coljuegos, como el máximo de 72 h para el retiro [F1]'],
+  ['Supuesto','Lo decide el equipo, con una razón','Toda cifra con S#: las de la ficha del Bloque 2 y las nuevas del Bloque 3, con su razón'],
+  ['Dato','Lo dio el cliente o la semilla','Solo las definiciones del caso: 5 proveedores, 4 tipos de juego, 5 medios de pago y el horizonte del año 3. El equipo hace de cliente']
+];
+const CHG = [
+  ['13 de noviembre de 2026','Adecuación funcional sube de 1 a 2 y Fiabilidad baja de 4 a 3. Reparto vigente: Seguridad 4, Fiabilidad 3, Compatibilidad 3, Desempeño 3, Adecuación funcional 2 y el resto en 1','Retroalimentación del profesor: el operador calcula reglas que exige el reglamento (saldo nunca negativo, límites de depósito, autoexclusión, plazo del retiro, reglas fiscales)'],
+  ['15 de noviembre de 2026','Se agrega a la ficha el supuesto S44: en una ronda de <i>crash</i>, hasta el 30 % de los 2.400 jugadores se retira en el mismo segundo (720 retiros)','La revisión encontró la cifra en la ficha y en ESC-04 sin supuesto que la definiera (H10)']
+];
+
+/* ---------- 2 · Línea base ---------- */
+const CRIT = [
+  ['ADR-02','B · Confirmar tras la grabación local y copiar después','<b>0 operaciones confirmadas perdidas</b>: si el servidor falla antes de copiar, se pierden las últimas ya confirmadas'],
+  ['ADR-03','A · Buscar el identificador en el historial de operaciones','<b>0 abonos duplicados</b>: dos copias simultáneas pueden pasar ambas la búsqueda'],
+  ['ADR-04','A · Clave fija y lista de direcciones de red permitidas por proveedor','<b>100 % de la batería rechazada</b>: la copia de una petición legítima con el monto modificado pasa'],
+  ['ADR-01','A · Retener los retiros hasta que termine la reconsulta','<b>Evaluación del retiro en p95 ≤ 1 s</b>: durante la reconsulta un retiro espera hasta 6 h [S19]']
+];
+const STEPS_SALDO = [
+  ['Proveedor de juego (externo)','Envía la petición de descuento, abono o reversión con su protocolo y su identificador. Sin respuesta en ~3 s, la reenvía o la revierte.','5 proveedores [dato] · ~3 s [S14][F24]'],
+  ['Red pública hasta el sitio principal','Canal cifrado y autenticado en ambos sentidos.','Clave de ≥ 2048 bits [F1]'],
+  ['Entrada del sitio principal','Descarta la petición que no venga de una dirección registrada para algún proveedor.',''],
+  ['Servidor de aplicación: interfaz de saldo','Compara la clave fija, interpreta el protocolo con código propio y busca el identificador en el historial; si lo encuentra, reconstruye la respuesta.','1 servidor [S30] · ~3.000 /s, ~4.000 en ráfaga [S6]'],
+  ['Base única','En una transacción comprueba el saldo, lo cambia y anota la operación. Confirma al grabar en el disco local.','~24 M de operaciones al día [S4][S6] · historial ≥ 6 meses [F1]'],
+  ['Servidor de aplicación: respuesta','Devuelve el resultado y el saldo nuevo.','Meta p99 ≤ 250 ms [S14]'],
+  ['Copia al sistema alterno (después)','Un proceso graba en el alterno las operaciones ya confirmadas, segundos después.','Sitio separado, misma certificación [F1]',1],
+  ['Extracción para el regulador (después)','Un proceso envía las transacciones nuevas en el formato de Coljuegos.','Formato y periodicidad de Coljuegos [F1]',1]
+];
+const STEPS_RETIRO = [
+  ['Jugador','Solicita el retiro desde el sitio web.','~3.000 retiros al día [S8]'],
+  ['Servidor de aplicación','Recibe la solicitud y llama a la evaluación de riesgo.',''],
+  ['Evaluación de riesgo','Lee el perfil y la marca de listas de la cuenta. Si hay una reconsulta en curso, retiene el retiro. Si no está disponible, el retiro se detiene (fallo cerrado).','Meta p95 ≤ 1 s [S20]'],
+  ['Proveedor de listas (externo)','Entrega la actualización varias veces al mes y responde consultas por documento.','Varias veces al mes [S19]'],
+  ['Reconsulta masiva','Recorre las cuentas, consulta cada documento al proveedor y guarda la marca, sin ritmo máximo.','350.000 cuentas [S3] · ≤ 6 h, ≥ 16 consultas/s [S19]'],
+  ['Orden de transferencia','Si el retiro pasa la evaluación, se emite la orden.','Meta ≤ 24 h [S8] · máximo legal 72 h [F1]']
+];
+const FRON = [
+  ['Sistema alterno con copia posterior','E1: alterno certificado, con los cambios replicados de inmediato [F1]','Redundancia pasiva','Cuándo se copia y cuántas copias: ADR-02'],
+  ['Transacción de saldo e historial','C6: ningún saldo negativo; C11: reconstruir cada jugada [F1]','Transacciones','Qué más entra en el paso indivisible: ADR-03'],
+  ['Historial de operaciones','C11: registro de toda operación ≥ 6 meses [F1]','Auditoría','Nada: se usa tal cual'],
+  ['Clave fija por proveedor','E11: autenticar todos los accesos [F1]','Identificar actores, Autenticar actores','Autenticar el contenido de cada petición: ADR-04'],
+  ['Filtro de direcciones de red','Opción A de ADR-04, la más simple que cumple E11','Limitar el acceso','Nada nuevo'],
+  ['Canal cifrado y autenticado','E7: cifrado ≥ 2048 bits y autenticación mutua [F1]','Cifrar datos','Nada'],
+  ['Fallo cerrado en los retiros','Restricción 9 de la ficha','—','Nada: es una regla de negocio']
+];
+
+/* ---------- 3 · Perfil de carga ---------- */
+const CHAIN = [
+  [1,'Cuentas registradas (año 3)','350.000','~3 cuentas por cada jugador activo al mes','S3'],
+  [2,'Jugadores activos al mes','120.000','350.000 ÷ 3 ≈ 117.000, redondeado a la cifra de S2','S2'],
+  [3,'Activos en un día promedio','36.000','120.000 × 30 %','S4'],
+  [4,'Activos en el día pico de diseño','~86.000','36.000 × 2,4 = 86.400 (quincena, fin de semana y promoción)','S31'],
+  [5,'Llegadas en la hora pico','~16.000 /h','86.400 × 18,5 % = 16.000','S4 S31'],
+  [6,'Concurrentes en el pico','12.000','Ley de Little: 4,44 llegadas/s × 2.700 s','S4'],
+  [7,'Operaciones de saldo por jugador','~0,25 /s','Mezcla de juegos: 2.992 ÷ 12.000 = 0,249','S5 S6'],
+  [8,'Tasa del pico de la operación crítica','~3.000 /s','12.000 × 0,249 /s = 2.992 /s','S6',1],
+  [9,'Ráfaga dentro del pico','~4.000 /s','Cota de S6 cuando coinciden las peticiones del <i>crash</i>','S6']
+];
+const AVG = [
+  ['Promedio de un día normal (24 h)','1.125','~280'],
+  ['Promedio del día pico (24 h)','2.700','~670'],
+  ['Pico normal (viernes o sábado, 20:00–24:00)','5.000 [S4]','~1.250'],
+  ['Pico de diseño (quincena + promoción)','12.000 [S4]','~3.000',1],
+  ['Ráfaga dentro del pico','—','~4.000']
+];
+const DIMS = [
+  ['Identificadores por conservar para conciliación (≥ 4 meses)','24 M/día × 122 días','~3.000 millones','S4 S6 F24'],
+  ['Historial disponible (≥ 6 meses)','24 M/día × 183 días','~4.400 millones','S4 S6 F1'],
+  ['Ritmo mínimo de la reconsulta','350.000 ÷ 21.600 s','≥ 16,2 consultas/s','S3 S19'],
+  ['Retiros al día','12.000 depósitos ÷ 4','~3.000 (~125 por hora)','S7 S8'],
+  ['Retiros retenidos por una reconsulta (línea base)','3.000 × 6 h ÷ 24 h','hasta ~750','S8 S19'],
+  ['Peticiones legítimas rechazadas toleradas','24 M × 0,001 %','~240 por día','S27']
+];
+const BUD = [
+  ['Operación de saldo completa, en el operador','p99 ≤ 250 ms','S14'],
+  ['Espera del proveedor antes de dar la operación por fallida','~3 s','S14 F24'],
+  ['Verificación del origen (ADR-04)','≤ 20 ms (p99) de los 250 ms','S26'],
+  ['Saldo visible después de un abono','p95 ≤ 2 s','S23'],
+  ['Evaluación de riesgo de un retiro o depósito','p95 ≤ 1 s','S20'],
+  ['Alerta por una petición anómala','≤ 5 min','S25 S28'],
+  ['Vuelta a p99 ≤ 250 ms tras restablecer','≤ 5 min','S24'],
+  ['Recuperación de juego y saldo','≤ 15 min','S13']
+];
+
+/* ---------- 4 · Cuello de botella ---------- */
+const CAND = [
+  ['Proveedor de listas (reconsulta)','5 consultas/s','Referencia [F37]','3,24','—','108.000 cuentas en 6 h','x'],
+  ['Base única: transacciones de saldo','~10.000 /s (~14.000)','Supuesto sobre referencia [F34][S36]','0,30','0,40','~40.000 jugadores','m'],
+  ['Servidor de aplicación','16.000 peticiones/s','Supuesto [S32][S33]','0,26','0,33','~46.000 jugadores',''],
+  ['Red pública','1 Gbit/s','Supuesto [S35]','0,24','0,26','~50.000 jugadores',''],
+  ['Base del alterno','Igual a la principal','Supuesto sobre referencia [F34][S36]','0,30','0,40','~40.000 jugadores',''],
+  ['Enlace entre sitios para la copia','6 Mbit/s de carga','Supuesto [S34]','Despreciable','Despreciable','—',''],
+  ['Búsqueda del identificador y lecturas de fondo','Dentro del límite de la base','Supuesto [S36]','Incluido arriba','Incluido arriba','—','']
+];
+const SEE = [
+  ['Base única > ~10.000 /s','Jugador','El giro se queda esperando y termina en un error del juego. Un descuento se revierte [F24] y la jugada se anula; un abono no aparece hasta que el proveedor lo reenvía con éxito'],
+  ['','Proveedor de juego','Operaciones sin respuesta en ~3 s: reenvía abonos y revierte descuentos [F24][F26]. Cada reenvío es una petición más y la saturación se agrava sola'],
+  ['','Regulador','Más reversiones y repeticiones en el historial; la extracción lee la misma base saturada y se atrasa'],
+  ['Proveedor de listas > 5 /s','Jugador','Su retiro queda "en revisión" hasta ~19,4 h en lugar de 6 h: ~2.430 retiros retenidos por reconsulta, varias veces al mes'],
+  ['','Proveedor de listas','Recibe más de 5 consultas/s y rechaza peticiones [F37]; la reconsulta reintenta y tarda más'],
+  ['','Regulador','Con 5 consultas/s el retiro se paga dentro del máximo de 72 h [F1]. Con 1 consulta/s (~97 h), no']
+];
+
+/* ---------- 5 · Tácticas ---------- */
+const TACS = [
+  {id:'TAC-01', n:'Redundancia activa', fam:'Disponibilidad → Recuperarse', adr:'ADR-02', resp:'Previene (la pérdida de lo confirmado)',
+   mech:'El sitio principal pasa de 1 a <b>3 servidores de base de datos</b> del tamaño de S32. Cada transacción de saldo se anota en orden en una libreta de solo agregar que los tres reciben, y el servidor que atiende responde al proveedor cuando <b>al menos 2 de los 3</b> la tienen grabada en disco. La copia al alterno sigue igual, leyendo la libreta.',
+   met:'Operaciones de saldo confirmadas que se pierden cuando falla el servidor de base de datos', b:'~3.000', a:'0',
+   how:'Línea base: retraso de la copia × tasa = 1 s × 3.000 /s = 3.000 (4.000 en la ráfaga; 15.000 con 5 s). Con la táctica ninguna operación se confirma sin estar en un segundo servidor.', typ:'Supuesto [S37] sobre el retraso de la copia; tasa de la fase 3 [S6]',
+   cost:'~USD 24.000 al año por 2 servidores (2 × USD 1.002 al mes) [F41], ~COP 96 M, 1,3 % del presupuesto de tecnología. +~1 ms por operación [S40]. ~17 Mbit/s de red interna.', pays:'Eficiencia de desempeño y Mantenibilidad'},
+  {id:'TAC-02', n:'Latido (heartbeat)', fam:'Disponibilidad → Detectar fallas', adr:'ADR-02', resp:'Detecta',
+   mech:'El servidor de base de datos que atiende envía una señal a los otros dos varias veces por segundo. Si un servidor deja de recibirla durante un intervalo aleatorio de <b>150 a 300 ms</b>, declara caído al que atendía.',
+   met:'Tiempo desde la caída del servidor de saldo hasta que se detecta', b:'10–30 min', a:'≤ 0,3 s',
+   how:'El intervalo de 150–300 ms es el que recomienda la referencia del algoritmo de consenso por mayoría [F40]. En la línea base nada detecta la caída: la detectan personas [S40].', typ:'Referencia [F40]; supuesto [S40] para la línea base',
+   cost:'Una pausa de red de más de 300 ms dispara un cambio de servidor innecesario (~30 s sin saldo). Tráfico despreciable.', pays:'Fiabilidad (por las caídas falsas)'},
+  {id:'TAC-03', n:'Reconfiguración', fam:'Disponibilidad → Recuperarse', adr:'ADR-02', resp:'Recupera',
+   mech:'Cuando TAC-02 declara caído al servidor que atendía, los dos que quedan eligen al que tiene la libreta completa y ese pasa a atender. El servidor de aplicación se reconecta y retoma; las operaciones en curso sin confirmar no tienen efecto y el proveedor las revierte o reenvía [F24].',
+   met:'Tiempo con el juego y el saldo detenidos tras la caída', b:'10–30 min', a:'≤ 30 s',
+   how:'Detección ≤ 0,3 s + elección en menos de 1 s [F40] + reconexión ≤ 30 s [S40]. Frente a ≤ 15 min de ESC-02: margen de 30 veces.', typ:'Supuesto [S40] apoyado en referencia [F40]',
+   cost:'Hasta ~90.000 operaciones sin respuesta por cambio (3.000 /s × 30 s), que los proveedores revierten o reenvían. Mientras no se reponga el caído quedan 2 de 3.', pays:'Mantenibilidad y, durante 30 s, Eficiencia de desempeño'},
+  {id:'TAC-04', n:'Transacciones', fam:'Disponibilidad → Prevenir fallas', adr:'ADR-03', resp:'Previene (el doble abono)',
+   mech:'Un registro de identificadores procesados en la base única, con clave única <b>proveedor + jugador + identificador</b> [F26]. La misma transacción que cambia el saldo inserta la clave, un resumen de la petición y la respuesta dada. Si la clave ya existe, no toca el saldo y devuelve la respuesta guardada. Se borra por días completos a los 4 meses [F24]. Refuerza la transacción que ya exige el reglamento.',
+   met:'Abonos aplicados dos veces cuando dos copias se procesan a la vez', b:'1 por par solapado', a:'0',
+   how:'Dos transacciones no pueden insertar la misma clave única: la que llega segunda ve la primera y devuelve su respuesta. No depende de la carga ni del momento.', typ:'Referencia [F26] para la unicidad; costo supuesto [S41]',
+   cost:'~300 GB de disco [S41]. +3.000 inserciones/s. ≤ 1 ms por operación. El límite de la base no cambia (~10.000/s).', pays:'Eficiencia de desempeño'},
+  {id:'TAC-05', n:'Validar entradas', fam:'Seguridad → Resistir ataques', adr:'ADR-03', resp:'Detecta y resiste',
+   mech:'Cuando la clave ya existe en el registro de TAC-04, la transacción compara el resumen guardado (tipo y monto) con el de la petición nueva. Iguales: devuelve la respuesta guardada. Distintos: <b>rechaza la petición</b> sin tocar el saldo y deja un evento en el canal de alertas de TAC-08.',
+   met:'Peticiones con la misma clave y datos distintos que se rechazan, y tiempo hasta la alerta', b:'0 %', a:'100 %, alerta ≤ 1 min',
+   how:'La comparación es exacta sobre un resumen de 32 bytes: no hay casos grises. La clave incluye al jugador [F26].', typ:'Razonamiento sobre el mecanismo; ventana de alerta [S43]',
+   cost:'~96 GB, dentro de los ~300 GB de TAC-04. Si un proveedor reutiliza un identificador para otra operación del mismo jugador, una petición legítima se rechaza (dentro del ≤ 0,001 % de S27).', pays:'Compatibilidad'},
+  {id:'TAC-06', n:'Usar un intermediario', fam:'Modificabilidad → Reducir el acoplamiento', adr:'ADR-03 y ADR-04', resp:'Desacopla',
+   mech:'La interpretación del protocolo se separa en <b>5 piezas, una por proveedor</b>. Cada pieza entrega a la interfaz de saldo una petición común (proveedor, jugador, identificador, tipo, monto y resultado de la verificación de origen). No guardan memoria de repetidos y corren en el mismo proceso, sin salto de red.',
+   met:'Partes que cambian al integrar un proveedor nuevo', b:'Interfaz de saldo completa', a:'1 pieza nueva, 0 cambios',
+   how:'Por construcción: la interfaz de saldo solo conoce la petición común. 1 o 2 proveedores nuevos al año [S11].', typ:'Razonamiento sobre el mecanismo [S11]',
+   cost:'5 piezas que mantener y recertificar; cada cambio pasa por el laboratorio, 2 a 4 semanas [S10]. < 0,1 ms por llamada.', pays:'Mantenibilidad'},
+  {id:'TAC-07', n:'Verificar integridad del mensaje', fam:'Seguridad → Detectar ataques', adr:'ADR-04', resp:'Detecta y resiste',
+   mech:'En la pieza de su proveedor, antes de llegar al saldo, se verifica la firma del contenido con el esquema y la clave <b>de ese proveedor</b>: clave pública o secreto compartido. Si no corresponde, se rechaza sin tocar el saldo y se registra con su origen. La clave fija y la lista de direcciones se conservan como primera barrera.',
+   met:'Porcentaje de la batería de falsificación de ESC-05 que se rechaza', b:'67 % (2 de 3)', a:'100 % (3 de 3)',
+   how:'Recorrido de los tres tipos de la batería contra el mecanismo. Tiempo: 1 ÷ 22.220 verificaciones/s = 0,045 ms [F36].', typ:'Referencia [F24][F26][F36]; que los 5 firmen es supuesto [S42]',
+   cost:'+0,05 ms de los 20 ms de S26. 0,135 núcleos, 0,8 % del servidor de aplicación. 5 claves que guardar y rotar; cada cambio, 2 a 4 semanas de laboratorio [S10].', pays:'Mantenibilidad y, en mínima parte, Eficiencia de desempeño'},
+  {id:'TAC-08', n:'Informar a los actores', fam:'Seguridad → Reaccionar', adr:'ADR-04 (y ADR-03)', resp:'Hace observable y reacciona',
+   mech:'Cada rechazo de TAC-07 y de TAC-05 deja un evento con el origen, el proveedor que dice ser y el motivo. Un proceso aparte agrupa los eventos por origen en ventanas de <b>1 minuto</b>: el primero abre un incidente y alerta al equipo de seguridad; los siguientes se suman a él.',
+   met:'Tiempo desde la primera petición falsificada hasta la alerta', b:'Sin alerta', a:'≤ 1 min',
+   how:'El incidente se abre con el primer evento; la ventana acota el resto a 1 min [S43], frente a ≤ 5 min de la medida [S25][S28].', typ:'Supuesto [S43]',
+   cost:'Hasta 240 alertas falsas al día si las legítimas rechazadas llegan al tope de S27 (común a TAC-05 y TAC-07). Un proceso más que vigilar.', pays:'Mantenibilidad'},
+  {id:'TAC-09', n:'Múltiples copias de datos', fam:'Rendimiento → Gestionar recursos', adr:'ADR-01', resp:'Gestiona recursos y previene',
+   mech:'Cuando llega la actualización del proveedor, la evaluación de riesgo carga la lista completa en la memoria del servidor de aplicación, indexada por documento. Solo cuando la carga termina reemplaza a la anterior, y desde ahí cada retiro se evalúa contra la lista nueva, <b>haya o no terminado la reconsulta</b>. Mientras carga, los retiros esperan.',
+   met:'Tiempo de evaluación de un retiro mientras corre la reconsulta', b:'≤ 19,4 h', a:'≤ 10 ms',
+   how:'Una búsqueda en memoria más la lectura del perfil en la base [F34]. Carga: 1 M de registros × 500 bytes = 500 MB en ≤ 1 min [S42]; solo esperan ~2 retiros por actualización.', typ:'Supuesto [S42] apoyado en referencia [F34]',
+   cost:'~500 MB de 128 GB (0,4 %). Dos procesos que mantener coherentes. Si el servidor se reinicia, la lista se recarga y los retiros esperan ≤ 1 min.', pays:'Mantenibilidad y Eficiencia de desempeño'},
+  {id:'TAC-10', n:'Limitar la tasa de eventos', fam:'Rendimiento → Controlar la demanda', adr:'ADR-01', resp:'Controla la demanda',
+   mech:'La reconsulta recorre las 350.000 cuentas, compara cada documento con la lista en memoria de TAC-09 y guarda la marca solo si cambió, con un <b>ritmo máximo de 50 cuentas/s</b>.',
+   met:'Uso de la base durante la reconsulta · duración (efecto conjunto con TAC-09)', b:'~1,0 sin tope · ~19,4 h', a:'0,31 · ~1,9 h',
+   how:'Sin la táctica, la reconsulta tomaría la capacidad libre (7.000 lecturas/s, uso ~1,0). Con el tope: 100 ÷ 10.000 = +0,01. Duración: 350.000 ÷ 50 /s = 1,94 h; la baja desde ~19,4 h la produce TAC-09.', typ:'Supuesto [S42] con el límite de la base [F34][S36]',
+   cost:'La reconsulta dura ~1,9 h; una marca de riesgo que cambie llega a la cuenta hasta 1,9 h después.', pays:'Eficiencia de desempeño'}
+];
+
+/* ---------- 6 · ADR ---------- */
+const ADR = [
+  {id:'ADR-01', t:'Evaluación de los retiros contra listas restrictivas recién recibidas', esc:'ESC-01', tacs:['TAC-09','TAC-10'],
+   ctx:[
+    ['Atributo de calidad','Seguridad, con una restricción de desempeño'],
+    ['Fuente del estímulo','Un jugador cuyo documento aparece en una actualización de listas restrictivas que el operador recibió hace 30 minutos, y cuya cuenta todavía no ha sido reconsultada'],
+    ['Estímulo','Solicita un retiro de COP 3.000.000 hacia su billetera digital'],
+    ['Artefacto','El proceso de solicitud de retiros y su evaluación de riesgo de lavado de activos (SARLAFT)'],
+    ['Entorno','Viernes de quincena a las 21:00. 12.000 jugadores simultáneos, ~3.000 operaciones de saldo por segundo, ~1.800 depósitos en la hora. Reconsulta de las 350.000 cuentas contra la lista nueva en curso, iniciada hace 30 minutos'],
+    ['Respuesta','Evalúa el retiro contra la versión de la lista recién recibida, aunque la cuenta no haya sido reconsultada todavía. Si el jugador está en la lista: no paga el retiro, suspende la cuenta por precaución, alerta al oficial de cumplimiento, deja el caso listo para el reporte a la UIAF y le muestra al jugador el retiro "en revisión", sin revelarle el motivo. Si el jugador no está en la lista y su riesgo es normal: el retiro sigue su curso habitual. El juego y los depósitos de los demás jugadores siguen operando'],
+    ['Medida de la respuesta','<b>0 retiros pagados</b> a personas incluidas en una lista ya recibida, verificado cruzando pagos y listas por marca de tiempo. Evaluación del retiro en <b>p95 ≤ 1 s</b>, también durante la reconsulta. Alerta al oficial de cumplimiento en <b>≤ 15 min</b>. Durante la reconsulta, las operaciones de saldo del juego se mantienen en <b>p99 ≤ 250 ms</b>. Reconsulta completa en <b>≤ 6 h</b>. Los retiros de riesgo normal mantienen la orden de transferencia en <b>≤ 24 h</b>']],
+   opts:[['A','Retener los retiros hasta que termine la reconsulta.'],['B','Consultar al proveedor de listas en cada retiro.'],['C','Lista vigente consultable por el operador, independiente de la reconsulta.']], pick:'C',
+   dec:'Usaremos una <b>lista vigente propia en la memoria del servidor de aplicación</b> (TAC-09) para evaluar cada retiro desde el minuto en que llega la actualización del proveedor, sin esperar a la reconsulta. Limitaremos la reconsulta de las 350.000 cuentas a <b>50 cuentas por segundo</b> (TAC-10), comparando cada cuenta con esa lista y no con el proveedor. La lista nueva solo reemplaza a la anterior cuando termina de cargarse; mientras carga, los retiros esperan (fallo cerrado).',
+   disc:[
+    ['A · Retener hasta terminar la reconsulta','Incumple la evaluación en p95 ≤ 1 s','El retiro espera hasta ~19,4 h (350.000 ÷ 5 /s = 70.000 s) y se retienen ~2.430 retiros por reconsulta'],
+    ['B · Consultar al proveedor en cada retiro','Incumple p95 ≤ 1 s durante la reconsulta y la disponibilidad de los retiros','El proveedor admite 5 consultas/s [F37] y la reconsulta ya le pide 16,2/s (uso 3,24). Con fallo cerrado, una caída del proveedor detiene todos los retiros']],
+   lim:'La reconsulta cumple las 6 h hasta <b>1.080.000 cuentas</b>, y el proveedor de listas queda a 0,002 de su límite. La evaluación del retiro ya no depende de la reconsulta.',
+   calc:`reconsulta a 50 cuentas/s en 6 h     50 /s × 21.600 s = 1.080.000 cuentas
+margen sobre las cuentas de hoy      1.080.000 ÷ 350.000 = 3,1
+duración de la reconsulta de hoy     350.000 ÷ 50 /s = 7.000 s = 1,94 h        ≤ 6 h
+uso del proveedor de listas          ~1.000 registros al día ÷ 86.400 s = 0,012 /s ÷ 5 /s = 0,002
+uso de la base única                 0,30 + (50 lecturas + 50 escrituras) ÷ 10.000 = 0,31`,
+   next:'La base única: la reconsulta le suma 0,01 de uso por cada 50 cuentas/s, así que subir el ritmo compite con el saldo.',
+   meet:[['0 retiros pagados a personas de una lista ya recibida','La evaluación usa la lista nueva desde que termina de cargarse (≤ 1 min); solo esperan ~2 retiros y no se pagan'],['Evaluación p95 ≤ 1 s, también durante la reconsulta','≤ 10 ms [S42]'],['Alerta al oficial ≤ 15 min','No cambia: nace de la evaluación, que tarda ≤ 10 ms'],['Saldo p99 ≤ 250 ms durante la reconsulta','La base sube de 0,30 a 0,31'],['Reconsulta completa ≤ 6 h','~1,9 h'],['Orden de transferencia ≤ 24 h','Sin espera por la reconsulta']],
+   gana:'La evaluación del retiro pasa de hasta ~19,4 h a ≤ 10 ms; la reconsulta, de ~19,4 h a ~1,9 h; el uso del proveedor de listas, de 3,24 a 0,002, y los retiros dejan de depender de un tercero en el camino crítico.',
+   paga:'~500 MB de memoria de 128 GB (0,4 %) [S42]; dos procesos que mantener coherentes; una marca de riesgo que cambie llega hasta ~1,9 h después; tras un reinicio, la lista se recarga y los retiros esperan ≤ 1 min.',
+   nores:'(1) Las coincidencias parciales de nombre: la lista se indexa por documento. (2) Supone que el proveedor entrega la lista completa; la vinculante de Naciones Unidas tiene 877 registros [F42] y el millón de S42 es una cota. (3) La lista en memoria no sobrevive a un reinicio sin recargarse.',
+   rev:'(a) Las cuentas registradas superan <b>~1.000.000</b> (la reconsulta a 50/s llegaría a 5,6 h). (b) La lista supera <b>1 M de registros</b> o su carga tarda más de <b>1 min</b>. (c) El proveedor deja de entregar la lista completa.'},
+  {id:'ADR-02', t:'Permanencia de las operaciones de saldo confirmadas ante la caída de un servidor', esc:'ESC-02', tacs:['TAC-01','TAC-02','TAC-03'],
+   ctx:[
+    ['Atributo de calidad','Fiabilidad, con una restricción de desempeño'],
+    ['Fuente del estímulo','Una falla de hardware en el servidor que registra las operaciones de saldo de los jugadores'],
+    ['Estímulo','El servidor deja de responder abruptamente, con operaciones de saldo en curso'],
+    ['Artefacto','La cuenta de juego: el registro del saldo de cada jugador y de sus operaciones de descuento, abono y reversión'],
+    ['Entorno','Sábado de quincena a las 21:30, en el pico de diseño. 12.000 jugadores simultáneos, ~3.000 operaciones de saldo por segundo, confirmadas a los proveedores con p99 ≤ 250 ms. Una ronda de <i>crash</i> en curso con 2.400 apuestas registradas. Sistema técnico de juego alterno certificado, exigido por el regulador'],
+    ['Respuesta','Conserva todas las operaciones que ya había confirmado a los proveedores. Las operaciones que estaban en curso sin confirmar quedan sin efecto sobre el saldo, de forma que el proveedor y el operador terminen con el mismo saldo. Avisa a los jugadores afectados que el juego no está disponible. Restablece el juego y el saldo. Al reconectarse, cada jugador ve el resultado de la jugada que quedó incompleta. Registra el inicio, la duración y los servicios afectados, e informa a Coljuegos'],
+    ['Medida de la respuesta','<b>0 operaciones confirmadas perdidas</b>, verificado por la conciliación operador–proveedores posterior al evento. <b>0 saldos negativos.</b> Juego y saldo restablecidos en <b>≤ 15 min</b>. <b>100 %</b> de las jugadas incompletas con su resultado visible al reconectarse. Aviso a Coljuegos en <b>≤ 30 min</b>. A los <b>5 min</b> del restablecimiento, las operaciones de saldo vuelven a <b>p99 ≤ 250 ms</b>']],
+   opts:[['A','Confirmar solo después de escribir en dos sitios físicos.'],['B','Confirmar tras la grabación local y copiar después.'],['C','Libreta de operaciones de solo agregar, confirmada por mayoría.']], pick:'C',
+   dec:'Usaremos una <b>libreta de operaciones de solo agregar, mantenida por tres servidores de base de datos del sitio principal</b> (TAC-01), y responderemos al proveedor cuando al menos dos de los tres la tengan grabada en disco. Detectaremos la caída del servidor que atiende con una señal de vida entre los tres, con un intervalo aleatorio de 150 a 300 ms (TAC-02), y los dos que quedan elegirán al que tiene la libreta completa para atender (TAC-03). El sistema alterno seguirá recibiendo la copia leyendo la libreta, fuera del camino de cada jugada.',
+   disc:[
+    ['A · Dos sitios antes de confirmar','Cumple la pérdida cero y la latencia, pero incumple la disponibilidad de juego y saldo','La ida y vuelta cuesta ~10 ms [F39][S38]: cabe. Pero un enlace a 99,9 % [S39] deja 0,001 × 43.200 min = 43,2 min al mes sin enlace, exactamente el margen de S13'],
+    ['B · Grabación local y copia posterior','Incumple 0 operaciones confirmadas perdidas','Es la línea base: ~3.000 operaciones perdidas (1 s × 3.000 /s; hasta 15.000 con 5 s) [S37] y 10 a 30 min para restablecer [S40]']],
+   lim:'<b>~10.000 operaciones de saldo/s</b>, sin cambio. La prueba de referencia ya confirma cada transacción después de que una réplica la recibe [F34], y la espera local suma ~1 ms [S40].',
+   calc:`margen sobre el pico            10.000 ÷ 3.000 = 3,3
+margen sobre la ráfaga          10.000 ÷ 4.000 = 2,5
+tolerancia a fallas             1 servidor de 3 (mayoría de 2)
+cambio de servidor              3.000 /s × 30 s = ~90.000 operaciones sin respuesta
+vuelta a p99 ≤ 250 ms           ~90.000 reenvíos ÷ (10.000 − 3.000) /s ≈ 13 s   (~39 s con 3 copias)`,
+   next:'La base única, ahora el servidor que atiende: todas las escrituras del saldo pasan por él, y los otros dos reciben la libreta pero no suman capacidad de escritura.',
+   meet:[['0 operaciones confirmadas perdidas','0 mientras sobreviva 1 de los otros 2 servidores'],['0 saldos negativos','No cambia: la regla sigue en la transacción (C6)'],['Juego y saldo restablecidos en ≤ 15 min','≤ 30 s; margen de 30 veces'],['100 % de jugadas incompletas con resultado visible','Las operaciones sin confirmar no tienen efecto y el proveedor las revierte o reenvía [F24]'],['Aviso a Coljuegos ≤ 30 min','No cambia; la detección en ≤ 0,3 s adelanta el registro'],['p99 ≤ 250 ms a los 5 min','≈ 13 s (~39 s con 3 copias por operación)']],
+   gana:'La pérdida de operaciones confirmadas pasa de ~3.000 a 0, y el restablecimiento de 10–30 min a ≤ 30 s.',
+   paga:'~USD 24.000 al año por 2 servidores más (~COP 96 M, 1,3 % del presupuesto de tecnología) [F41][S9]; +~1 ms por operación; ~17 Mbit/s de red interna; hasta ~90.000 operaciones revertidas o reenviadas en cada cambio; una pausa de red de más de 300 ms dispara un cambio innecesario; tres servidores que operar y recertificar.',
+   nores:'(1) La pérdida del sitio completo sigue dejando ~3.000 operaciones en riesgo, porque el alterno recibe la copia con atraso (S37). (2) Mientras no se reponga el caído quedan 2 de 3 y una segunda falla detiene el juego. (3) El límite de escritura sigue siendo el de un solo servidor.',
+   rev:'(a) El pico sostenido supera <b>~7.500 operaciones/s</b> (~30.000 jugadores: deja de caber la ráfaga). (b) Más de <b>20 cambios de servidor al mes</b> (10 min de los 43,2 de S13). (c) El atraso de la copia al alterno supera <b>5 s</b> (15.000 operaciones en riesgo).'},
+  {id:'ADR-03', t:'Tratamiento de las peticiones de saldo repetidas de los proveedores de juego', esc:'ESC-03', tacs:['TAC-04','TAC-05','TAC-06'],
+   ctx:[
+    ['Atributo de calidad','Compatibilidad (interoperabilidad), con una restricción de fiabilidad'],
+    ['Fuente del estímulo','El proveedor externo del juego <i>crash</i>'],
+    ['Estímulo','Envía tres veces la misma petición de abono de COP 50.000, con el mismo identificador de transacción, porque no recibió respuesta a la primera dentro de su tiempo de espera de ~3 s'],
+    ['Artefacto','La interfaz de operaciones de saldo que el operador ofrece a los proveedores de juego'],
+    ['Entorno','Pico de diseño: ~3.000 operaciones de saldo por segundo. La red entre el proveedor y el operador está congestionada y pierde respuestas. Ronda de <i>crash</i> en curso con 2.400 jugadores. 5 proveedores conectados, cada uno con su propio protocolo'],
+    ['Respuesta','Abona los COP 50.000 una sola vez. A la segunda y a la tercera petición les responde con el mismo resultado y el mismo saldo que a la primera. Si llegara una petición del mismo proveedor, para el mismo jugador y con el mismo identificador, pero con datos distintos (otro monto u otro tipo de operación), la rechaza y genera una alerta. Registra cada petición recibida para la conciliación con el proveedor. Reporta la transacción una sola vez al sistema de inspección de Coljuegos'],
+    ['Medida de la respuesta','<b>0 abonos duplicados.</b> <b>100 %</b> de las peticiones repetidas reciben una respuesta idéntica a la original, en <b>p99 ≤ 250 ms</b>. <b>0 diferencias</b> en la conciliación diaria de saldos operador–proveedor. <b>0 transacciones duplicadas</b> en el reporte a Coljuegos. <b>100 %</b> de las peticiones que repiten proveedor, jugador e identificador con datos distintos rechazadas, con alerta en <b>≤ 5 min</b>']],
+   opts:[['A','Buscar el identificador en el historial de operaciones.'],['B','Registro de identificadores procesados, guardado junto con el cambio de saldo.'],['C','Una pieza de traducción por proveedor que descarta repetidos antes de llegar al saldo.']], pick:'B',
+   pickNote:'Combinación: B con la traducción de C, que el Bloque 2 dejó por evaluar.',
+   dec:'Usaremos un <b>registro de identificadores procesados dentro de la misma transacción que cambia el saldo</b> (TAC-04), con clave única de proveedor, jugador e identificador. Si la clave ya existe, devolveremos la respuesta guardada sin tocar el saldo; si existe con datos distintos, rechazaremos la petición y alertaremos (TAC-05). Del traductor por proveedor tomaremos solo la <b>traducción del protocolo</b>: una pieza por proveedor entrega al saldo una petición común (TAC-06). Su memoria de repetidos de 24 h no se usa.',
+   disc:[
+    ['A · Buscar en el historial','Incumple 0 abonos duplicados','Es la línea base: dos copias que llegan a la vez pasan ambas la búsqueda. Ocurre con la base saturada o tras un cambio de servidor (hasta ~90.000 reenvíos). La búsqueda recorre ~4.400 M de registros'],
+    ['C · Traductor que filtra repetidos','Parcial: no garantiza 0 duplicados','Su memoria de 24 h no ve repeticiones tardías dentro de los 4 meses de conciliación [F24], y una caída del traductor la borra. Su traducción sí se toma (TAC-06)']],
+   lim:'<b>~10.000 operaciones de saldo/s</b>, sin cambio. Con el registro, cada transacción sigue siendo menos trabajo que la de la prueba de referencia [F35].',
+   calc:`escrituras adicionales          1 inserción × 3.000 /s = 3.000 inserciones/s          [S6]
+tiempo adicional                ≤ 1 ms de 250 ms                                      [S41]
+registro                        3.000 M identificadores × ~100 bytes = ~300 GB       [S41]
+datos de la base                1,1 TB + 0,3 TB = 1,4 TB = 2,8 × los 500 GB de F34
+margen de datos                 2,5 TB ÷ 1,4 TB = 1,8
+margen sobre el pico            10.000 ÷ 3.000 = 3,3   (ráfaga: 2,5)`,
+   next:'La base única, por la tasa (~10.000/s) y por el volumen: a 2,5 TB se llega al escalón que S36 descontó completo, ~1,8 veces las operaciones diarias de hoy (~43 M al día).',
+   meet:[['0 abonos duplicados','0: la segunda inserción de la misma clave falla dentro de su transacción'],['100 % de repetidas con respuesta idéntica, p99 ≤ 250 ms','Se devuelve la respuesta guardada; +≤ 1 ms'],['0 diferencias en la conciliación diaria','El registro guarda cada petición con su respuesta'],['0 duplicados en el reporte a Coljuegos','Una sola aplicación por clave'],['100 % de misma clave con datos distintos rechazadas, alerta ≤ 5 min','100 %, alerta ≤ 1 min']],
+   gana:'0 duplicados sin importar cuándo lleguen las copias (incluidos los ~90.000 reenvíos de un cambio de servidor), alerta en ≤ 1 min, y un proveedor nuevo es 1 pieza nueva con 0 cambios en la interfaz de saldo [S11].',
+   paga:'~300 GB de disco [S41]; +3.000 inserciones/s y ≤ 1 ms por operación; 5 piezas que recertificar, cada cambio entre 2 y 4 semanas [S10]; hasta 240 alertas falsas al día entre ADR-03 y ADR-04 (tope común de S27).',
+   nores:'(1) Un proveedor que reutilice un identificador para otra operación del mismo jugador ve rechazada una petición legítima. (2) Las repeticiones posteriores a los 4 meses de conservación [F24]. (3) El registro suma volumen a la misma base que es el cuello del saldo.',
+   rev:'(a) Los datos superan <b>2,5 TB</b> o el promedio supera <b>~43 M de operaciones al día</b>. (b) Los rechazos legítimos de ADR-03 y ADR-04, sumados, superan <b>0,001 %</b> (240 al día). (c) Un proveedor reutiliza identificadores entre operaciones distintas del mismo jugador.'},
+  {id:'ADR-04', t:'Verificación del origen de las peticiones de saldo de los proveedores', esc:'ESC-05', tacs:['TAC-06','TAC-07','TAC-08'],
+   ctx:[
+    ['Atributo de calidad','Seguridad (autenticidad e integridad), con una restricción de compatibilidad'],
+    ['Fuente del estímulo','Un actor externo no autorizado que se hace pasar por uno de los proveedores de tragamonedas'],
+    ['Estímulo','Envía a la interfaz de saldo una petición de abono de COP 2.000.000 a una cuenta de jugador, con el formato de ese proveedor, pero que no fue emitida por él'],
+    ['Artefacto','La interfaz de operaciones de saldo que el operador ofrece a los proveedores de juego'],
+    ['Entorno','Viernes de quincena a las 21:00, en el pico de diseño: 12.000 jugadores simultáneos y ~3.000 operaciones de saldo legítimas por segundo de 5 proveedores, cada uno con su propio esquema de autenticación'],
+    ['Respuesta','Rechaza la petición sin modificar ningún saldo, la registra con su origen y alerta al equipo de seguridad. Si llegan más peticiones no emitidas por proveedores desde el mismo origen, las sigue rechazando y las agrupa en el mismo incidente. Las peticiones legítimas de los 5 proveedores se siguen aceptando, cada una con el esquema de autenticación propio de su proveedor'],
+    ['Medida de la respuesta','<b>100 %</b> de las peticiones de una batería de falsificación rechazadas (sin credencial, con la credencial de otro proveedor y copia de una petición legítima con el monto modificado), con <b>0 saldos modificados</b>, verificado en la prueba de carga y en las pruebas de penetración del laboratorio. <b>≤ 0,001 %</b> de las peticiones legítimas rechazadas por la verificación. La verificación añade <b>≤ 20 ms (p99)</b> a cada operación, y las operaciones de saldo siguen en <b>p99 ≤ 250 ms</b>. Alerta al equipo de seguridad en <b>≤ 5 min</b>']],
+   opts:[['A','Clave fija y lista de direcciones de red permitidas por proveedor.'],['B','Firma de cada petición con un secreto por proveedor, verificada por una pieza de traducción por proveedor.'],['C','Un esquema único, definido por el operador, para todos los proveedores.']], pick:'B',
+   dec:'Usaremos una <b>firma por petición verificada en la pieza de cada proveedor</b> (TAC-06), con el esquema y la clave de ese proveedor (TAC-07), antes de que la petición llegue al saldo. Conservaremos la clave fija y la lista de direcciones de la línea base como primera barrera. Cada rechazo de firma dejará un evento que un proceso aparte agrupa por origen en ventanas de 1 minuto y alerta al equipo de seguridad (TAC-08). <b>No integraremos a un proveedor que no firme el contenido de sus peticiones.</b>',
+   disc:[
+    ['A · Clave fija y direcciones permitidas','Incumple el 100 % de la batería','Es la línea base: rechaza 2 de 3 tipos (~67 %); pasa la copia con el monto modificado porque la clave no depende del contenido'],
+    ['C · Esquema único del operador','Incumple la aceptación de las legítimas de los 5 proveedores','Cada proveedor trae su esquema y no acepta cambiarlo [S29]. Un certificado vencido cortaría a un proveedor completo']],
+   lim:'El servidor de aplicación pasa de ~45.800 a <b>~44.400 jugadores conectados</b>. La verificación suma ~0,045 ms de cómputo a cada operación de saldo [F36].',
+   calc:`costo de verificar              1 ÷ 22.220 verificaciones/s = 0,045 ms                [F36]
+cómputo en el pico              3.000 /s × 0,045 ms = 0,135 núcleos = 0,8 % de 16 núcleos
+petición-equivalente/jugador    0,249 × (1 + 0,045) + 0,1 = 0,360 /s
+límite en jugadores             16.000 ÷ 0,360 = ~44.400        (antes ~45.800)
+margen sobre el pico            44.400 ÷ 12.000 = 3,7
+presupuesto de verificación     20 ms ÷ 0,05 ms = 400 veces`,
+   next:'La base única (~40.000 jugadores). Sigue antes que el servidor de aplicación, que además se multiplica sin tocar ningún ADR del saldo; solo obliga a replicar la lista de ADR-01 (I6).',
+   meet:[['100 % de la batería, 0 saldos modificados','3 de 3 tipos, con S42 (a)'],['≤ 0,001 % de legítimas rechazadas','Una firma válida no se rechaza; no se verifica la hora, así que un reloj desfasado no interviene'],['Verificación ≤ 20 ms (p99)','+0,05 ms'],['Saldo p99 ≤ 250 ms','~43 ms con las tácticas de ADR-02, ADR-03 y ADR-04 sumadas (I3)'],['Alerta ≤ 5 min','≤ 1 min']],
+   gana:'La batería de falsificación pasa de ~67 % a 100 % con +0,05 ms de 20 ms; cada proveedor conserva su esquema; el tráfico alterado se alerta en ≤ 1 min.',
+   paga:'+0,05 ms por operación; 0,8 % de CPU; 5 claves que guardar y rotar, cada rotación por laboratorio en 2 a 4 semanas [S10]; hasta 240 alertas falsas al día entre ADR-03 y ADR-04.',
+   nores:'(1) La filtración del secreto de un proveedor: quien lo tenga firma como él. (2) Un proveedor que no firme el contenido: por eso no se integra. (3) No hay rechazo por petición vieja: los esquemas no firman la hora [F24][F26]; las copias exactas las cubre TAC-04. (4) El certificado propio por proveedor (C) queda como variante.',
+   rev:'(a) Un proveedor actual o nuevo no firma el contenido. (b) Los rechazos legítimos de ADR-03 y ADR-04, sumados, superan <b>0,001 %</b> (240 al día). (c) La verificación supera <b>20 ms (p99)</b>.'}
+];
+
+/* ---------- 7 · Interacción ---------- */
+const INTER = [
+  ['I1','TAC-03 (ADR-02) → ESC-03','Cada cambio de servidor deja hasta ~90.000 operaciones sin respuesta que los proveedores reenvían: es el estímulo de ESC-03. Las repetidas tardan más de 250 ms durante ~13 s (hasta ~39 s con 3 copias)','Resuelta en los duplicados (0, por TAC-04). Aceptada en el tiempo: rige ESC-02, p99 ≤ 250 ms a los 5 min','m'],
+  ['I2','TAC-02 (ADR-02) → ESC-01, 03, 04 y 05','Una pausa de red de más de 300 ms provoca un cambio innecesario: ~30 s sin saldo, ~1 retiro en espera, 0,5 min de los 43,2 min mensuales','Aceptada, acotada por la condición de revisión (b) de ADR-02','m'],
+  ['I3','TAC-01, 04, 06 y 07 → tiempo del saldo','+2,15 ms sobre ~41 ms: ~43 ms de 250 ms','Aceptada: margen de 5,8 veces','m'],
+  ['I4','TAC-10 (ADR-01) → saldo de ESC-02 a ESC-05','Uso de la base de 0,30 a 0,31 (0,40 a 0,41 en la ráfaga)','Resuelta por el propio tope de 50 cuentas/s','s'],
+  ['I5','TAC-05 y TAC-07 → TAC-08 y el equipo de seguridad','Hasta 240 alertas falsas al día con el tope común de S27 (1 cada 6 min)','Decisión del equipo: tope común','m'],
+  ['I6','TAC-09 (ADR-01) → multiplicar el servidor de aplicación','N copias de ~500 MB y N cargas de lista; hoy N = 1: sin efecto en el pico','Aceptada hoy; pista para el Bloque 4','m']
+];
+const ESCS = ['ESC-01','ESC-02','ESC-03','ESC-04','ESC-05'];
+const MX = [
+  ['TAC-01 Redundancia activa',['▼ +1 ms en el saldo','▲ perdidas ~3.000 → 0','▼ +1 ms','▼ +1 ms','▼ +1 ms']],
+  ['TAC-02 Latido',['▼ cambio falso (I2)','▲ detección 10–30 min → ≤ 0,3 s','▼ cambio falso (I2)','▼ cambio falso (I2)','▼ cambio falso (I2)']],
+  ['TAC-03 Reconfiguración',['▼ ~1 retiro espera ≤ 30 s','▲ restablecer 10–30 min → ≤ 30 s','▼ hasta ~90.000 reenvíos (I1)','▼ 720 abonos sin respuesta ≤ 30 s','▼ ≤ 30 s sin saldo']],
+  ['TAC-04 Transacciones',['▼ +≤ 1 ms','·','▲ duplicados 1 por par → 0','▼ +≤ 1 ms; 720 inserciones','▲▼ cubre la copia exacta · +≤ 1 ms']],
+  ['TAC-05 Validar entradas',['·','·','▲ 0 % → 100 % de misma clave con datos distintos','·','▼ alertas falsas (I5)']],
+  ['TAC-06 Usar un intermediario',['▼ < 0,1 ms','·','▲ proveedor nuevo: 1 pieza','▼ < 0,1 ms','▲▼ 1 pieza por esquema · < 0,1 ms']],
+  ['TAC-07 Verificar integridad',['▼ +0,05 ms','·','▼ +0,05 ms','▼ +0,05 ms; 32 ms de cómputo ese segundo','▲ batería 67 % → 100 %']],
+  ['TAC-08 Informar a los actores',['·','·','▲ alerta de clave repetida ≤ 1 min','·','▲▼ sin alerta → ≤ 1 min · alertas falsas (I5)']],
+  ['TAC-09 Múltiples copias de datos',['▲ evaluación ~19,4 h → ≤ 10 ms','·','·','·','·']],
+  ['TAC-10 Limitar la tasa de eventos',['▲ reconsulta ~19,4 h → ~1,9 h','▼ +0,01 de uso (I4)','▼ +0,01 de uso','▼ +0,01 de uso','▼ +0,01 de uso']]
+];
+const SYN = [
+  ['TAC-04 con TAC-03','Los ~90.000 reenvíos de un cambio de servidor no duplican abonos (I1)'],
+  ['TAC-04 con TAC-07','La copia exacta la cubre TAC-04; la copia con el monto modificado, TAC-07. Juntas dejan sin hueco la batería de ESC-05'],
+  ['TAC-06 con TAC-07 y TAC-04','Una sola pieza por proveedor sirve a ADR-03 y a ADR-04: 5 piezas, no 10'],
+  ['TAC-08 con TAC-05 y TAC-07','Un solo canal de alertas para dos escenarios (con el costo de I5)'],
+  ['TAC-09 con TAC-10','La reconsulta compara contra la lista propia: el proveedor baja de uso 3,24 a 0,002']
+];
+const LIM = [
+  ['Base única: saldo','~10.000/s · uso 0,30 · ~40.000 jugadores','~10.000/s · uso 0,31 · ~40.000 jugadores','TAC-10 suma 0,01; TAC-01 y TAC-04 no mueven el límite'],
+  ['Servidor de aplicación','16.000 peticiones/s · ~45.800 jugadores','16.000 peticiones/s · ~44.400 jugadores','TAC-07: 0,360 /s por jugador'],
+  ['Base única: volumen','1,1 TB de historial','1,4 TB; tope de 2,5 TB (margen 1,8)','TAC-04: ~300 GB de registro'],
+  ['Proveedor de listas','5 consultas/s · uso 3,24','Uso 0,002','TAC-09: la reconsulta deja de consultarlo'],
+  ['Reconsulta','~19,4 h · 108.000 cuentas en 6 h','~1,9 h · hasta 1.080.000 cuentas en 6 h','TAC-10: 50 × 21.600'],
+  ['Red pública','1 Gbit/s · 0,24','Sin cambio','Ninguna táctica agrega bytes públicos'],
+  ['Copia al alterno','~3.000 operaciones en riesgo (S37)','Sin cambio','TAC-01 cubre la caída de un servidor, no la del sitio']
+];
+
+/* ---------- 8 · Extensión X1 ---------- */
+const X1USE = [
+  ['Base única: saldo','15.000 ÷ 10.000','1,5 (1,07 con 14.000/s) · ráfaga 2,0','1,5','No'],
+  ['Servidor de aplicación','(15.000 × 1,045 + 1.200) ÷ 16.000','1,05 · ráfaga 1,38','1,35','No'],
+  ['Red pública','240 + 192 Mbit/s ÷ 1.000','0,43','1,2','Sí / No'],
+  ['Base del alterno','Recibe las mismas escrituras','1,5','1,5','No'],
+  ['Volumen de datos','108 M × 350 bytes = 37,8 GB; 2,5 ÷ 1,44','margen 1,7','igual','Sí'],
+  ['Retiros y reconsulta','No cambian','sin cambio','sin cambio','Sí']
+];
+const X1STEP = [
+  ['~7.500','La ráfaga de 4/3 deja de caber en la base (condición de revisión (a) de ADR-02)','10.000 ÷ (4.000 ÷ 3.000)'],
+  ['~7.600','TAC-03 no vuelve a p99 ≤ 250 ms en 5 min si cada operación llega 3 veces','90 R ÷ (9.900 − R) ≤ 300 → R ≤ 7.615'],
+  ['~9.000','Lo mismo con 1 copia por operación','30 R ÷ (9.900 − R) ≤ 300 → R ≤ 9.000'],
+  ['~9.900','Se satura el único servidor que escribe: TAC-01 no le suma escritura','10.000 − 100 de la reconsulta'],
+  ['~14.200','Se satura el servidor de aplicación (9.600 con 60.000 conectados)','(16.000 − 1.200) ÷ 1,045']
+];
+const X1TAC = [
+  ['TAC-01 Redundancia activa','Se sostiene la garantía, no la capacidad','s','0 operaciones perdidas; el servidor que atiende se satura a 9.900/s'],
+  ['TAC-02 Latido','Expuesta en la práctica','m','Si el servidor saturado retrasa su señal más de 300 ms, hay cambios falsos; 86 cambios agotan los 43,2 min del mes'],
+  ['TAC-03 Reconfiguración','Se rompe','x','Un cambio deja 450.000 operaciones sin respuesta y la capacidad libre (9.900/s) es menor que la llegada: la cola no se drena'],
+  ['TAC-04 Transacciones','Se sostiene','s','0 duplicados a cualquier tasa; +15.000 inserciones/s y ~10,8 GB de registro'],
+  ['TAC-05 Validar entradas','Se sostiene','s','100 % de misma clave con datos distintos rechazadas'],
+  ['TAC-06 Usar un intermediario','Se sostiene','s','< 0,1 ms dentro del proceso'],
+  ['TAC-07 Verificar integridad','Se sostiene','s','0,675 núcleos, 4,2 % de 16; 0,045 ms de los 20 ms'],
+  ['TAC-08 Informar a los actores','Se sostiene','s','El plazo y el tope de alertas no dependen de la tasa'],
+  ['TAC-09 Múltiples copias de datos','Se sostiene, sin garantía de tiempo','m','Comparte servidor con la puerta de saldo (uso 1,05)'],
+  ['TAC-10 Limitar la tasa de eventos','Se sostiene, pero compite','m','+100/s sobre una base al 1,5; se pausa durante el evento']
+];
+const X1SEE = [
+  ['Jugador','Desde el segundo 6 el giro termina en un error del juego; el descuento se revierte [F24]. En el mejor caso falla 1 de cada 3 operaciones: 36 M en las 2 h'],
+  ['Proveedor de juego','Revierte descuentos y reenvía abonos [F24][F26]. Cada reenvío suma carga; TAC-04 evita el doble abono, no que la base lo procese'],
+  ['Regulador','Más reversiones y repeticiones; la extracción se atrasa. Lo que se registra es correcto, pero incompleto en el tiempo'],
+  ['Equipo de operaciones','Si TAC-03 corre durante la saturación, ESC-02 (volver a p99 ≤ 250 ms en 5 min) no se cumple mientras dure el evento']
+];
+const X1COST = [
+  ['Jugadas rechazadas','27 M en 2 h (50 %): hasta 3.750 por segundo'],
+  ['Servidor de aplicación adicional','~USD 12.000 al año [F41]; rechazar cuesta ~0,5 ms [S45]'],
+  ['Memoria de la lista','1.000 MB (0,8 % de 128 GB), una copia por servidor (I6)'],
+  ['Ingreso','Sin estimar: el proyecto no tiene modelo de ingresos por jugada']
+];
+const X1ADR = [
+  ['ADR-02','No se reemplaza. Se dispara su condición de revisión (a) (> ~7.500/s); ADR-05 es la respuesta a ese disparo'],
+  ['ADR-03','Se sostiene (TAC-04)'],
+  ['ADR-04','Se sostiene (TAC-07)'],
+  ['ADR-01','Se sostiene; solo se pausa la reconsulta']
+];
+
+/* ---------- Para sustentar ---------- */
+const QA = [
+  ['¿De dónde sale este número? ¿Es dato, supuesto o referencia?','F# es referencia, S# es supuesto y "dato" solo las definiciones del caso (5 proveedores, 4 tipos de juego, 5 medios de pago, año 3). Una cifra derivada toma el tipo de su insumo más débil. Ejemplo: 3.000 operaciones/s = 12.000 conectados [S4] × 0,249 operaciones/s por jugador [S5][S6]: supuesto. El límite de 10.000/s es la prueba pública F34 con un descuento de −30 % [S36]: supuesto sobre referencia.'],
+  ['¿Qué componente se satura primero hoy y con cuánta carga?','La base única, que aguanta ~10.000 transacciones de saldo/s [F34][S36]. En el pico recibe 3.000/s: uso 0,30 (0,40 en la ráfaga). No se satura en el pico: aguanta ~40.000 jugadores, 3,3 veces el pico. En la otra dimensión, el proveedor de listas ya está saturado: la reconsulta le pide 16,2 consultas/s contra 5/s [F37], uso 3,24, y tarda ~19,4 h en lugar de 6 h.'],
+  ['¿Cuánto mueve su táctica esa métrica y cómo lo estimaron?','TAC-01 lleva las operaciones confirmadas perdidas de ~3.000 a 0: en la línea base se pierde lo no copiado, 1 s de atraso [S37] × 3.000/s. TAC-07 lleva la batería de 67 % a 100 % recorriendo los tres tipos contra el mecanismo, con 0,045 ms por verificación [F36]. TAC-09 lleva la evaluación del retiro de ~19,4 h a ≤ 10 ms porque deja de esperar a la reconsulta.'],
+  ['Con la extensión, ¿qué táctica se rompe primero y qué ve el usuario?','TAC-03 (Reconfiguración), desde ~7.600 operaciones/s si cada operación llega 3 veces durante un cambio de servidor. A 15.000/s entran 5.000/s más de las que salen; en 6 s la cola supera los ~3 s de espera del proveedor y desde ahí las jugadas fallan y se revierten: en el mejor caso, 1 de cada 3.'],
+  ['¿Qué haría falta para pasar el siguiente cuello de botella?','Que las escrituras del saldo no pasen todas por un solo servidor de base de datos: por ejemplo, repartir las cuentas entre varios grupos de tres servidores. Cada grupo repite el costo de TAC-01 y las operaciones entre cuentas de grupos distintos dejan de ser una sola transacción. Cuál estilo lo resuelve es del Bloque 4.'],
+  ['¿Por qué no simplemente más servidores?','Porque el servidor de aplicación se multiplica sin tocar ningún ADR, pero la base única no: todas las escrituras del saldo pasan por el servidor que atiende, y los otros dos de TAC-01 reciben la libreta sin sumar capacidad de escritura. Comprar servidores resuelve el ~14.200/s del servidor de aplicación y deja el ~10.000/s de la base donde está.'],
+  ['¿Por qué el margen de volumen es 1,8 y no 3,3?','El 3,3 es de tasa (10.000 ÷ 3.000). El de volumen mide los datos: con el registro de ADR-03 la base llega a 1,4 TB, y el descuento de S36 cubre hasta 2,5 TB. A ~43 M de operaciones al día los datos llegan a ese escalón; crecer más no rompe la base, pero el límite de 10.000/s deja de tener sustento en F34.']
+];
+
+/* ---------- Autoevaluación ---------- */
+const RUB = [
+  ['Línea base y cuello de botella','Línea base sin tácticas con sus pasos en orden y el piso regulatorio separado; límite de cada candidato con fuente; uso 0,30 en la base y 3,24 en el proveedor de listas; qué ven jugador, proveedor y regulador','Medio: el componente "que se satura primero" no se satura en el pico (R10)'],
+  ['Perfil de carga','Cadena de 350.000 cuentas a 3.000 operaciones/s con tipo y S# en cada eslabón, ley de Little, promedio y pico lado a lado, otras dimensiones','Bajo'],
+  ['Decision','"Usaremos…" en los cuatro ADR; cada opción descartada contrastada con la medida y con un número','Bajo'],
+  ['Tácticas como mecanismos','Diez fichas con nombre del catálogo, componente y paso de la línea base','Bajo'],
+  ['Efecto estimado','Cada táctica con métrica, antes y después, cuenta y tipo de la estimación','Bajo'],
+  ['Costo cuantificado','USD al año, ms por operación, GB, núcleos, semanas de laboratorio, alertas al día; cada costo con su atributo','Bajo'],
+  ['Hasta dónde','Límite calculado, siguiente componente, ¿se cumple? y condición de revisión con umbral en los cuatro ADR; margen 3,3 en tasa, 2,5 en ráfaga y 1,8 en volumen','Medio: en ADR-02 y ADR-03 el siguiente componente es la misma base (R9)'],
+  ['Interacción entre tácticas','Matriz de 10 tácticas × 5 escenarios, presupuestos compartidos e I1 a I6 con magnitud y resolución','Bajo'],
+  ['Extensión','X1 tal cual; 15.000/s con la cadena de la fase 3; qué se sostiene y qué se rompe (TAC-03 desde ~7.600/s); qué ve cada actor; respuesta que no es "más servidores"; ADR-05','Medio: la lectura literal exige 1,25 operaciones/s por jugador (R11) y el rechazo por carga no tiene fuente (R12)']
+];
+const AUTO = [
+  ['Cada número del perfil de carga dice si es dato, supuesto o referencia, y tiene razón o fuente','Perfil de carga; tipos de cifra en Punto de partida'],
+  ['La tasa del pico sale de una cuenta que se puede seguir, con unidades','4,44 llegadas/s × 2.700 s = 12.000; 12.000 × 0,249 /s = 2.992 /s'],
+  ['Identificamos el componente que se satura primero en la línea base y con qué carga','Base única, uso 0,30, ~10.000/s; proveedor de listas, uso 3,24'],
+  ['Cada ADR tiene Decision en voz activa y explica por qué descarta las demás opciones','Pestaña ADR'],
+  ['Cada táctica se nombra con el catálogo y se describe como un mecanismo concreto','Pestaña Tácticas'],
+  ['Cada táctica dice qué métrica mueve, de cuánto a cuánto y cómo lo estimamos','Resumen y fichas de tácticas'],
+  ['Cada táctica tiene un costo cuantificado, no solo un adjetivo','Campo "Costo" de cada ficha'],
+  ['Cada ADR dice hasta dónde llegan sus tácticas y cuál es el siguiente cuello de botella','"Hasta dónde" en los cuatro ADR'],
+  ['Cada ADR tiene una condición de revisión medible','Umbrales en cuentas, operaciones/s, cambios al mes, TB, % y ms'],
+  ['Aplicamos la extensión a nuestros propios números','5 × 3.000 = 15.000/s, con los límites de las fases 4 y 7']
+];
+const RECON_N = [
+  '<b>El límite de la base, ~10.000 operaciones de saldo por segundo</b> (F34 y S36). Sale de una prueba pública hecha en otra máquina y con otros datos, con un descuento de 30 % por criterio propio. De él dependen el margen de 3,3 y la conclusión de la extensión.',
+  '<b>Cuántas veces reenvía cada proveedor una operación durante un cambio de servidor</b> (supusimos 3). Depende de su política de reintentos, que no está publicada. Con 3 copias el tope de 7.500/s queda con un margen de apenas 1,07.',
+  '<b>El límite del proveedor de listas, 5 consultas por segundo</b> (F37). Lo dijo su personal técnico en un foro, y otra respuesta dice 1/s. Con 1/s, la reconsulta de la línea base tardaría ~97 h y superaría el máximo legal de 72 h.'
+];
+const RECON_D = [
+  '<b>Cómo leer la extensión X1.</b> Con los mismos 12.000 jugadores, cada uno tendría que hacer 1,25 operaciones por segundo, tres veces el juego más rápido; la lectura coherente es que lleguen 60.000. Elegimos la literal y mostramos la otra al lado, pero no sabemos cuál espera el profesor.',
+  '<b>Si la respuesta a X1 merece un ADR propio.</b> ADR-05 sacrifica jugadas, es decir, Adecuación funcional, que tiene 2 puntos. Con nuestro criterio del Bloque 2 no sería un escenario crítico. Lo declaramos sin formalizarlo.'
+];
+const RISKS = [
+  ['R6','Las copias por operación durante un cambio de servidor no están en las fuentes; de ellas dependen los ~39 s de I1, el ~7.600/s y el margen de 1,07','Se usa 3, el estímulo de ESC-03, y se muestra la holgura: hacen falta 23 copias para agotar los 5 min'],
+  ['R7','F37 sale de un foro, no de la documentación formal, y otra respuesta dice 1/s','Con cualquiera de los dos la línea base incumple las 6 h, y con la opción C el proveedor sale del camino (uso 0,002)'],
+  ['R8','S33 (1 ms por petición) no tiene referencia pública','Aunque fuera 10 % mayor, la base (~40.000 jugadores) seguiría saturándose antes que el servidor de aplicación (~44.400)'],
+  ['R9','En ADR-02 y ADR-03 el siguiente componente es la misma base','Es el resultado: las tácticas compran garantías, no capacidad. Detrás están el servidor de aplicación y el tope de volumen'],
+  ['R10','El componente "que se satura primero" no se satura en el pico (uso 0,30)','El material permite decirlo y buscar el límite en otra dimensión: el proveedor de listas, uso 3,24'],
+  ['R11','La lectura literal de X1 exige 1,25 operaciones/s por jugador','Es lo que dice el texto; se muestra al lado la lectura de 60.000 y la base se satura igual'],
+  ['R12','El rechazo explícito por carga no está documentado por los proveedores','Un rechazo en milisegundos no puede ser peor que un silencio de ~3 s; hay que confirmarlo con cada proveedor'],
+  ['R13','ADR-05 sacrifica Adecuación funcional (2), que no es alta','La plantilla pregunta por la decisión, no por la criticidad; se declara sin formalizar']
+];
+
+/* ---------- Supuestos y fuentes ---------- */
+const SUPS = [
+  ['S30','La línea base tiene 1 servidor de aplicación y 1 de base de datos en el sitio principal, y lo mismo en el alterno','Es la versión más simple que funcionaría; cada servidor adicional sería una táctica'],
+  ['S31','El día pico de diseño es el día promedio × 2,4: ~86.000 activos y sesiones de 45 min','El mismo factor de S4, aplicado al día; no cambia la tasa del pico, solo el volumen del día (~58 M)'],
+  ['S32','Cada servidor tiene 16 núcleos virtuales, 128 GB y disco de estado sólido local','Es el tamaño de la prueba de referencia F34; con 4 núcleos quedaría por debajo de la ráfaga'],
+  ['S33','~1 ms de cómputo por petición; el sitio genera ~0,1 peticiones/s por jugador; los proveedores reutilizan conexiones','Trabajo corto por petición; conexiones persistentes por omisión [F38]. El supuesto más débil de la fase 4'],
+  ['S34','Cada operación ocupa ~250 bytes en el historial, con su índice','Orden de magnitud de los campos de la operación'],
+  ['S35','Enlace a internet de 1 Gbit/s; ~2 KB por operación de saldo y ~20 KB por petición del sitio','Enlace estándar de centro de datos; mensajes cortos; el contenido de los juegos lo sirve el proveedor'],
+  ['S36','El límite de la base es el de F34 con −30 %: ~10.000 transacciones/s, con 14.000/s como extremo alto','−15 % por tener 2,2 veces más datos que la prueba y −15 % por el índice y las lecturas de fondo; se ignoran dos efectos a favor'],
+  ['S37','En la línea base la copia al alterno va ~1 s atrasada en el pico (rango de 1 a 5 s)','La línea base copia "segundos después"; el atraso lo fija el proceso, no la red'],
+  ['S38','El alterno está a ~400 km de fibra; ida y vuelta de 5 a 10 ms','E5 exige un sitio separado; 2 × 400 km × 5 µs/km = 4 ms [F39] más equipos'],
+  ['S39','El enlace entre sitios tiene 99,9 % de disponibilidad','Valor usual de un enlace sin redundancia; coincide con la meta de S13'],
+  ['S40','Esperar un segundo servidor local suma ~1 ms; con mayoría de tres se vuelve a atender en ≤ 30 s; el cambio manual de la línea base toma 10 a 30 min','La referencia F34 ya mide con esa espera; 30 s cubren detección y elección [F40] con margen'],
+  ['S41','Cada registro de identificador ocupa ~100 bytes con su índice e insertarlo suma ≤ 1 ms','Campos cortos y resumen de tamaño fijo; una inserción en un índice en memoria'],
+  ['S42','(a) Los 5 proveedores firman el contenido, sin garantía de firmar la hora. (b) Lista de hasta 1 M de registros de ~500 bytes, cargada en ≤ 1 min. (c) Evaluación local ≤ 10 ms. (d) Reconsulta a 50 cuentas/s','Las integraciones documentadas firman [F24][F26]; la lista vinculante tiene 877 registros [F42]; 50/s es ~3 veces el mínimo de 16,2/s'],
+  ['S43','Los rechazos se agrupan por origen en ventanas de 1 minuto para alertar','Evita una alerta por petición y queda 5 veces por debajo del plazo de ≤ 5 min'],
+  ['S45','Rechazar una petición en la puerta de admisión cuesta ~0,5 ms (1 ms como extremo pesimista)','No verifica el saldo ni llama a la base; el servidor cabe hasta 0,93 ms']
+];
+const SRCS = [
+  ['F34','ClickHouse, "PostgresBench: benchmarking NVMe managed Postgres", S. Srirampur (2026)','https://clickhouse.com/blog/benchmarking-nvme-managed-postgres-planetscale-vs-clickhouse','Transacciones por segundo y p99 de una carga tipo TPC-B en servidores de 4 y 16 núcleos con disco local'],
+  ['F35','PostgreSQL, documentación de pgbench, guion "tpcb-like"','https://www.postgresql.org/docs/current/pgbench.html','Qué hace cada transacción de la prueba F34'],
+  ['F36','I. Ristić, OpenSSL Cookbook, capítulo "Performance"','https://www.feistyduck.com/library/openssl-cookbook/online/openssl-command-line/performance.html','Firmas y verificaciones por segundo con clave de 2.048 bits en un núcleo'],
+  ['F37','Foro de desarrolladores de LSEG, World-Check One: "API call limit" y "Error 429"','https://community.developers.lseg.com/discussion/114061/api-call-limit/p1','Ritmo máximo recomendado de 5 consultas/s (1/s en otra respuesta)'],
+  ['F38','IETF, RFC 9112 "HTTP/1.1", §9.3 Persistence (2022)','https://www.rfc-editor.org/rfc/rfc9112.html','HTTP/1.1 usa conexiones persistentes por omisión'],
+  ['F39','CommScope, "Latency in optical fiber systems", WP-111432','https://www.commscope.com/globalassets/digizuite/2799-latency-in-optical-fiber-systems-wp-111432-en.pdf','~5 µs por kilómetro de fibra en un sentido'],
+  ['F40','D. Ongaro y J. Ousterhout, "In Search of an Understandable Consensus Algorithm", USENIX ATC 2014','https://raft.github.io/raft.pdf','Latidos e intervalo de elección aleatorio de 150–300 ms; nueva elección en menos de un segundo'],
+  ['F41','Holori, calculadora de precios: instancia de 16 núcleos, 128 GB y disco local, us-east-1','https://calculator.holori.com/aws/ec2/i4i.4xlarge/us-east-1','~USD 1.002 al mes por un servidor del tamaño de S32'],
+  ['F42','Naciones Unidas, Consejo de Seguridad, "Composition of the List"','https://www.un.org/sc/suborg/en/sanctions/un-sc-consolidated-list.html','684 personas y 193 entidades: 877 registros']
+];
+
+/* ---------- Pestañas ---------- */
+const TABS = ['resumen','partida','base','carga','cuello','tacticas','adr','interaccion','x1','sustentar','rubrica','anexo'];
+function showTab(id, push){
+  if(!TABS.includes(id)) id = 'resumen';
+  $$('nav.tabs button').forEach(b => b.setAttribute('aria-selected', String(b.dataset.tab === id)));
+  $$('section.panel').forEach(p => p.hidden = p.id !== 'p-' + id);
+  if(push){ try{ history.replaceState(null,'','#'+id); }catch(e){} }
+}
+$$('nav.tabs button').forEach(b => b.addEventListener('click', () => showTab(b.dataset.tab, true)));
+window.addEventListener('hashchange', () => { try{ showTab(location.hash.slice(1), false); }catch(e){} });
+
+/* ---------- Pintar ---------- */
+renderRuler($('#rulerMain'), RULER_MAIN);
+renderRuler($('#rulerBase'), RULER_BASE);
+renderRuler($('#rulerX1'), RULER_X1);
+
+$('#mapTbl').innerHTML = thead(['ADR','Escenario','Opción elegida','Tácticas','Qué compra']) +
+  rows(MAP, r => `<tr><td class="nowrap"><b>${r[0]}</b></td><td class="nowrap">${r[1]}</td><td>${r[2]}</td><td>${r[3]}</td><td>${r[4]}</td></tr>`);
+
+$('#escTbl').innerHTML = thead(['Escenario','ADR','Tensión','Atributo dominante','Atributo que paga']) +
+  rows(ESC, r => `<tr><td>${r[0]}</td><td class="nowrap">${r[1]}</td><td>${r[2]}</td><td>${r[3]}</td><td>${r[4]}</td></tr>`);
+$('#opTbl').innerHTML = thead(['Dato','Valor','Origen']) + rows(OP, r => `<tr><td>${r[0]}</td><td class="num">${r[1]}</td><td>${tg(r[2],'amber')}</td></tr>`);
+$('#dimTbl').innerHTML = thead(['Dimensión','Valor','Origen']) + rows(DIM, r => `<tr><td>${r[0]}</td><td class="num">${r[1]}</td><td>${r[2] ? tg(r[2],'amber') : ''}</td></tr>`);
+$('#typTbl').innerHTML = thead(['Tipo','Qué dice el material','Qué es en este proyecto']) + rows(TYP, r => `<tr><td><b>${r[0]}</b></td><td>${r[1]}</td><td>${r[2]}</td></tr>`);
+$('#chgTbl').innerHTML = thead(['Fecha','Cambio','Razón']) + rows(CHG, r => `<tr><td class="nowrap">${r[0]}</td><td>${r[1]}</td><td>${r[2]}</td></tr>`);
+
+$('#critTbl').innerHTML = thead(['ADR','Opción que entra en la línea base','Medida del escenario que incumple']) +
+  rows(CRIT, r => `<tr><td class="nowrap"><b>${r[0]}</b></td><td>${r[1]}</td><td>${r[2]}</td></tr>`);
+const step = s => `<li${s[3] ? ' class="after"' : ''}><h4>${s[0]}</h4><p>${s[1]}</p>${s[2] ? `<p class="fig">${s[2]}</p>` : ''}</li>`;
+$('#stepsSaldo').innerHTML = STEPS_SALDO.map(step).join('');
+$('#stepsRetiro').innerHTML = STEPS_RETIRO.map(step).join('');
+$('#fronTbl').innerHTML = thead(['Pieza','Por qué está','Táctica con la que coincide','Qué queda abierto']) +
+  rows(FRON, r => `<tr><td>${r[0]}</td><td>${r[1]}</td><td>${r[2]}</td><td>${r[3]}</td></tr>`);
+
+$('#chainTbl').innerHTML = thead(['#','Eslabón','Valor','Cómo sale','Origen']) +
+  rows(CHAIN, r => `<tr${r[5] ? ' class="hi"' : ''}><td class="num">${r[0]}</td><td>${r[5] ? '<b>'+r[1]+'</b>' : r[1]}</td><td class="num" style="text-align:right">${r[2]}</td><td>${r[3]}</td><td>${tg(r[4] + ' · supuesto','amber')}</td></tr>`);
+$('#avgTbl').innerHTML = thead(['Momento','Concurrentes','Operaciones de saldo/s']) +
+  rows(AVG, r => `<tr${r[3] ? ' class="hi"' : ''}><td>${r[0]}</td><td class="num">${r[1]}</td><td class="num">${r[2]}</td></tr>`);
+$('#dimsTbl').innerHTML = thead(['Dimensión','Cuenta','Valor','Origen']) +
+  rows(DIMS, r => `<tr><td>${r[0]}</td><td>${r[1]}</td><td class="num">${r[2]}</td><td>${tg(r[3],'amber')}</td></tr>`);
+$('#budTbl').innerHTML = thead(['Presupuesto','Valor','Origen']) + rows(BUD, r => `<tr><td>${r[0]}</td><td class="num">${r[1]}</td><td>${tg(r[2],'amber')}</td></tr>`);
+
+$('#candTbl').innerHTML = thead(['Candidato','Límite','Tipo del límite','Uso en el pico','Uso en la ráfaga','Aguanta hasta']) +
+  rows(CAND, r => `<tr><td>${r[6] ? '<b>'+r[0]+'</b>' : r[0]}</td><td class="num">${r[1]}</td><td>${r[2]}</td><td class="num">${r[6] === 'x' ? `<span class="verd x">${r[3]}</span>` : r[6] === 'm' ? `<span class="verd m">${r[3]}</span>` : r[3]}</td><td class="num">${r[4]}</td><td>${r[5]}</td></tr>`);
+$('#seeTbl').innerHTML = thead(['Límite superado','Quién','Qué ve']) +
+  rows(SEE, r => `<tr><td class="nowrap">${r[0] ? '<b>'+r[0]+'</b>' : ''}</td><td class="nowrap">${r[1]}</td><td>${r[2]}</td></tr>`);
+
+$('#tacTbl').innerHTML = thead(['ID','Táctica (catálogo)','ADR','Métrica','Línea base → con la táctica']) +
+  rows(TACS, t => `<tr><td class="nowrap"><b>${t.id}</b></td><td>${t.n}</td><td class="nowrap">${t.adr}</td><td>${t.met}</td><td class="num">${t.b} → <b>${t.a}</b></td></tr>`);
+let curTac = 'TAC-01';
+function renderTac(id){
+  curTac = id;
+  $('#tacPills').innerHTML = TACS.map(t => `<button class="chip" aria-pressed="${t.id === id}" data-tac="${t.id}">${t.id}</button>`).join('');
+  $$('#tacPills .chip').forEach(b => b.addEventListener('click', () => { renderTac(b.dataset.tac); $(`#tacPills [data-tac="${b.dataset.tac}"]`).focus(); }));
+  const t = TACS.find(x => x.id === id);
+  $('#tacBody').innerHTML = `
+    <div class="head" style="margin-bottom:6px">${tg(t.id,'amber')}${tg(t.adr)}${tg(t.resp,'cyan')}</div>
+    <h3 style="margin-bottom:14px">${t.n} <span class="muted" style="font-size:15px">· ${t.fam}</span></h3>
+    <div class="parts">
+      <div class="part"><div class="k">Mecanismo</div><div class="v">${t.mech}</div></div>
+      <div class="part"><div class="k">Métrica que mueve</div><div class="v">${t.met}</div></div>
+      <div class="part"><div class="k">Antes → después</div><div class="v"><div class="ba"><span>${t.b}</span><span class="arrow" aria-hidden="true">→</span><span class="c-good">${t.a}</span></div></div></div>
+      <div class="part"><div class="k">Cómo se estimó</div><div class="v">${t.how}<div class="note" style="margin-top:6px">${t.typ}</div></div></div>
+      <div class="part"><div class="k">Costo cuantificado</div><div class="v">${t.cost}</div></div>
+      <div class="part"><div class="k">Atributo que paga</div><div class="v">${t.pays}</div></div>
+    </div>`;
+}
+
+$('#adrSum').innerHTML = thead(['ADR','Opción elegida','Límite con las tácticas','Margen sobre el pico','¿Cumple?','Siguiente en saturarse']) + rows([
+  ['ADR-01','C · lista vigente propia','Reconsulta: 1.080.000 cuentas en 6 h','3,1 sobre 350.000 cuentas','Base única (+0,01)'],
+  ['ADR-02','C · libreta confirmada por mayoría','~10.000 operaciones/s (sin cambio)','3,3 (2,5 en la ráfaga)','Base única'],
+  ['ADR-03','B con la traducción de C','~10.000 operaciones/s (sin cambio)','3,3 (2,5 en la ráfaga)','Base única (volumen: margen 1,8)'],
+  ['ADR-04','B · firma por petición','~44.400 jugadores (antes ~45.800)','3,7','Base única (~40.000 jugadores)']
+], r => `<tr><td class="nowrap"><b>${r[0]}</b></td><td>${r[1]}</td><td>${r[2]}</td><td>${r[3]}</td><td><span class="ok">Sí${r[0] === 'ADR-04' ? ', con S42 (a)' : ''}</span></td><td>${r[4]}</td></tr>`);
+
+let curAdr = 'ADR-02';
+function renderAdr(id){
+  curAdr = id;
+  $('#adrPills').innerHTML = ADR.map(a => `<button class="chip" aria-pressed="${a.id === id}" data-adr="${a.id}">${a.id}</button>`).join('');
+  $$('#adrPills .chip').forEach(b => b.addEventListener('click', () => { renderAdr(b.dataset.adr); $(`#adrPills [data-adr="${b.dataset.adr}"]`).focus(); }));
+  const a = ADR.find(x => x.id === id);
+  $('#adrBody').innerHTML = `
+    <div class="head" style="margin-bottom:8px"><span class="lvl">Aceptado · 15 de noviembre de 2026</span>${tg('Escenario ' + a.esc)}${a.tacs.map(t => tg(t,'amber')).join('')}</div>
+    <h3 style="margin-bottom:16px">${a.id} · ${a.t}</h3>
+    <details><summary>Context · el escenario ${a.esc}, tal cual</summary>
+      <div class="parts">${a.ctx.map(c => `<div class="part"><div class="k">${c[0]}</div><div class="v">${c[1]}</div></div>`).join('')}</div>
+    </details>
+    <h4 style="margin:24px 0 10px">Opciones del Bloque 2</h4>
+    <div class="opts">${a.opts.map(o => `<div class="opt${o[0] === a.pick ? ' on' : ''}"><span class="letter">${o[0]}</span><p>${o[1]}${o[0] === a.pick ? ' <b>Elegida.</b>' : ''}</p></div>`).join('')}</div>
+    ${a.pickNote ? `<p class="note" style="margin-top:8px">${a.pickNote}</p>` : ''}
+    <div class="quote" style="margin-top:20px"><div class="kicker">Decision</div><p>${a.dec}</p></div>
+    <h4 style="margin:24px 0 10px">Por qué se descartan las demás</h4>
+    <div class="tblwrap"><table class="wide">${thead(['Opción','Frente a la medida','Número'])}${rows(a.disc, d => `<tr><td><b>${d[0]}</b></td><td>${d[1]}</td><td>${d[2]}</td></tr>`)}</table></div>
+    <h4 style="margin:24px 0 10px">Hasta dónde llegan estas tácticas</h4>
+    <p>${a.lim}</p>
+    <pre class="calc">${a.calc}</pre>
+    <p style="margin-top:12px"><b>Siguiente componente que se satura:</b> ${a.next}</p>
+    <div class="tblwrap" style="margin-top:12px"><table>${thead(['Parte de la medida','Valor con la decisión','Cumple'])}${rows(a.meet, m => `<tr><td>${m[0]}</td><td>${m[1]}</td><td><span class="ok">Sí</span></td></tr>`)}</table></div>
+    <h4 style="margin:24px 0 10px">Consequences</h4>
+    <div class="cons">
+      <div><h4>Gana</h4><p>${a.gana}</p></div>
+      <div><h4>Paga</h4><p>${a.paga}</p></div>
+      <div><h4>No resuelve</h4><p>${a.nores}</p></div>
+      <div><h4>Condición de revisión</h4><p>${a.rev}</p></div>
+    </div>`;
+}
+
+$('#intTbl').innerHTML = thead(['#','Táctica → escenario','Magnitud','Resolución']) +
+  rows(INTER, r => `<tr><td class="nowrap"><b>${r[0]}</b></td><td>${r[1]}</td><td>${r[2]}</td><td><span class="verd ${r[4]}" style="white-space:normal;display:inline-block">${r[3]}</span></td></tr>`);
+const cellCls = c => c.startsWith('▲▼') ? 'cell-mx' : c.startsWith('▲') ? 'cell-up' : c.startsWith('▼') ? 'cell-dn' : 'cell-0';
+$('#mxTbl').innerHTML = thead(['Táctica'].concat(ESCS)) +
+  rows(MX, r => `<tr><td>${r[0]}</td>${r[1].map(c => `<td class="${cellCls(c)}">${c}</td>`).join('')}</tr>`);
+$('#synTbl').innerHTML = thead(['Pareja','Qué se gana']) + rows(SYN, r => `<tr><td class="nowrap"><b>${r[0]}</b></td><td>${r[1]}</td></tr>`);
+$('#limTbl').innerHTML = thead(['Componente','Línea base','Con todas las tácticas','Qué lo mueve']) +
+  rows(LIM, r => `<tr><td><b>${r[0]}</b></td><td>${r[1]}</td><td>${r[2]}</td><td>${r[3]}</td></tr>`);
+
+$('#x1Use').innerHTML = thead(['Componente','Cuenta (literal)','Uso literal','Uso con 60.000','¿Se sostiene?']) +
+  rows(X1USE, r => `<tr><td><b>${r[0]}</b></td><td>${r[1]}</td><td class="num">${r[2]}</td><td class="num">${r[3]}</td><td>${r[4] === 'No' ? '<span class="verd x">No</span>' : r[4] === 'Sí' ? '<span class="verd s">Sí</span>' : '<span class="verd m">' + r[4] + '</span>'}</td></tr>`);
+$('#x1Step').innerHTML = thead(['Tasa (operaciones/s)','Qué deja de alcanzar','Cuenta']) +
+  rows(X1STEP, r => `<tr><td class="num"><b>${r[0]}</b></td><td>${r[1]}</td><td class="num" style="white-space:normal">${r[2]}</td></tr>`);
+$('#x1Tac').innerHTML = thead(['Táctica','Veredicto con ×5','Valor']) +
+  rows(X1TAC, r => `<tr><td class="nowrap">${r[0]}</td><td><span class="verd ${r[2]}">${r[1]}</span></td><td>${r[3]}</td></tr>`);
+$('#x1See').innerHTML = thead(['Actor','Qué ve']) + rows(X1SEE, r => `<tr><td class="nowrap"><b>${r[0]}</b></td><td>${r[1]}</td></tr>`);
+$('#x1Cost').innerHTML = thead(['Qué se paga con ADR-05','Valor']) + rows(X1COST, r => `<tr><td>${r[0]}</td><td>${r[1]}</td></tr>`);
+$('#x1Adr').innerHTML = thead(['ADR','Qué le pasa con X1']) + rows(X1ADR, r => `<tr><td class="nowrap"><b>${r[0]}</b></td><td>${r[1]}</td></tr>`);
+
+$('#qa').innerHTML = QA.map((q, i) => `<details${i === 0 ? ' open' : ''}><summary>${q[0]}</summary><p>${q[1]}</p></details>`).join('');
+$('#rub').innerHTML = thead(['#','Criterio','Nivel','Evidencia','Riesgo de lectura']) +
+  rows(RUB, (r, i) => `<tr><td class="num">${i + 1}</td><td><b>${r[0]}</b></td><td><span class="lvl">Logrado</span></td><td>${r[1]}</td><td>${r[2]}</td></tr>`);
+$('#auto').innerHTML = thead(['Punto del autochequeo','Cumple','Evidencia']) +
+  rows(AUTO, r => `<tr><td>${r[0]}</td><td><span class="ok" aria-label="Se cumple">✔</span></td><td>${r[1]}</td></tr>`);
+$('#reconN').innerHTML = RECON_N.map(x => `<li>${x}</li>`).join('');
+$('#reconD').innerHTML = RECON_D.map(x => `<li>${x}</li>`).join('');
+$('#risks').innerHTML = thead(['#','Riesgo','Defensa']) + rows(RISKS, r => `<tr><td class="nowrap"><b>${r[0]}</b></td><td>${r[1]}</td><td>${r[2]}</td></tr>`);
+
+$('#sups').innerHTML = thead(['ID','Supuesto','Razón']) + rows(SUPS, s => `<tr><td class="nowrap"><b>${s[0]}</b></td><td>${s[1]}</td><td>${s[2]}</td></tr>`);
+$('#srcs').innerHTML = thead(['ID','Fuente','Qué aporta']) +
+  rows(SRCS, s => `<tr><td class="nowrap"><b>${s[0]}</b></td><td class="src"><a href="${s[2]}" target="_blank" rel="noopener">${s[1]}</a></td><td>${s[3]}</td></tr>`);
+
+/* ---------- Inicio ---------- */
+renderTac('TAC-01');
+renderAdr('ADR-02');
+let startTab = 'resumen';
+try{ const h = location.hash.slice(1); if(TABS.includes(h)) startTab = h; }catch(e){}
+showTab(startTab, false);
+</script>
+
+</body></html>
