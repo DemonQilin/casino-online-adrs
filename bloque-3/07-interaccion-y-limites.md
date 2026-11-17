@@ -43,7 +43,7 @@
 | Táctica | ESC-01 | ESC-02 | ESC-03 | ESC-04 | ESC-05 |
 |---------|--------|--------|--------|--------|--------|
 | TAC-01 Redundancia activa | ▼ +1 ms en el saldo | ▲ perdidas ~3.000 → 0 | ▼ +1 ms | ▼ +1 ms | ▼ +1 ms |
-| TAC-02 Latido | ▼ cambio falso (I2) | ▲ detección 10–30 min → ≤ 0,3 s | ▼ cambio falso (I2) | ▼ cambio falso (I2) | ▼ cambio falso (I2) |
+| TAC-02 Latido | ▼ cambio falso (I2) | ▲ detección manual (dentro de 10–30 min) → ≤ 0,3 s | ▼ cambio falso (I2) | ▼ cambio falso (I2) | ▼ cambio falso (I2) |
 | TAC-03 Reconfiguración | ▼ ~1 retiro espera ≤ 30 s | ▲ restablecer 10–30 min → ≤ 30 s | ▼ hasta ~90.000 reenvíos (I1) | ▼ 720 abonos sin respuesta ≤ 30 s, si el cambio cae en la ráfaga | ▼ ≤ 30 s sin saldo |
 | TAC-04 Transacciones | ▼ +≤ 1 ms | · | ▲ duplicados 1 por par → 0 | ▼ +≤ 1 ms; 720 inserciones | ▲ cubre la copia exacta · ▼ +≤ 1 ms |
 | TAC-05 Validar entradas | · | · | ▲ 0 % → 100 % de misma clave con datos distintos | · | ▼ alertas falsas (I5) |

@@ -13,7 +13,7 @@ No hay código de producto, ni build, ni lint, ni pruebas. Los entregables son d
 | Bloque | Tema | Estado | Efecto sobre los ADR |
 |--------|------|--------|----------------------|
 | 2 | Atributos de calidad, escenarios y ADR | Entregado (`bloque-2/`) | Context y opciones consideradas. Estado: Propuesto |
-| 3 | Tácticas y sizing | En curso: falta la plantilla (10.2) (`bloque-3/`) | Se completan Decision y Consequences. Estado: Aceptado |
+| 3 | Tácticas y sizing | Entregado (`bloque-3/`) | Se completan Decision y Consequences. Estado: Aceptado |
 | 4 | Estilos arquitectónicos | Pendiente | Un estilo puede condicionar o reemplazar decisiones; los ADR se enlazan |
 
 ## Fuente de autoridad

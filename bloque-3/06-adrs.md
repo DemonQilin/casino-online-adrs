@@ -27,7 +27,7 @@ Las fichas de las tácticas no se repiten aquí: cada ADR enlaza las suyas en `0
 | ADR-01 | C · lista vigente propia | TAC-09, TAC-10 | Reconsulta: 1.080.000 cuentas en 6 h | 3,1 sobre las 350.000 cuentas | Sí | Base única (+0,01 de uso por la reconsulta) |
 | ADR-02 | C · libreta confirmada por mayoría | TAC-01, TAC-02, TAC-03 | ~10.000 operaciones de saldo/s (sin cambio) | 3,3 (2,5 en la ráfaga) | Sí | Base única |
 | ADR-03 | B con la traducción de C | TAC-04, TAC-05, TAC-06 | ~10.000 operaciones de saldo/s (sin cambio) | 3,3 (2,5 en la ráfaga) | Sí | Base única (por volumen: tope de 2,5 TB, 1,8 veces el actual) |
-| ADR-04 | B · firma por petición | TAC-06, TAC-07, TAC-08 | ~44.400 jugadores en el servidor de aplicación (antes ~45.800) | 3,7 | Sí, con S42 (a) | Base única (~40.000 jugadores) |
+| ADR-04 | B · firma por petición | TAC-06, TAC-07, TAC-08 | ~44.400 jugadores en el servidor de aplicación (antes ~45.800) | 3,7 | Depende de S42 (a) | Base única (~40.000 jugadores) |
 
 **Lectura:** las tácticas de la operación de saldo compran garantías (0 pérdidas, 0 duplicados, origen verificado), no capacidad: el límite sigue siendo el de la base única. Es la pista que la fase 7 deja para el Bloque 4.
 
@@ -159,7 +159,7 @@ Usaremos una **libreta de operaciones de solo agregar, mantenida por tres servid
 | ID | Táctica (catálogo) | Métrica | Antes → después |
 |----|--------------------|---------|-----------------|
 | TAC-01 | Redundancia activa | Operaciones confirmadas perdidas | ~3.000 → 0 |
-| TAC-02 | Latido (heartbeat) | Tiempo de detección de la caída | 10–30 min → ≤ 0,3 s |
+| TAC-02 | Latido (heartbeat) | Tiempo de detección de la caída | manual, dentro de 10–30 min → ≤ 0,3 s |
 | TAC-03 | Reconfiguración | Tiempo con el saldo detenido | 10–30 min → ≤ 30 s |
 
 ### Hasta dónde llegan estas tácticas
@@ -345,11 +345,11 @@ presupuesto de verificación     20 ms ÷ 0,05 ms = 400 veces
 ```
 
 - **Siguiente componente que se satura:** la **base única** (~40.000 jugadores, `04` §3). Sigue siendo anterior al servidor de aplicación, que además se multiplica sin tocar ningún ADR de la operación de saldo; solo obliga a replicar la lista vigente de ADR-01 (`07` I6).
-- **¿Se cumple la medida con la carga del pico?** **Sí, con S42 (a)**: los 5 proveedores firman el contenido con su propio esquema.
+- **¿Se cumple la medida con la carga del pico?** **Depende de S42 (a)**: sí, si los 5 proveedores firman el contenido con su propio esquema. Con un proveedor que no firme el contenido no se cumpliría, y por eso no se integra (Decision).
 
 | Parte de la medida | Valor con la decisión | Cumple |
 |--------------------|-----------------------|--------|
-| 100 % de la batería rechazada, 0 saldos modificados | 3 de 3 tipos (sin credencial, credencial de otro proveedor, monto modificado) | Sí, con S42 (a) |
+| 100 % de la batería rechazada, 0 saldos modificados | 3 de 3 tipos (sin credencial, credencial de otro proveedor, monto modificado) | Depende de S42 (a) |
 | ≤ 0,001 % de legítimas rechazadas | Firma válida de un proveedor legítimo no se rechaza; un reloj desfasado no interviene porque no se verifica la hora | Sí |
 | Verificación ≤ 20 ms (p99) | +0,05 ms | Sí |
 | Saldo p99 ≤ 250 ms | +0,05 ms (más ≤ 1 ms de ADR-03 y ~1 ms de ADR-02: suma completa en la fase 7) | Sí |

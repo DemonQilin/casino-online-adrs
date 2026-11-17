@@ -14,7 +14,7 @@ Proyecto final de Arquitectura de Software (ITM, Equipo 8). Desarrolla de forma 
 | Bloque | Tema | Estado | Presentación |
 |:-:|---|---|---|
 | 2 | Atributos de calidad, escenarios y ADR | Entregado | [Casino Andino.html](./bloque-2/Casino%20Andino.html) |
-| 3 | Tácticas y sizing | En curso: falta la plantilla (10.2) | [Casino Andino.html](./bloque-3/Casino%20Andino.html) |
+| 3 | Tácticas y sizing | Entregado | [Casino Andino.html](./bloque-3/Casino%20Andino.html) |
 | 4 | Estilos arquitectónicos | Pendiente | — |
 
 ## Índice del Bloque 3 · Tácticas y sizing
@@ -31,6 +31,7 @@ Proyecto final de Arquitectura de Software (ITM, Equipo 8). Desarrolla de forma 
 | 7 | [Interacción y límites](./bloque-3/07-interaccion-y-limites.md) | Qué táctica empeora otro escenario y cuál es el límite con todas |
 | 8 | [Extensión X1](./bloque-3/08-extension.md) | Qué se sostiene y qué se rompe con el pico multiplicado por 5 |
 | 9 | [Revisión integral](./bloque-3/09-revision.md) | Autoevaluación, coherencia y lo que el equipo reconoce |
+| 10 | [Plantilla de la entrega](./bloque-3/plantilla-entrega.md) | El resumen en texto plano que lee el docente, transcrito de las fases |
 
 ## Índice del Bloque 2 · Atributos de calidad, escenarios y ADR
 

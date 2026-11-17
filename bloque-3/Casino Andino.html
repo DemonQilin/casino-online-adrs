@@ -745,13 +745,13 @@ const TACS = [
    cost:'~USD 24.000 al año por 2 servidores (2 × USD 1.002 al mes) [F41], ~COP 96 M, 1,3 % del presupuesto de tecnología. +~1 ms por operación [S40]. ~17 Mbit/s de red interna.', pays:'Eficiencia de desempeño y Mantenibilidad'},
   {id:'TAC-02', n:'Latido (heartbeat)', fam:'Disponibilidad → Detectar fallas', adr:'ADR-02', resp:'Detecta',
    mech:'El servidor de base de datos que atiende envía una señal a los otros dos varias veces por segundo. Si un servidor deja de recibirla durante un intervalo aleatorio de <b>150 a 300 ms</b>, declara caído al que atendía.',
-   met:'Tiempo desde la caída del servidor de saldo hasta que se detecta', b:'10–30 min', a:'≤ 0,3 s',
-   how:'El intervalo de 150–300 ms es el que recomienda la referencia del algoritmo de consenso por mayoría [F40]. En la línea base nada detecta la caída: la detectan personas [S40].', typ:'Referencia [F40]; supuesto [S40] para la línea base',
+   met:'Tiempo desde la caída del servidor de saldo hasta que se detecta', b:'Manual, dentro de 10–30 min', a:'≤ 0,3 s',
+   how:'El intervalo de 150–300 ms es el que recomienda la referencia del algoritmo de consenso por mayoría [F40]. En la línea base nada detecta la caída: la notan personas, como primer paso del cambio manual de 10–30 min [S40], que no separa cuánto tarda la detección.', typ:'Referencia [F40]; supuesto [S40] para la línea base',
    cost:'Una pausa de red de más de 300 ms dispara un cambio de servidor innecesario (~30 s sin saldo). Tráfico despreciable.', pays:'Fiabilidad (por las caídas falsas)'},
   {id:'TAC-03', n:'Reconfiguración', fam:'Disponibilidad → Recuperarse', adr:'ADR-02', resp:'Recupera',
    mech:'Cuando TAC-02 declara caído al servidor que atendía, los dos que quedan eligen al que tiene la libreta completa y ese pasa a atender. El servidor de aplicación se reconecta y retoma; las operaciones en curso sin confirmar no tienen efecto y el proveedor las revierte o reenvía [F24].',
    met:'Tiempo con el juego y el saldo detenidos tras la caída', b:'10–30 min', a:'≤ 30 s',
-   how:'Detección ≤ 0,3 s + elección en menos de 1 s [F40] + reconexión ≤ 30 s [S40]. Frente a ≤ 15 min de ESC-02: margen de 30 veces.', typ:'Supuesto [S40] apoyado en referencia [F40]',
+   how:'Detección ≤ 0,3 s + elección en menos de 1 s [F40] + reconexión ≤ 30 s [S40]. Frente a ≤ 15 min de ESC-02: margen de 30 veces.', typ:'Supuesto [S40]; se apoya en la referencia [F40]',
    cost:'Hasta ~90.000 operaciones sin respuesta por cambio (3.000 /s × 30 s), que los proveedores revierten o reenvían. Mientras no se reponga el caído quedan 2 de 3.', pays:'Mantenibilidad y, durante 30 s, Eficiencia de desempeño'},
   {id:'TAC-04', n:'Transacciones', fam:'Disponibilidad → Prevenir fallas', adr:'ADR-03', resp:'Previene (el doble abono)',
    mech:'Un registro de identificadores procesados en la base única, con clave única <b>proveedor + jugador + identificador</b> [F26]. La misma transacción que cambia el saldo inserta la clave, un resumen de la petición y la respuesta dada. Si la clave ya existe, no toca el saldo y devuelve la respuesta guardada. Se borra por días completos a los 4 meses [F24]. Refuerza la transacción que ya exige el reglamento.',
@@ -781,7 +781,7 @@ const TACS = [
   {id:'TAC-09', n:'Múltiples copias de datos', fam:'Rendimiento → Gestionar recursos', adr:'ADR-01', resp:'Gestiona recursos y previene',
    mech:'Cuando llega la actualización del proveedor, la evaluación de riesgo carga la lista completa en la memoria del servidor de aplicación, indexada por documento. Solo cuando la carga termina reemplaza a la anterior, y desde ahí cada retiro se evalúa contra la lista nueva, <b>haya o no terminado la reconsulta</b>. Mientras carga, los retiros esperan.',
    met:'Tiempo de evaluación de un retiro mientras corre la reconsulta', b:'≤ 19,4 h', a:'≤ 10 ms',
-   how:'Una búsqueda en memoria más la lectura del perfil en la base [F34]. Carga: 1 M de registros × 500 bytes = 500 MB en ≤ 1 min [S42]; solo esperan ~2 retiros por actualización.', typ:'Supuesto [S42] apoyado en referencia [F34]',
+   how:'Una búsqueda en memoria más la lectura del perfil en la base [F34]. Carga: 1 M de registros × 500 bytes = 500 MB en ≤ 1 min [S42]; solo esperan ~2 retiros por actualización.', typ:'Supuesto [S42]; se apoya en la referencia [F34]',
    cost:'~500 MB de 128 GB (0,4 %). Dos procesos que mantener coherentes. Si el servidor se reinicia, la lista se recarga y los retiros esperan ≤ 1 min.', pays:'Mantenibilidad y Eficiencia de desempeño'},
   {id:'TAC-10', n:'Limitar la tasa de eventos', fam:'Rendimiento → Controlar la demanda', adr:'ADR-01', resp:'Controla la demanda',
    mech:'La reconsulta recorre las 350.000 cuentas, compara cada documento con la lista en memoria de TAC-09 y guarda la marca solo si cambió, con un <b>ritmo máximo de 50 cuentas/s</b>.',
@@ -894,7 +894,7 @@ límite en jugadores             16.000 ÷ 0,360 = ~44.400        (antes ~45.800
 margen sobre el pico            44.400 ÷ 12.000 = 3,7
 presupuesto de verificación     20 ms ÷ 0,05 ms = 400 veces`,
    next:'La base única (~40.000 jugadores). Sigue antes que el servidor de aplicación, que además se multiplica sin tocar ningún ADR del saldo; solo obliga a replicar la lista de ADR-01 (I6).',
-   meet:[['100 % de la batería, 0 saldos modificados','3 de 3 tipos, con S42 (a)'],['≤ 0,001 % de legítimas rechazadas','Una firma válida no se rechaza; no se verifica la hora, así que un reloj desfasado no interviene'],['Verificación ≤ 20 ms (p99)','+0,05 ms'],['Saldo p99 ≤ 250 ms','~43 ms con las tácticas de ADR-02, ADR-03 y ADR-04 sumadas (I3)'],['Alerta ≤ 5 min','≤ 1 min']],
+   meet:[['100 % de la batería, 0 saldos modificados','3 de 3 tipos, si los 5 proveedores firman el contenido','Depende de S42 (a)'],['≤ 0,001 % de legítimas rechazadas','Una firma válida no se rechaza; no se verifica la hora, así que un reloj desfasado no interviene'],['Verificación ≤ 20 ms (p99)','+0,05 ms'],['Saldo p99 ≤ 250 ms','~43 ms con las tácticas de ADR-02, ADR-03 y ADR-04 sumadas (I3)'],['Alerta ≤ 5 min','≤ 1 min']],
    gana:'La batería de falsificación pasa de ~67 % a 100 % con +0,05 ms de 20 ms; cada proveedor conserva su esquema; el tráfico alterado se alerta en ≤ 1 min.',
    paga:'+0,05 ms por operación; 0,8 % de CPU; 5 claves que guardar y rotar, cada rotación por laboratorio en 2 a 4 semanas [S10]; hasta 240 alertas falsas al día entre ADR-03 y ADR-04.',
    nores:'(1) La filtración del secreto de un proveedor: quien lo tenga firma como él. (2) Un proveedor que no firme el contenido: por eso no se integra. (3) No hay rechazo por petición vieja: los esquemas no firman la hora [F24][F26]; las copias exactas las cubre TAC-04. (4) El certificado propio por proveedor (C) queda como variante.',
@@ -913,7 +913,7 @@ const INTER = [
 const ESCS = ['ESC-01','ESC-02','ESC-03','ESC-04','ESC-05'];
 const MX = [
   ['TAC-01 Redundancia activa',['▼ +1 ms en el saldo','▲ perdidas ~3.000 → 0','▼ +1 ms','▼ +1 ms','▼ +1 ms']],
-  ['TAC-02 Latido',['▼ cambio falso (I2)','▲ detección 10–30 min → ≤ 0,3 s','▼ cambio falso (I2)','▼ cambio falso (I2)','▼ cambio falso (I2)']],
+  ['TAC-02 Latido',['▼ cambio falso (I2)','▲ detección manual (dentro de 10–30 min) → ≤ 0,3 s','▼ cambio falso (I2)','▼ cambio falso (I2)','▼ cambio falso (I2)']],
   ['TAC-03 Reconfiguración',['▼ ~1 retiro espera ≤ 30 s','▲ restablecer 10–30 min → ≤ 30 s','▼ hasta ~90.000 reenvíos (I1)','▼ 720 abonos sin respuesta ≤ 30 s','▼ ≤ 30 s sin saldo']],
   ['TAC-04 Transacciones',['▼ +≤ 1 ms','·','▲ duplicados 1 por par → 0','▼ +≤ 1 ms; 720 inserciones','▲▼ cubre la copia exacta · +≤ 1 ms']],
   ['TAC-05 Validar entradas',['·','·','▲ 0 % → 100 % de misma clave con datos distintos','·','▼ alertas falsas (I5)']],
@@ -1145,7 +1145,7 @@ $('#adrSum').innerHTML = thead(['ADR','Opción elegida','Límite con las táctic
   ['ADR-02','C · libreta confirmada por mayoría','~10.000 operaciones/s (sin cambio)','3,3 (2,5 en la ráfaga)','Base única'],
   ['ADR-03','B con la traducción de C','~10.000 operaciones/s (sin cambio)','3,3 (2,5 en la ráfaga)','Base única (volumen: margen 1,8)'],
   ['ADR-04','B · firma por petición','~44.400 jugadores (antes ~45.800)','3,7','Base única (~40.000 jugadores)']
-], r => `<tr><td class="nowrap"><b>${r[0]}</b></td><td>${r[1]}</td><td>${r[2]}</td><td>${r[3]}</td><td><span class="ok">Sí${r[0] === 'ADR-04' ? ', con S42 (a)' : ''}</span></td><td>${r[4]}</td></tr>`);
+], r => `<tr><td class="nowrap"><b>${r[0]}</b></td><td>${r[1]}</td><td>${r[2]}</td><td>${r[3]}</td><td><span class="ok">${r[0] === 'ADR-04' ? 'Depende de S42 (a)' : 'Sí'}</span></td><td>${r[4]}</td></tr>`);
 
 let curAdr = 'ADR-02';
 function renderAdr(id){
@@ -1169,7 +1169,7 @@ function renderAdr(id){
     <p>${a.lim}</p>
     <pre class="calc">${a.calc}</pre>
     <p style="margin-top:12px"><b>Siguiente componente que se satura:</b> ${a.next}</p>
-    <div class="tblwrap" style="margin-top:12px"><table>${thead(['Parte de la medida','Valor con la decisión','Cumple'])}${rows(a.meet, m => `<tr><td>${m[0]}</td><td>${m[1]}</td><td><span class="ok">Sí</span></td></tr>`)}</table></div>
+    <div class="tblwrap" style="margin-top:12px"><table>${thead(['Parte de la medida','Valor con la decisión','Cumple'])}${rows(a.meet, m => `<tr><td>${m[0]}</td><td>${m[1]}</td><td><span class="ok">${m[2] || 'Sí'}</span></td></tr>`)}</table></div>
     <h4 style="margin:24px 0 10px">Consequences</h4>
     <div class="cons">
       <div><h4>Gana</h4><p>${a.gana}</p></div>

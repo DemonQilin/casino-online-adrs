@@ -73,7 +73,7 @@ límite de referencia  = 14.046 transacciones/s                              [F3
 límite de diseño      = 14.046 × (1 − 0,30) = 9.832 ≈ 10.000 transacciones/s  [F34 · referencia][S36 · supuesto]
 ```
 
-El límite se da como un rango: **entre ~10.000 y ~14.000 transacciones de saldo por segundo**. Las cuentas usan el extremo bajo, ~10.000/s. Por la regla de la fase 1 (§5), la cifra toma el tipo de su insumo más débil: es un **supuesto apoyado en una referencia**.
+El límite se da como un rango: **entre ~10.000 y ~14.000 transacciones de saldo por segundo**. Las cuentas usan el extremo bajo, ~10.000/s. Por la regla de la fase 1 (§5), la cifra toma el tipo de su insumo más débil: es un **supuesto**, que se apoya en la referencia F34.
 
 **Tiempo de respuesta por debajo del límite.** La prueba, saturada, da p99 de 31 a 39 ms [F34]. Con la carga del pico, el paso de la base consume menos de ~40 ms de los 250 ms de S14. **La línea base cumple el tiempo de respuesta en el pico**; lo que no cumple es la pérdida cero (ESC-02), que no es un problema de carga.
 
@@ -311,7 +311,7 @@ Los nombres de productos aparecen solo en esta lista, nunca en un mecanismo (`00
 
 **Componente que se satura primero:** la base de datos única del sitio principal, en el paso de escritura del saldo. Con la carga del pico no se satura. La dependencia que sí se satura hoy es el proveedor de listas restrictivas, en la reconsulta de cuentas (otra dimensión).
 
-**Su límite:** ~10.000 transacciones de saldo por segundo (rango 10.000–14.000) | tipo: supuesto apoyado en una referencia | razón o fuente: prueba pública de una base de datos relacional con carga tipo TPC-B en un servidor de 16 núcleos, 128 GB y disco local, con 500 GB de datos: 14.046 transacciones/s (F34, F35). Se descuenta un 30 % porque nuestros datos son 2,2 veces más grandes y la búsqueda del identificador y las lecturas de fondo usan la misma base (S36). Servidor del mismo tamaño que la prueba (S32).
+**Su límite:** ~10.000 transacciones de saldo por segundo (rango 10.000–14.000) | tipo: supuesto (toma el tipo de su insumo más débil, S36; se apoya en la referencia F34) | razón o fuente: prueba pública de una base de datos relacional con carga tipo TPC-B en un servidor de 16 núcleos, 128 GB y disco local, con 500 GB de datos: 14.046 transacciones/s (F34, F35). Se descuenta un 30 % (14.046 × 0,7 = 9.832 ≈ 10.000) porque nuestros datos son 2,2 veces más grandes y la búsqueda del identificador y las lecturas de fondo usan la misma base (S36). Servidor del mismo tamaño que la prueba (S32).
 Proveedor de listas: 5 consultas por segundo | tipo: referencia | razón o fuente: ritmo máximo recomendado por el personal técnico de un proveedor de listas de alcance mundial en su foro de desarrolladores (F37).
 
 **Uso con la carga del pico (carga / límite, con la cuenta):**

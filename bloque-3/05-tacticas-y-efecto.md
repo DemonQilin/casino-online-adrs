@@ -117,9 +117,9 @@ Con un solo enlace, la opción A gasta en el enlace todo el margen de caída del
 | **Mecanismo** | El servidor de base de datos que atiende envía una señal a los otros dos varias veces por segundo. Si un servidor deja de recibirla durante un intervalo aleatorio de **150 a 300 ms**, declara caído al que atendía |
 | **Responsabilidad** | Detecta |
 | **Métrica que mueve** | Tiempo desde la caída del servidor de saldo hasta que el sistema la detecta |
-| **Valor en la línea base** | **10 a 30 min**: en la línea base nada detecta la caída; la detectan y deciden personas (`02` §3.1 no tiene detección) |
+| **Valor en la línea base** | **Sin detección automática**: la caída la notan personas, como primer paso del cambio manual de **10 a 30 min** [S40]. S40 no separa cuánto de ese tiempo es la detección, así que los 10 a 30 min son una cota superior (`02` §3.1 no tiene detección) |
 | **Valor con la táctica** | **≤ 0,3 s** |
-| **Cómo se estimó** | El intervalo de 150–300 ms es el que recomienda la referencia del algoritmo de consenso por mayoría [F40]. La línea base es S40 |
+| **Cómo se estimó** | El intervalo de 150–300 ms es el que recomienda la referencia del algoritmo de consenso por mayoría [F40]. La línea base es la primera parte del cambio manual de S40, sin cifra propia |
 | **Tipo de la estimación** | Referencia [F40] para la táctica; supuesto [S40] para la línea base |
 | **Costo cuantificado** | **Caídas falsas:** una pausa de red de más de 300 ms dispara un cambio de servidor innecesario, con el costo de TAC-03 (~30 s sin saldo). **Tráfico:** despreciable (mensajes de pocos bytes) |
 | **Atributo que paga** | Fiabilidad (disponibilidad, por las caídas falsas) |
@@ -135,7 +135,7 @@ Con un solo enlace, la opción A gasta en el enlace todo el margen de caída del
 | **Valor en la línea base** | **10 a 30 min**: pasar a mano al sistema alterno en el otro sitio [S40] |
 | **Valor con la táctica** | **≤ 30 s** |
 | **Cómo se estimó** | Detección ≤ 0,3 s (TAC-02) + elección en menos de 1 s [F40] + reconexión del servidor de aplicación y vuelta a atender ≤ 30 s [S40]. La medida de ESC-02 es ≤ 15 min: margen de 15 min ÷ 0,5 min = 30 veces |
-| **Tipo de la estimación** | Supuesto [S40] apoyado en una referencia [F40] |
+| **Tipo de la estimación** | Supuesto [S40]; se apoya en la referencia [F40] |
 | **Costo cuantificado** | **Operaciones afectadas en cada cambio:** 3.000/s × 30 s = **hasta ~90.000** operaciones sin respuesta, que los proveedores revierten (descuentos) o reenvían (abonos) [F24]. **Capacidad:** mientras no se reemplace el servidor caído, quedan 2 de 3 y una segunda falla detiene el juego |
 | **Atributo que paga** | Mantenibilidad (procedimiento de cambio que hay que probar y recertificar) y, durante 30 s, Eficiencia de desempeño |
 
@@ -300,7 +300,7 @@ uso del proveedor de listas   línea base:  16,2 consultas/s ÷ 5 /s = 3,24
 | **Valor en la línea base** | **Hasta ~19,4 h** (el retiro espera a que termine la reconsulta al ritmo del proveedor, `04` §2.7); **~2.430 retiros** retenidos por reconsulta |
 | **Valor con la táctica** | **≤ 10 ms** por retiro. Solo esperan los retiros que llegan durante la carga: ≤ 1 min, **~2 retiros** (125 por hora ÷ 60) |
 | **Cómo se estimó** | Evaluar es una búsqueda en un índice en memoria más la lectura del perfil de riesgo en la base única, del mismo orden que una operación de saldo (p99 ≤ 40 ms saturada [F34]); se usa ≤ 10 ms con la base al 30 % [S42]. Carga: 1 M de registros × 500 bytes = 500 MB, en ≤ 1 min [S42]. Retenidos: 3.000 retiros al día ÷ 24 h = 125 por hora × 1 min ÷ 60 min ≈ 2 |
-| **Tipo de la estimación** | Supuesto [S42] apoyado en una referencia [F34] |
+| **Tipo de la estimación** | Supuesto [S42]; se apoya en la referencia [F34] |
 | **Costo cuantificado** | **Memoria:** ~500 MB de 128 GB (0,4 %) [S32][S42]. **Disco:** una copia del archivo por actualización, varias veces al mes. **Operación:** dos procesos que mantener coherentes (lista vigente y reconsulta); si el servidor de aplicación se reinicia, la lista se recarga y los retiros esperan ≤ 1 min |
 | **Atributo que paga** | Mantenibilidad y Eficiencia de desempeño (utilización de memoria) |
 
@@ -352,7 +352,7 @@ Adelanto para las fases 6 y 7, que calculan el "hasta dónde" sobre la opción e
 | ID | Táctica (catálogo) | ADR | Métrica | Línea base → con la táctica | Costo principal |
 |----|--------------------|-----|---------|-----------------------------|-----------------|
 | TAC-01 | Redundancia activa | ADR-02 | Operaciones confirmadas perdidas | ~3.000 → 0 | USD ~24.000/año; +1 ms |
-| TAC-02 | Latido (heartbeat) | ADR-02 | Tiempo de detección de la caída | 10–30 min → ≤ 0,3 s | Cambios falsos ante pausas de red > 300 ms |
+| TAC-02 | Latido (heartbeat) | ADR-02 | Tiempo de detección de la caída | manual, dentro de 10–30 min → ≤ 0,3 s | Cambios falsos ante pausas de red > 300 ms |
 | TAC-03 | Reconfiguración | ADR-02 | Tiempo con el saldo detenido | 10–30 min → ≤ 30 s | ~90.000 operaciones revertidas o reenviadas por cambio |
 | TAC-04 | Transacciones | ADR-03 | Abonos duplicados con copias simultáneas | 1 por par solapado → 0 | ~300 GB; +3.000 inserciones/s; ≤ 1 ms |
 | TAC-05 | Validar entradas | ADR-03 | Rechazo de misma clave con datos distintos | 0 % → 100 %, alerta ≤ 1 min | Rechazo si un proveedor reutiliza identificadores |
